@@ -4,7 +4,7 @@ import "./globals.css";
 import { config } from "../data/config";
 import Footer from "../components/footer";
 import Header from "../components/header";
-import Providers from "./providers";
+import QueryProvider from "@/providers/queryProvider";
 
 // Police principale
 const ptSans = PT_Sans({
@@ -34,11 +34,11 @@ export default function RootLayout({
   return (
     <html lang="fr">
       <body className={`${ptSans.variable} ${oleo.variable} antialiased`}>
-        <Providers>
+        <QueryProvider>
           <Header />
           <main className="mt-[80px]">{children}</main>
           <Footer />
-        </Providers>
+        </QueryProvider>
       </body>
     </html>
   );
