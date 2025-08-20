@@ -1,4 +1,5 @@
 "use client";
+import ProductGrid from "@/components/universal/ProductGrid";
 import ProductQuery from "@/queries/productQuery";
 import { useQuery } from "@tanstack/react-query";
 import Image from "next/image";
@@ -32,6 +33,8 @@ export default function Home() {
           <h4>Je suis un titre h4</h4>
           <p>Je suis un paragraphe</p>
         </div>
+
+        <ProductGrid products={productData.data.data} category={categoryData.data.data[0]} isCategory={true} />
 
         <div>
           <h2>Produit: </h2>
