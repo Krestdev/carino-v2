@@ -1,21 +1,29 @@
 "use client";
-
 import ProductGrid from "@/components/universal/ProductGrid";
-import { useCategories } from "@/hooks/useCategory";
-import { useProducts } from "@/hooks/useProducts";
+import ProductQuery from "@/queries/productQuery";
+import { useQuery } from "@tanstack/react-query";
 import Image from "next/image";
 
 export default function Home() {
-  const { data: productData, isSuccess: productIsSuccess, isLoading: productIsLoading, isError: productIsError, error: productError } = useProducts();
-  const {data: categoryData, isSuccess: categoryIsSucces, isLoading: categoryIsLoading, isError: categoryIsError, error: categoryError } = useCategories()
+  const product = new ProductQuery();
+  const productData = useQuery({
+    queryKey: ["productFetchAll"],
+    queryFn: () => product.getAllProducts(),
+  });
+  const categoryData = useQuery({
+    queryKey: ["productFetchAll"],
+    queryFn: () => product.getAllProducts(),
+  });
 
-  if (productIsLoading || categoryIsLoading) {
+  if (productData.isLoading && categoryData.isLoading) {
     return <div>Loading...</div>;
   }
-  if (productIsError || categoryIsError) {
-    return <div>{productError?.message || categoryError?.message}</div>;
+  if (productData.isError && categoryData.isError) {
+    return (
+      <div>{productData.error?.message && categoryData.error?.message}</div>
+    );
   }
-  if (productIsSuccess && categoryIsSucces) {
+  if (productData.isSuccess && categoryData.isSuccess) {
     return (
       <>
         <div>
@@ -30,15 +38,11 @@ export default function Home() {
 
         <div>
           <h2>Produit: </h2>
-          <pre>
-            {JSON.stringify(productData.data.data[0], null, 2)}
-          </pre>
+          <pre>{JSON.stringify(productData.data.data[0], null, 2)}</pre>
         </div>
         <div>
           <h2>Categories: </h2>
-          <pre>
-            {JSON.stringify(categoryData.data.data[0], null, 2)}
-          </pre>
+          <pre>{JSON.stringify(categoryData.data.data[0], null, 2)}</pre>
         </div>
       </>
     );
