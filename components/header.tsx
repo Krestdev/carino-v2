@@ -58,7 +58,7 @@ const Header = () => {
           </div>
         ) : (
           <div className="hidden md:flex flex-row gap-2 items-center">
-            <Button variant={"outline"}>
+            <Button variant={"outline"} className="text-black border-black">
               <LuCircleUser />
               {"compte"}
             </Button>

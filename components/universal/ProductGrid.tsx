@@ -13,7 +13,7 @@ const ProductGrid = ({ products }: Props) => {
         <div className='max-w-[1440px] w-full mx-auto flex flex-col gap'>
             <div className='w-full flex flex-row'>
 
-                <div className='w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 px-4'>
+                <div className='w-fit grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 items-center justify-center gap-5 px-4'>
                     {
                         products.map(product => (
                             <ProductComp key={product.id} produit={product} />
