@@ -1,5 +1,6 @@
 "use client";
-import ProductGrid from "@/components/universal/ProductGrid";
+import CatProdMob from "@/components/universal/CatProdMob";
+import ProductCarousel from "@/components/universal/ProductCarousel";
 import ProductQuery from "@/queries/productQuery";
 import { useQuery } from "@tanstack/react-query";
 
@@ -33,20 +34,15 @@ export default function Home() {
           <p>Je suis un paragraphe</p>
         </div>
 
-        <ProductGrid
+        <ProductCarousel
           products={productData.data.data}
           category={categoryData.data.data[0]}
-          isCategory={true}
         />
 
-        <div>
-          <h2>Produit: </h2>
-          <pre>{JSON.stringify(categoryData.data.data[0], null, 2)}</pre>
-        </div>
-        <div>
-          <h2>Categories: </h2>
-          <pre>{JSON.stringify(categoryData.data.data[0], null, 2)}</pre>
-        </div>
+        <CatProdMob
+          products={productData.data.data}
+          category={categoryData.data.data[0]}
+        />
       </>
     );
   }
