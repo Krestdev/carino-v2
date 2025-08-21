@@ -1,3 +1,7 @@
+@import "tailwindcss/theme.css"layer(theme);
+@import "tailwindcss/preflight.css"layer(base);
+@import "tailwindcss/utilities.css"layer(utilities);
+
 @import "tailwindcss";
 @import "tw-animate-css";
 
@@ -95,28 +99,32 @@ body {
 
 /* styles/globals.css ou styles/app.css */
 
-h1 {
-  @apply text-[88px] leading-[130%] font-bold tracking-[-3%] font-sans;
-}
+@layer base {
+  h1 {
+    @apply text-[88px] leading-[130%] font-bold tracking-[-3%] font-sans;
+  }
 
-h2 {
-  @apply text-[52px] leading-[120%] font-bold tracking-[-2%] font-mono;
-}
+  h2 {
+    @apply text-[52px] leading-[120%] font-bold tracking-[-2%] font-mono;
+  }
 
-h3 {
-  @apply text-[32px] leading-[150%] font-bold tracking-[-1%] font-sans;
-}
+  h3 {
+    @apply text-[32px] leading-[150%] font-bold tracking-[-1%] font-sans;
+  }
 
-h4 {
-  @apply text-[20px] leading-[150%] font-bold tracking-[0%] font-sans;
-}
+  h4 {
+    @apply text-[20px] leading-[150%] font-bold tracking-[0%] font-sans;
+  }
 
-p {
-  @apply text-[16px] leading-[150%] font-normal tracking-[0%] font-sans;
-}
-/* Si tu veux uniformiser tous les titres h1-h6 */
-h1,h2,h3,h4,h5,h6 {
-  @apply transition-all ease-out duration-150;
+  p {
+    @apply text-[16px] leading-[150%] font-normal tracking-[0%] font-sans;
+  }
+
+  /* Si tu veux uniformiser tous les titres h1-h6 */
+  h1, h2, h3, h4, h5, h6 {
+    @apply transition-all ease-out duration-150;
+  }
+
 }
 
 .dark {
@@ -153,10 +161,20 @@ h1,h2,h3,h4,h5,h6 {
   --sidebar-ring: oklch(0.556 0 0);
 }
 
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
   }
+
   body {
     @apply bg-background text-foreground;
   }
