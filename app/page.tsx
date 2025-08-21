@@ -1,9 +1,13 @@
 "use client";
+import CategoryCarousel from "@/components/Home/CategoryCarousel";
+import CategoryComp from "@/components/Home/CategoryComp";
 import Hero from "@/components/Home/Hero";
+import PubComp from "@/components/Home/PubComp";
+import Reservation from "@/components/Home/Reservation";
 import CatProdMob from "@/components/universal/CatProdMob";
 import ProductCarousel from "@/components/universal/ProductCarousel";
 import ProductQuery from "@/queries/productQuery";
-import { Categories, ProductData } from "@/types/types";
+import { Categories, CategoryData, ProductData } from "@/types/types";
 import { useQuery } from "@tanstack/react-query";
 
 export default function Home() {
@@ -42,11 +46,21 @@ export default function Home() {
     return (
       <div>
         <Hero />
-        <div className="pt-6">
+        <div className="md:pt-6">
           <ProductCarousel products={dailyMenu} category={dailyCategory} />
         </div>
-
         <CatProdMob products={dailyMenu} category={dailyCategory} />
+        <PubComp
+          pub1={"/tempo/pub1.webp"}
+          pub2={"/tempo/pub3.webp"}
+          pub3={"/tempo/pub3.webp"}
+        />
+        <CategoryCarousel
+          categories={categoryData.data.data.filter(
+            (x: Categories) => x.id_parent === null
+          )}
+        />
+        <Reservation />
       </div>
     );
   }

@@ -12,8 +12,8 @@ const Hero = () => {
       backgroundSize: "cover",
       backgroundPosition: "center",
     }} className='relative pt-[calc(60px+48px)] pb-[calc(80px+48px)] sm:pt-[calc(60px+72px)] sm:pb-[calc(80px+72px)] md:py-0 md:h-screen overflow-hidden flex items-center justify-center'>
-      <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-b md:bg-gradient-to-r from-[#191537] from-78% md:from-42% to-transparent to-100%" />
-      
+      <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-b md:bg-gradient-to-r from-[#191537] from-30% md:from-42% to-transparent to-100%" />
+
       <div className='px-0 md:px-24 z-10'>
         <div className='flex flex-col gap-4 px-8 w-fit'>
           <div className='flex flex-col '>
