@@ -22,3 +22,9 @@ export function is8march() {
   // Vérifier si c'est le 8 mars
   return mois === 3 && jour === 8;
 }
+
+export function isPromotion(start: Date, end: Date) {
+  const maintenant = new Date();
+  // Vérifier si c'est le 8 mars
+  return (maintenant >= start && maintenant <= end);
+}

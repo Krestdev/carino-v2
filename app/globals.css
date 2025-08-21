@@ -101,7 +101,7 @@ body {
 
 @layer base {
   h1 {
-    @apply text-[88px] leading-[130%] font-bold tracking-[-3%] font-sans;
+    @apply text-[32px] md:text-[60px] lg:text-[80px] leading-[130%] font-bold tracking-[-3%] font-sans;
   }
 
   h2 {
