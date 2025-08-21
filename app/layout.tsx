@@ -36,7 +36,9 @@ export default function RootLayout({
       <body className={`${ptSans.variable} ${oleo.variable} antialiased`}>
         <QueryProvider>
           <Header />
-          <main className="mt-[80px]">{children}</main>
+          <main>
+            {children}
+          </main>
           <Footer />
         </QueryProvider>
       </body>

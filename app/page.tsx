@@ -1,7 +1,9 @@
 "use client";
+import Hero from "@/components/Home/Hero";
 import CatProdMob from "@/components/universal/CatProdMob";
 import ProductCarousel from "@/components/universal/ProductCarousel";
 import ProductQuery from "@/queries/productQuery";
+import { Categories, ProductData } from "@/types/types";
 import { useQuery } from "@tanstack/react-query";
 
 export default function Home() {
@@ -11,8 +13,8 @@ export default function Home() {
     queryFn: () => product.getAllProducts(),
   });
   const categoryData = useQuery({
-    queryKey: ["productFetchAll"],
-    queryFn: () => product.getAllProducts(),
+    queryKey: ["categoryFetchAll"],
+    queryFn: () => product.getCategories(),
   });
 
   if (productData.isLoading && categoryData.isLoading) {
@@ -23,24 +25,33 @@ export default function Home() {
       <div>{productData.error?.message && categoryData.error?.message}</div>
     );
   }
+
+
+
+
   if (productData.isSuccess && categoryData.isSuccess) {
+
+    const dailyMenu: ProductData[] = productData.data.data
+      .filter((product: { cat: ProductData[]; }) =>
+        product.cat.some(
+          (element) =>
+            element.name.toLocaleLowerCase().includes("suggestion") || element.name.toLocaleLowerCase() === "suggestions du chef"
+        )
+      );
+    const dailyCategory = categoryData.data.data.find((category: Categories) => category.id === dailyMenu[0].cat[0].id);
+    
     return (
-      <>
-        <div>
-          <h1>Je suis un titre h1</h1>
-          <h2>Je suis un titre h2</h2>
-          <h3>Je suis un titre h3</h3>
-          <h4>Je suis un titre h4</h4>
-          <p>Je suis un paragraphe</p>
+      <div>
+        <Hero />
+        <div className="pt-6">
+          <ProductCarousel
+            products={dailyMenu}
+            category={dailyCategory}
+          />
         </div>
 
-        <ProductCarousel
-          products={productData.data.data}
-          category={categoryData.data.data[0]}
-        />
-
-        <CatProdMob products={productData.data.data} category={categoryData.data.data[0]} />
-      </>
+        <CatProdMob products={dailyMenu} category={dailyCategory} />
+      </div>
     );
   }
 }
