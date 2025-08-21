@@ -1,4 +1,5 @@
 import api from "@/providers/axios";
+import { ProductData, Products } from "@/types/types";
 
 export default class ProductQuery {
   route = "products";
@@ -10,7 +11,7 @@ export default class ProductQuery {
   getAllCategoryProducts = async (category: string) => {
     return api.get(`/${category}/all/cat/product`).then((res) => res.data);
   };
-  getAllProducts = async () => {
+  getAllProducts = async (): Promise<Products> => {
     return api.get(`/${this.route}`).then((res) => res.data);
   };
   getCategories = () => {
