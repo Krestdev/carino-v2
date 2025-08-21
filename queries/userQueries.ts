@@ -22,7 +22,7 @@ type Order = {
   commande: cartItem[];
 };
 
-export default class User {
+export default class UserQuery {
   route = "/auth";
   route1 = "/users";
 
@@ -41,14 +41,14 @@ export default class User {
   orders = async (data: Order) => {
     return api.post(`${this.route}/orders`, data).then((res) => res.data);
   };
-  allUsers = async () => {
+  allUsers = async (id: number) => {
     return api
-      .get(`${this.route}/:id([0-9]+)/all/user/orders`)
+      .get(`${this.route}/${id}/all/user/orders`)
       .then((res) => res.data);
   };
-  status = async () => {
+  status = async (ref: string) => {
     return api
-      .get(`${this.route}/:ref/check/status/transaction`)
+      .get(`${this.route}/${ref}/check/status/transaction`)
       .then((res) => res.data);
   };
   product = async () => {
