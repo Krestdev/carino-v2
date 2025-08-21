@@ -31,7 +31,7 @@ const ProductGrid = ({ products, isCategory, category }: Props) => {
               <p className="text-white line-clamp-2">{category?.description}</p>
               <Button>
                 <ArrowUpRight />
-                {"Voi'r tout"}
+                {"Voir tout"}
               </Button>
             </div>
           </div>

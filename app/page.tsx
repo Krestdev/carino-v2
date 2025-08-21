@@ -6,12 +6,12 @@ import { useQuery } from "@tanstack/react-query";
 export default function Home() {
   const product = new ProductQuery();
   const productData = useQuery({
-    queryKey: ["productFetchAll"],
+    queryKey: ["categoryFetchAll"],
     queryFn: () => product.getAllProducts(),
   });
   const categoryData = useQuery({
     queryKey: ["productFetchAll"],
-    queryFn: () => product.getAllProducts(),
+    queryFn: () => product.getCategories(),
   });
 
   if (productData.isLoading && categoryData.isLoading) {
@@ -41,7 +41,7 @@ export default function Home() {
 
         <div>
           <h2>Produit: </h2>
-          <pre>{JSON.stringify(productData.data.data[0], null, 2)}</pre>
+          <pre>{JSON.stringify(categoryData.data.data[0], null, 2)}</pre>
         </div>
         <div>
           <h2>Categories: </h2>
