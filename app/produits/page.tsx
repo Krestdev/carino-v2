@@ -9,6 +9,7 @@ import JsonView from "@uiw/react-json-view";
 import Breadcumb from "@/components/produits/breadcumb";
 import Categories from "@/components/produits/categories";
 import Dishes from "@/components/produits/dishes";
+import Hero from "@/components/produits/Hero";
 
 const Page = () => {
   const product = new ProductQuery();
@@ -32,26 +33,16 @@ const Page = () => {
   if (productData.isSuccess && categoryData.isSuccess) {
     return (
       <>
-        <div className="bg-[url('/images/catalog.jpg')] bg-cover w-full h-screen flex justify-center items-center ">
-          <h1 className="text-white">Tout nos Produits</h1>
-        </div>
+        <Hero />
         {/*<JsonView value={productData.data.data[0]} />*/}
         {/* {productData.data.data.map((product: { name: string }) => (
             <p>{product.name}</p>
           ))} */}
-        <div>
+        <div className=" pt-10 container mx-auto ">
           <Breadcumb />
-          <Categories />
+          <Categories categories={categoryData.data.data} />
           <Dishes />
-
-          <p>{productData.data.data[2].name}</p>
-          <p>{productData.data.data[2].price}</p>
         </div>
-
-        <img
-          src={productData.data.data[2].image}
-          alt={productData.data.data[2].name}
-        />
       </>
     );
   }

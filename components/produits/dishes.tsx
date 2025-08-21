@@ -4,6 +4,8 @@ import { Plus } from "lucide-react";
 import ProductQuery from "@/queries/productQuery";
 import { useQuery } from "@tanstack/react-query";
 import Categories from "./categories";
+import ProductComp from "../universal/ProductComp";
+import { ProductData } from "@/types/types";
 
 const Dishes = () => {
   const product = new ProductQuery();
@@ -19,37 +21,14 @@ const Dishes = () => {
   }
   if (productData.isSuccess) {
     return (
-      <div>
-        {productData.data.data.slice(0, 12).map(
-          (
-            value: {
-              image: string;
-              name: string;
-              description: string;
-              price: number;
-            },
-            i: number
-          ) => {
-            return (
-              <div key={i}>
-                <div>
-                  <img src={value.image} alt={value.name} />
-
-                  <p>{value.name}</p>
-                  <p>{value.description}</p>
-                </div>
-                <div>
-                  <p>{value.price}</p>
-                  <p>FCFA</p>
-                </div>
-                <Button>
-                  <Plus color="white" />
-                  {"Ajouter panier"}
-                </Button>
-              </div>
-            );
-          }
-        )}
+      <div className="  grid grid-cols-1   md:grid-cols-4  gap-5  w-full pt-7 pr-5 pb-7 pl-5 justify-center items-center    ">
+        {productData.data.data.map((value: ProductData, i: number) => {
+          return (
+            <div className=" ">
+              <ProductComp produit={value} />
+            </div>
+          );
+        })}
       </div>
     );
   }
