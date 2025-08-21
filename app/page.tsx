@@ -1,7 +1,6 @@
 "use client";
 import CatProdMob from "@/components/universal/CatProdMob";
 import ProductCarousel from "@/components/universal/ProductCarousel";
-import ProductGrid from "@/components/universal/ProductGrid";
 import ProductQuery from "@/queries/productQuery";
 import { useQuery } from "@tanstack/react-query";
 
@@ -35,10 +34,9 @@ export default function Home() {
           <p>Je suis un paragraphe</p>
         </div>
 
-        <ProductGrid
+        <ProductCarousel
           products={productData.data.data}
           category={categoryData.data.data[0]}
-          isCategory={true}
         />
 
         <CatProdMob products={productData.data.data} category={categoryData.data.data[0]} />
