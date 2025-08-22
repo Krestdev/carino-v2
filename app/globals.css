@@ -179,3 +179,89 @@ body {
     @apply bg-background text-foreground;
   }
 }
+
+@layer components {
+  .footerBloc{
+    @apply flex flex-col gap-4 px-2 max-w-[240px];
+  }
+  .footerLink{
+    @apply text-slate-400 hover:text-white transition-colors duration-150 ease-linear;
+  }
+  .lien{
+    @apply font-bold text-primary hover:underline first-letter:uppercase;
+  }
+  .mainTitle{
+    @apply leading-[120%] max-w-screen-xl text-white sm:text-[40px] md:text-[48px] lg:text-[60px] xl:text-[72px];
+  }
+  .subtitle{
+    @apply text-xl font-light lg:text-2xl first-letter:uppercase text-slate-200 max-w-4xl;
+  }
+  .meshBackground{
+    background-color:hsla(276,69%,27%,1);
+    background-image:
+      radial-gradient(at 40% 20%, hsla(233,61%,29%,1) 0px, transparent 50%),
+      radial-gradient(at 80% 0%, hsla(189,100%,56%,1) 0px, transparent 50%),
+      radial-gradient(at 0% 50%, hsla(216,69%,20%,1) 0px, transparent 50%),
+      radial-gradient(at 80% 50%, hsla(291,100%,76%,1) 0px, transparent 50%),
+      radial-gradient(at 0% 100%, hsla(224,49%,44%,1) 0px, transparent 50%),
+      radial-gradient(at 0% 0%, hsla(240,83%,27%,1) 0px, transparent 50%),
+      radial-gradient(at 94% 100%, hsla(235,100%,76%,1) 0px, transparent 50%);
+  }
+  .categoryBlocTitle{
+    @apply text-2xl md:text-3xl lg:text-4xl font-bold text-center text-primary uppercase;
+  }
+  .categoryBlocSubtitle{
+    @apply text-center mt-1 text-slate-600 max-w-3xl;
+  }
+  .heroHeight{
+    @apply h-[400px] sm:h-[450px] md:h-[500px] lg:h-[600px];
+  }
+  .productCardTitle{
+    @apply font-semibold uppercase line-clamp-2;
+  }
+  .productCardPrice{
+    @apply shrink-0 text-sm;
+  }
+  .productDetailTitle{
+    @apply pb-2 pt-3 border-b font-semibold;
+  }
+  .productDiv {
+    @apply px-4 xl:px-10 py-8 sm:py-10 md:py-12 lg:py-14 xl:py-16 w-full flex flex-col gap-4 sm:gap-6 lg:gap-10;
+  }
+  .verticalPad {
+    @apply py-8 sm:py-10 md:py-12 lg:py-14 xl:py-16;
+  }
+  .specialCardHover{
+    @apply text-white text-lg 2xl:text-xl font-semibold uppercase absolute -bottom-16 left-1/2 -translate-x-1/2 translate-y-[100%] text-center z-20 group-hover:bottom-1/2 transition-all duration-300 ease-out;
+  }
+  .specialCardHoverBg{
+    @apply absolute w-full h-full bg-gradient-to-t from-black/40 to-black/20 group-hover:from-primary/80 group-hover:to-primary/20 transition-all duration-300 ease-out;
+  }
+  .catalogueContainer{
+    @apply grid grid-cols-1 min-[500px]:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 place-items-center gap-6;
+  }
+  .headerImage{
+    @apply w-full max-h-[300px] h-[20vw] min-h-fit relative flex flex-col gap-2 items-center justify-center text-white;
+  }
+  .searchResult{
+    @apply w-full px-4 py-2 max-w-[300px] capitalize truncate bg-slate-50 dark:bg-slate-950 hover:bg-slate-100 dark:hover:bg-slate-900 transition-all duration-75 ease-linear;
+  }
+  .productContainer{
+    @apply container flex flex-col xl:flex-row items-center xl:justify-between;
+  }
+  .productContentContainer{
+    @apply max-w-lg w-4/5 flex flex-col py-8 gap-3 bg-white rounded-md p-5 xl:px-8 xl:py-10;
+  }
+  .cartScroll{
+    @apply flex flex-col gap-4 w-full max-h-[300px] overflow-y-auto;
+  }
+  .cartScroll::-webkit-scrollbar-track{
+    @apply bg-slate-400 h-fit;
+  }
+  .cartScroll::-webkit-scrollbar{
+    @apply w-2;
+  }
+  .cartScroll::-webkit-scrollbar-thumb{
+    @apply bg-slate-700;
+  }
+}

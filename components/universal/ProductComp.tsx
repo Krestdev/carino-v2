@@ -3,6 +3,7 @@ import React from 'react'
 import { Button } from '../ui/button'
 import { Badge } from '../ui/badge'
 import { LuPlus } from 'react-icons/lu'
+import AddDialog from './AddDialog'
 
 type Props = {
     produit: ProductData
@@ -19,10 +20,12 @@ const ProductComp = ({ produit }: Props) => {
                     <p className='text-[14px] font-bold uppercase'>{produit.name}</p>
                     <p className='text-[24px] font-bold'>{`${produit.price} FCFA`}</p>
                 </div>
-                <Button disabled={produit.disable} className={`${produit.disable ? 'bg-gray-300 cursor-not-allowed' : ""}`}>
-                    <LuPlus />
-                    {"Ajouter au panier"}
-                </Button>
+                <AddDialog id={produit.id} name={produit.name} image={produit.image} description={produit.description} price={produit.price} cat={produit.cat} options={produit.options}>
+                    <Button disabled={produit.disable} className={`${produit.disable ? 'bg-gray-300 cursor-not-allowed' : ""}`}>
+                        <LuPlus />
+                        {"Ajouter au panier"}
+                    </Button>
+                </AddDialog>
             </div>
         </div>
     )
