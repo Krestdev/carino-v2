@@ -58,16 +58,16 @@ export type UserRegistration = {
   confirm_password: string;
 };
 
-export interface ProductData {
-  id: number;
-  name: string;
-  image: string | null;
-  disable?: boolean;
-  description: string | null;
-  price: number;
-  cat: Array<ProductCategory>;
-  options: Array<ProductOption>;
-}
+// export interface ProductData {
+//   id: number;
+//   name: string;
+//   image: string | null;
+//   disable?: boolean;
+//   description: string | null;
+//   price: number;
+//   cat: Array<ProductCategory>;
+//   options: Array<ProductOption>;
+// }
 
 export interface ProductCategory {
   name: string;
@@ -92,11 +92,11 @@ export interface DataValue {
   quantity: number;
 }
 
-export interface Products {
-  data: ProductData[];
-  message: string;
-  success: boolean;
-}
+// export interface Products {
+//   data: ProductData[];
+//   message: string;
+//   success: boolean;
+// }
 
 export type CategoryData = {
   data: Categories[];

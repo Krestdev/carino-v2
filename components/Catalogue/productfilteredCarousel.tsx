@@ -1,9 +1,7 @@
-import { Categories, ProductData } from "@/types/types";
-import React from "react";
-import Category from "../produits/categories";
+import { Categories, ProductsData } from "@/types/types";
 import ProductCarousel from "../universal/ProductCarousel";
 type Props = {
-  product: ProductData[];
+  product: ProductsData[];
   categories: Categories[];
 };
 
