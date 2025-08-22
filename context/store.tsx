@@ -1,7 +1,6 @@
-
 import { cartItem, ReceiptProps, User } from "@/types/types";
 import { create } from "zustand";
-import { persist } from "zustand/middleware";
+import { persist, createJSONStorage } from "zustand/middleware";
 
 export interface OptionProps {
   id: number;
@@ -19,11 +18,12 @@ type Store = {
 
 type Actions = {
   addToCart: (item: cartItem) => void;
-  editCart:(item:cartItem)=>void;
+  editCart: (item: cartItem) => void;
   removeFromCart: (itemId: number) => void;
   emptyCart: () => void;
   login: (user: User, token: string) => void;
   logout: () => void;
+  setToken: (token: string) => void;
   totalPrice: () => number;
   setTransaction: (refString: string | null) => void;
   setReceiptData: (data?: ReceiptProps) => void;
@@ -34,8 +34,8 @@ const initialState: Store = {
   user: null,
   token: null,
   receiptData: null,
-  transactionRef: '',
-  isFirstOrder: true
+  transactionRef: "",
+  isFirstOrder: true,
 };
 
 const useStore = create<Store & Actions>()(
@@ -43,25 +43,41 @@ const useStore = create<Store & Actions>()(
     (set, get) => ({
       ...initialState,
       addToCart: (item) => set({ cart: [item, ...get().cart] }),
-      editCart: (item)=>set({cart: get().cart.map(cartItem=>cartItem.itemId === item.itemId ? item : cartItem)}),
+      editCart: (item) =>
+        set({
+          cart: get().cart.map((cartItem) =>
+            cartItem.itemId === item.itemId ? item : cartItem
+          ),
+        }),
       removeFromCart: (itemId) =>
         set({
-          cart: get().cart.filter((element) => element.itemId != itemId),
+          cart: get().cart.filter((element) => element.itemId !== itemId),
         }),
       emptyCart: () => set({ cart: [] }),
-      login: (user, token) => set({ user: user, token: token, isFirstOrder: user.isFirstOrder }),
+      login: (user, token) =>
+        set({ user: user, token: token, isFirstOrder: user.isFirstOrder }),
       logout: () => set(initialState),
-      totalPrice: () => {
-        let value = get().cart.reduce((accumulator, item) => {
-          const price = item.price * item.qte;
-          return accumulator + price;
-        }, 0);
-        return value;
-      },
+      setToken: (token) => set({ token }),
+      totalPrice: () =>
+        get().cart.reduce(
+          (accumulator, item) => accumulator + item.price * item.qte,
+          0
+        ),
       setTransaction: (refString) => set({ transactionRef: refString }),
-      setReceiptData: (data) => data ? set({ receiptData: data }) : set({receiptData: null}),
+      setReceiptData: (data) =>
+        data ? set({ receiptData: data }) : set({ receiptData: null }),
     }),
-    { name: "cartStore" }
+    {
+      name: "cartStore", // clé dans le storage
+      storage: createJSONStorage(() => localStorage), // utilise localStorage
+      partialize: (state) => ({
+        // tu peux choisir ce qui est persisté
+        cart: state.cart,
+        user: state.user,
+        token: state.token,
+        isFirstOrder: state.isFirstOrder,
+      }),
+    }
   )
 );
 
