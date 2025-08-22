@@ -75,7 +75,7 @@ function Footer() {
       <div className="container max-w-[1417px] w-full mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 text-sm gap-8 md:gap-0">
         <div className="flex flex-col px-7 md:items-center">
           <div className="flex flex-col gap-2 md:gap-4">
-            <img src="LogoWhite.svg" alt="logo" width={100} height={100} />
+            <img src="/LogoWhite.svg" alt="logo" width={100} height={100} />
             <p className="text-slate-400">{config.contact.address}</p>
             <ul className="flex gap-3 text-slate-400">
               <li>
