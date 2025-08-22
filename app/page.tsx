@@ -13,7 +13,7 @@ import { useQuery } from "@tanstack/react-query";
 export default function Home() {
   const product = new ProductQuery();
   const productData = useQuery({
-    queryKey: ["categoryFetchAll"],
+    queryKey: ["productFetchAll"],
     queryFn: () => product.getAllProducts(),
   });
   const categoryData = useQuery({
