@@ -1,3 +1,4 @@
+
 import { cartItem, ReceiptProps, User } from "@/types/types";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
@@ -19,7 +20,7 @@ type Store = {
 
 type Actions = {
   addToCart: (item: cartItem) => void;
-  editCart: (item: cartItem) => void;
+  editCart:(item:cartItem)=>void;
   removeFromCart: (itemId: number) => void;
   emptyCart: () => void;
   login: (user: User, token: string) => void;
@@ -45,19 +46,13 @@ const useStore = create<Store & Actions>()(
     (set, get) => ({
       ...initialState,
       addToCart: (item) => set({ cart: [item, ...get().cart] }),
-      editCart: (item) =>
-        set({
-          cart: get().cart.map((cartItem) =>
-            cartItem.itemId === item.itemId ? item : cartItem
-          ),
-        }),
+      editCart: (item)=>set({cart: get().cart.map(cartItem=>cartItem.itemId === item.itemId ? item : cartItem)}),
       removeFromCart: (itemId) =>
         set({
           cart: get().cart.filter((element) => element.itemId != itemId),
         }),
       emptyCart: () => set({ cart: [] }),
-      login: (user, token) =>
-        set({ user: user, token: token, isFirstOrder: user.isFirstOrder }),
+      login: (user, token) => set({ user: user, token: token, isFirstOrder: user.isFirstOrder }),
       logout: () => set(initialState),
       setToken: (token) => set({ token }),
       totalPrice: () =>
@@ -75,8 +70,7 @@ const useStore = create<Store & Actions>()(
         }
       },
       setTransaction: (refString) => set({ transactionRef: refString }),
-      setReceiptData: (data) =>
-        data ? set({ receiptData: data }) : set({ receiptData: null }),
+      setReceiptData: (data) => data ? set({ receiptData: data }) : set({receiptData: null}),
     }),
     { name: "cartStore" }
   )

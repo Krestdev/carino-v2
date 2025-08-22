@@ -5,11 +5,13 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { LuCircleUser } from "react-icons/lu";
 import { Button } from "./ui/button";
-import useStore from "@/context/store";
 import PopAccount from "./Authentification/PopAccount";
 
 const Header = () => {
-  const { token } = useStore();
+  const [isLogin, setIsLogin] = useState(false);
+  useEffect(() => {
+    setIsLogin(false);
+  }, [setIsLogin]);
 
   return (
     <div className="sticky top-0 z-50 mx-3">
@@ -17,7 +19,7 @@ const Header = () => {
         <div className="flex flex-row items-center gap-8">
           <Link href="/">
             <img
-              src="/Logo.svg"
+              src="Logo.svg"
               alt="logo"
               height={60}
               width={60}
@@ -40,7 +42,7 @@ const Header = () => {
             </Link>
           </div>
         </div>
-        {!token ? (
+        {isLogin ? (
           <div className="hidden md:flex flex-row gap-2 items-center">
             <Link href={"/connexion"}>
               <Button variant={"link"}>{"Connexion"}</Button>
