@@ -11,6 +11,7 @@ type Store = {
   cart: Array<cartItem>;
   user: User | null;
   token: string | null;
+  DeliveryFees: number;
   transactionRef: string | null;
   receiptData: ReceiptProps | null;
   isFirstOrder: boolean;
@@ -25,6 +26,7 @@ type Actions = {
   logout: () => void;
   setToken: (token: string) => void;
   totalPrice: () => number;
+  setFees: (fees?: number) => void;
   setTransaction: (refString: string | null) => void;
   setReceiptData: (data?: ReceiptProps) => void;
 };
@@ -34,6 +36,7 @@ const initialState: Store = {
   user: null,
   token: null,
   receiptData: null,
+  DeliveryFees: 0,
   transactionRef: "",
   isFirstOrder: true,
 };
@@ -63,6 +66,15 @@ const useStore = create<Store & Actions>()(
           (accumulator, item) => accumulator + item.price * item.qte,
           0
         ),
+      setFees: (fees) => {
+        if (!fees) {
+          set({ DeliveryFees: 0 });
+        } else {
+          if (!get().isFirstOrder) {
+            set({ DeliveryFees: fees });
+          }
+        }
+      },
       setTransaction: (refString) => set({ transactionRef: refString }),
       setReceiptData: (data) =>
         data ? set({ receiptData: data }) : set({ receiptData: null }),

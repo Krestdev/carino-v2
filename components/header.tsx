@@ -48,7 +48,7 @@ const Header = () => {
             <Link href={"/inscription"}>
               <Button variant={"link"}>{"Inscription"}</Button>
             </Link>
-            <Link href={"/panier"}>
+            <Link href={"/cart"}>
               <Button className="bg-[#FFC336] hover:bg-[#FFC336]/90 text-black">
                 <ShoppingCart />
                 {"Panier"}
@@ -63,7 +63,7 @@ const Header = () => {
                 {"compte"}
               </Button>
             </PopAccount>
-            <Link href={"/panier"}>
+            <Link href={"/cart"}>
               <Button className="bg-[#FFC336] hover:bg-[#FFC336]/90 text-black">
                 <ShoppingCart />
                 {"Panier"}

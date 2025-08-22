@@ -31,11 +31,11 @@ export interface cartItem {
   options: Array<cartItemOption>;
   price: number;
   image: string;
-  cat: Array<ProductCategory>;
+  cat: Array<Cat>;
 }
 export interface cartItemOption {
   name: string;
-  id_zelty: string;
+  id_zelty?: string;
   details: Array<OptionData>;
 }
 export interface OptionData {
@@ -391,7 +391,7 @@ export interface Enfant {
   name: string;
   description?: string;
   image: string;
-  price: string;
+  price: number;
   min_choices?: number;
   max_choices?: number;
   id_zelty: string;

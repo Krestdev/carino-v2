@@ -25,7 +25,7 @@ function Footer() {
         },
         {
           title: "panier",
-          link: "/panier",
+          link: "/cart",
         },
         {
           title: "catalogue",
