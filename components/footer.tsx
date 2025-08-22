@@ -50,8 +50,8 @@ function Footer() {
       mainTitle: "aide & ressources",
       content: [
         {
-          title: "politique de confidentialité",
-          link: "/politique-confidentialite",
+          title: "politique & confidentialité",
+          link: "/privacy",
         },
         {
           title: "termes et conditions",
