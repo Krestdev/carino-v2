@@ -25,7 +25,10 @@ const DishGrid = ({ dishes, categories }: Props) => {
 
   return (
     <>
-      <Category categories={categories} handleFilter={handleFilter} />
+      <Category
+        categories={categories.filter((x) => x.id_parent == null)}
+        handleFilter={handleFilter}
+      />
       <Dishes products={filteredItems} />
     </>
   );

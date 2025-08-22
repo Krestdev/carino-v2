@@ -31,13 +31,12 @@ export default function Home() {
   }
 
   if (productData.isSuccess && categoryData.isSuccess) {
-    const dailyMenu: ProductData[] = productData.data.data.filter(
-      (product: { cat: ProductData[] }) =>
-        product.cat.some(
-          (element) =>
-            element.name.toLocaleLowerCase().includes("suggestion") ||
-            element.name.toLocaleLowerCase() === "suggestions du chef"
-        )
+    const dailyMenu: ProductData[] = productData.data.data.filter((product) =>
+      product.cat.some(
+        (element) =>
+          element.name.toLocaleLowerCase().includes("suggestion") ||
+          element.name.toLocaleLowerCase() === "suggestions du chef"
+      )
     );
     const dailyCategory = categoryData.data.data.find(
       (category: Categories) => category.id === dailyMenu[0].cat[0].id
