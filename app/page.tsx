@@ -30,32 +30,35 @@ export default function Home() {
     );
   }
 
-
-
-
   if (productData.isSuccess && categoryData.isSuccess) {
-
-    const dailyMenu: ProductData[] = productData.data.data
-      .filter((product: { cat: ProductData[]; }) =>
-        product.cat.some(
-          (element) =>
-            element.name.toLocaleLowerCase().includes("suggestion") || element.name.toLocaleLowerCase() === "suggestions du chef"
-        )
-      );
-    const dailyCategory = categoryData.data.data.find((category: Categories) => category.id === dailyMenu[0].cat[0].id);
+    const dailyMenu: ProductData[] = productData.data.data.filter((product) =>
+      product.cat.some(
+        (element) =>
+          element.name.toLocaleLowerCase().includes("suggestion") ||
+          element.name.toLocaleLowerCase() === "suggestions du chef"
+      )
+    );
+    const dailyCategory = categoryData.data.data.find(
+      (category: Categories) => category.id === dailyMenu[0].cat[0].id
+    );
 
     return (
       <div>
         <Hero />
         <div className="md:pt-6">
-          <ProductCarousel
-            products={dailyMenu}
-            category={dailyCategory}
-          />
+          <ProductCarousel products={dailyMenu} category={dailyCategory} />
         </div>
         <CatProdMob products={dailyMenu} category={dailyCategory} />
-        <PubComp pub1={"/tempo/pub1.webp"} pub2={"/tempo/pub3.webp"} pub3={"/tempo/pub3.webp"} />
-        <CategoryCarousel categories={categoryData.data.data.filter((x: Categories) => x.id_parent === null)} />
+        <PubComp
+          pub1={"/tempo/pub1.webp"}
+          pub2={"/tempo/pub3.webp"}
+          pub3={"/tempo/pub3.webp"}
+        />
+        <CategoryCarousel
+          categories={categoryData.data.data.filter(
+            (x: Categories) => x.id_parent === null
+          )}
+        />
         <Reservation />
       </div>
     );
