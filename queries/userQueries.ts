@@ -1,5 +1,5 @@
 import api from "@/providers/axios";
-import { cartItem } from "@/types/types";
+import { cartItem, UserLoginData, UserOrdersResponse } from "@/types/types";
 
 type UserRegister = {
   email: string;
@@ -29,7 +29,7 @@ export default class UserQuery {
   getUserById = async (id: number) => {
     return api.get(`${this.route1}/${id}`).then((res) => res.data);
   };
-  login = async (data: UserLogin) => {
+  login = async (data: UserLogin): Promise<UserLoginData> => {
     return api.post(`${this.route}/login`, data).then((res) => res.data);
   };
   logout = async () => {
@@ -41,7 +41,7 @@ export default class UserQuery {
   orders = async (data: Order) => {
     return api.post(`${this.route}/orders`, data).then((res) => res.data);
   };
-  allUsers = async (id: number) => {
+  allUsers = async (id: number): Promise<UserOrdersResponse> => {
     return api
       .get(`${this.route}/${id}/all/user/orders`)
       .then((res) => res.data);
