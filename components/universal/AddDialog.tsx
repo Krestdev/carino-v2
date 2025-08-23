@@ -243,7 +243,7 @@ function AddDialog({
             <DialogTrigger asChild>
                 {children}
             </DialogTrigger>
-            <DialogContent>
+            <DialogContent className="max-h-[800px] overflow-y-auto">
                 <DialogHeader>
                     <DialogTitle className="!relative py-5 min-h-[144px] flex items-center">
                         <div className="absolute w-full h-full bg-gradient-to-t from-black/40 to-black/80 -z-10" />
