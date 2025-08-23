@@ -1,6 +1,7 @@
 "use client";
 
 import Dishes from "@/components/produits/dishes";
+import Head from "@/components/universal/Head";
 import ProductQuery from "@/queries/productQuery";
 import { Categories } from "@/types/types";
 import { useQuery } from "@tanstack/react-query";
@@ -37,9 +38,7 @@ const Category = ({ id }: { id: number }) => {
     );
     return (
       <>
-        <div className="bg-[url('/images/catalog.jpg')] bg-cover w-full h-[300px] flex  justify-center items-center  ">
-          <h1 className="text-white text-center">{category?.name}</h1>
-        </div>
+      <Head image={category?.image ?? "/images/catalog.jpg"} title={category?.name} />
         <div className="container mx-auto">
           <div className="flex gap-2 border-b-[1px]  border-b-[#D9D9D9] pt-3 pr-5 pb-3 pl-5 ">
             <p className="text-orange-300">

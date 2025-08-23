@@ -15,7 +15,7 @@ const Header = () => {
 
   return (
     <div className="sticky top-0 z-50 mx-3">
-      <div className="absolute bg-white/60 backdrop-blur-lg top-[10px] left-1/2 transform -translate-x-1/2 max-w-[1039px] w-full h-[60px] md:h-[70px] rounded-full flex items-center justify-between px-[10px] z-50">
+      <div className="absolute bg-white/60 backdrop-blur-lg top-[10px] left-1/2 transform -translate-x-1/2 max-w-[1039px] w-full h-[60px] md:h-[70px] rounded-full flex justify-between px-[10px] z-50">
         <div className="flex flex-row items-center gap-8">
           <Link href="/">
             <img
