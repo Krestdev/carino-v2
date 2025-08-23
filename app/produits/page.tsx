@@ -6,7 +6,7 @@ import DishGrid from "@/components/produits/dishGrid";
 import Hero from "@/components/produits/Hero";
 import Head from "@/components/universal/Head";
 import ProductQuery from "@/queries/productQuery";
-import { ProductData } from "@/types/types";
+import { ProductsData } from "@/types/types";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 

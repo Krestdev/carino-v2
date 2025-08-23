@@ -49,7 +49,7 @@ const Header = () => {
               <Button variant={"link"}>{"Inscription"}</Button>
             </Link>
             <Link href={"/panier"}>
-              <Button className="bg-[#FFC336] hover:bg-[#FFC336]/90 text-black">
+              <Button className="bg-[#FFC336] hover:bg-[#FFC336]/90 text-black h-[54px] text-[20px]">
                 <ShoppingCart />
                 {"Panier"}
               </Button>
@@ -58,13 +58,13 @@ const Header = () => {
         ) : (
           <div className="hidden md:flex flex-row gap-2 items-center">
             <PopAccount>
-              <Button variant={"outline"} className="text-black border-black">
+              <Button variant={"outline"} className="text-black border-black h-[54px] text-[20px]">
                 <LuCircleUser />
                 {"compte"}
               </Button>
             </PopAccount>
             <Link href={"/panier"}>
-              <Button className="bg-[#FFC336] hover:bg-[#FFC336]/90 text-black">
+              <Button className="bg-[#FFC336] hover:bg-[#FFC336]/90 text-black h-[54px] text-[20px]">
                 <ShoppingCart />
                 {"Panier"}
               </Button>

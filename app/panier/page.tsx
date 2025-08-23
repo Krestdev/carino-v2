@@ -25,7 +25,7 @@ const Page = () => {
   }
 
   return (
-    <div>
+    <div className='py-24'>
       <Panier items={cartItems} />
     </div>
   )

@@ -11,7 +11,7 @@ const Hero = () => {
       backgroundImage: "url('/images/hero.webp')",
       backgroundSize: "cover",
       backgroundPosition: "center",
-    }} className='relative pt-[calc(60px+48px)] pb-[calc(80px+48px)] sm:pt-[calc(60px+72px)] sm:pb-[calc(80px+72px)] md:py-0 md:h-screen overflow-hidden flex items-center justify-center'>
+    }} className='relative pt-[calc(60px+48px)] pb-[calc(80px+48px)] sm:pt-[calc(60px+72px)] sm:pb-[calc(80px+72px)] md:py-0 md:h-screen overflow-hidden flex items-center '>
       <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-b md:bg-gradient-to-r from-[#191537] from-30% md:from-42% to-transparent to-100%" />
 
       <div className='px-0 md:px-24 z-10'>

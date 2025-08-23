@@ -28,3 +28,23 @@ export function isPromotion(start: Date, end: Date) {
   // Vérifier si c'est le 8 mars
   return (maintenant >= start && maintenant <= end);
 }
+
+export function isDeliveryOpen(startTime=process.env.NEXT_PUBLIC_OPENTIME||"10:30" , endTime=process.env.NEXT_PUBLIC_CLOSETIME ||"20:30"): boolean {
+  // Get the current time in UTC and adjust for UTC+1
+  const currentDate = new Date();
+  const utcHours = currentDate.getUTCHours() + 1; // Add 1 hour for UTC+1
+  const currentTime = utcHours * 100 + currentDate.getUTCMinutes();
+
+  // Helper function to convert "HH:MM" to HHMM format
+  function convertToHHMM(timeStr: string): number {
+    const [hours, minutes] = timeStr.split(':').map(Number);
+    return hours * 100 + minutes;
+  }
+
+  // Convert startTime and endTime to HHMM format
+  const start = convertToHHMM(startTime);
+  const end = convertToHHMM(endTime);
+
+  // Check if the current time is within the delivery window
+  return currentTime >= start && currentTime <= end;
+}

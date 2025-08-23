@@ -35,7 +35,7 @@ export function ApplyPromotion(data: cartItem[]): cartItem[] {
           {
             name: "Les Classiques Indémodables",
             id: 403441,
-            id_zelty: "6100",
+            // id_zelty: "6100",
             id_parent: 253199
           },
         ],

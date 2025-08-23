@@ -1,12 +1,11 @@
-import { ProductData } from "@/types/types";
-import React from "react";
-import { Button } from "../ui/button";
-import { Badge } from "../ui/badge";
-import { LuPlus } from "react-icons/lu";
+import { ProductsData } from "@/types/types";
 import AddDialog from "./AddDialog";
+import { Badge } from "../ui/badge";
+import { Button } from "../ui/button";
+import { LuPlus } from "react-icons/lu";
 
 type Props = {
-  produit: ProductData;
+  produit: ProductsData;
 };
 
 const ProductComp = ({ produit }: Props) => {
@@ -32,8 +31,15 @@ const ProductComp = ({ produit }: Props) => {
           <p className="text-[14px] font-bold uppercase">{produit.name}</p>
           <p className="text-[24px] font-bold">{`${produit.price} FCFA`}</p>
         </div>
-        <AddDialog id={0} name={produit.name} image={produit.image} description={produit.description} price={produit.price} cat={produit.cat} options={produit.options}>
-
+        <AddDialog
+          {...produit}
+          id={0}
+          name={produit.name}
+          image={produit.image}
+          description={produit.description}
+          price={produit.price}
+          cat={produit.cat}
+        >
           <Button
             disabled={produit.disable}
             className={`${produit.disable ? "bg-gray-300 cursor-not-allowed" : ""

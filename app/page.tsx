@@ -7,7 +7,7 @@ import Reservation from "@/components/Home/Reservation";
 import CatProdMob from "@/components/universal/CatProdMob";
 import ProductCarousel from "@/components/universal/ProductCarousel";
 import ProductQuery from "@/queries/productQuery";
-import { Categories, CategoryData, ProductData } from "@/types/types";
+import { Categories, CategoryData, ProductsData } from "@/types/types";
 import { useQuery } from "@tanstack/react-query";
 import Loading from "./loading";
 
@@ -32,7 +32,7 @@ export default function Home() {
   }
 
   if (productData.isSuccess && categoryData.isSuccess) {
-    const dailyMenu: ProductData[] = productData.data.data.filter((product) =>
+    const dailyMenu: ProductsData[] = productData.data.data.filter((product) =>
       product.cat.some(
         (element) =>
           element.name.toLocaleLowerCase().includes("suggestion") ||
