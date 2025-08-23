@@ -105,19 +105,19 @@ body {
   }
 
   h2 {
-    @apply text-[52px] leading-[120%] font-bold tracking-[-2%] font-mono;
+    @apply text-[42px] md:text-[48px] lg:text-[52px] leading-[120%] font-bold tracking-[-2%] font-mono;
   }
 
   h3 {
-    @apply text-[32px] leading-[150%] font-bold tracking-[-1%] font-sans;
+    @apply text-[24px] md:text-[28px] lg:text-[32px] leading-[150%] font-bold tracking-[-1%] font-sans;
   }
 
   h4 {
-    @apply text-[20px] leading-[150%] font-bold tracking-[0%] font-sans;
+    @apply text-[16px] md:text-[18px] lg:text-[20px] leading-[150%] font-bold tracking-[0%] font-sans;
   }
 
   p {
-    @apply text-[16px] leading-[150%] font-normal tracking-[0%] font-sans;
+    @apply text-[14px] md:text-[16px] leading-[150%] font-normal tracking-[0%] font-sans;
   }
 
   /* Si tu veux uniformiser tous les titres h1-h6 */
