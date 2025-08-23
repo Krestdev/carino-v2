@@ -16,7 +16,6 @@ const Reservation = () => {
                 </div>
                 <Button className='w-fit'>{"Reserver une table"}</Button>
             </div>
-
         </div>
     )
 }

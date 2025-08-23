@@ -1,16 +1,24 @@
-import axiosConfig from '@/api';
 import useStore from '@/context/store';
-import { isDeliveryOpen } from '@/lib/utils';
-import { orderMutation, OrderTypeProps, PostTakeAwayOrderProps } from '@/types/types';
+import { CitiesResponse, City, orderMutation, OrderTypeProps, PostOrderProps, PostTakeAwayOrderProps } from '@/types/types';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { AxiosResponse } from 'axios';
 import { useRouter } from 'next/navigation';
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form';
 import z from 'zod';
 import { ApplyPromotion, sendPackPromotion } from '../universal/promotions';
 import { toast } from '../ui/use-toast';
+import axiosConfig from '@/api';
+import { cn, isDeliveryOpen } from '@/lib/utils';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '../ui/form';
+import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover';
+import { Button } from '../ui/button';
+import { CalendarIcon, Check, ChevronsUpDown } from 'lucide-react';
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from '../ui/command';
+import { Input } from '../ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
+import { Calendar } from '../ui/calendar';
 
 
 const formSchema = z
@@ -189,8 +197,139 @@ const TakeawayForm = ({ fees, setFees, setPostOrderStatus }: OrderTypeProps) => 
     }
 
     return (
-        <div>
+        <div className='flex flex-col gap-6 w-full'>
+            <Form {...form}>
+                <form
+                    onSubmit={form.handleSubmit(onSubmit)}
+                    // className="grid gap-y-7 gap-x-2 grid-cols-1 md:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2 max-w-2xl items-baseline"
+                    className='flex flex-col gap-10 w-full items-end'
+                >
+                    <div className='grid grid-cols-2 max-w-[495px] w-full'>
+                        <FormField
+                            control={form.control}
+                            name="takeDate"
+                            render={({ field }) => (
+                                <FormItem className='max-w-[290px] w-full'>
+                                    <FormLabel>{"Date de collecte"}</FormLabel>
+                                    <Popover>
+                                        <PopoverTrigger asChild>
+                                            <FormControl>
+                                                <Button
+                                                    variant={"outline"}
+                                                    className={cn(
+                                                        "w-full pl-3 h-10 text-left font-normal normal-case tracking-normal border-input hover:bg-input hover:text-current bg-background",
+                                                        !field.value && "text-muted-foreground"
+                                                    )}
+                                                >
+                                                    {field.value ? (
+                                                        field.value.toLocaleDateString("fr-FR", {
+                                                            year: "numeric",
+                                                            month: "long",
 
+                                                            day: "numeric",
+                                                        })
+                                                    ) : (
+                                                        <span>{"Choisir une date"}</span>
+                                                    )}
+                                                    <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                                                </Button>
+                                            </FormControl>
+                                        </PopoverTrigger>
+                                        <PopoverContent className="w-auto p-0" align="start">
+                                            <Calendar
+                                                mode="single"
+                                                selected={field.value}
+                                                onSelect={field.onChange}
+                                                disabled={
+                                                    (date) => {
+                                                        const today = new Date(new Date().setHours(0, 0, 0, 0));
+                                                        const maxDate = new Date();
+                                                        maxDate.setDate(today.getDate() + 3);
+                                                        return date < today || date > maxDate;
+                                                    }
+                                                    //date < new Date(new Date().setDate(new Date().getDate() + 14))
+                                                }
+                                                initialFocus
+                                            />
+                                        </PopoverContent>
+                                    </Popover>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name="time"
+                            render={({ field }) => (
+                                <FormItem className='max-w-[290px] w-full'>
+                                    <FormLabel>{"Heure"}</FormLabel>
+                                    <Input type="time" {...field} />
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                    </div>
+                    <FormField
+                        control={form.control}
+                        name="operator"
+                        render={({ field }) => (
+                            <FormItem className="max-w-[495px] w-full">
+                                <FormLabel className="customFormLabel">
+                                    {"Operateur de Paiement"}
+                                </FormLabel>
+                                <Select
+                                    onValueChange={field.onChange}
+                                    defaultValue={field.value}
+                                >
+                                    <FormControl>
+                                        <SelectTrigger className='w-full'>
+                                            <SelectValue placeholder="Choisissez un opérateur" />
+                                        </SelectTrigger>
+                                    </FormControl>
+                                    <SelectContent>
+                                        <SelectItem value={"orange"}>{"Orange"}</SelectItem>
+                                        <SelectItem value={"mtn"}>{"MTN"}</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            </FormItem>
+                        )}
+                    />
+                    <div className='grid grid-cols-2 max-w-[495px] w-full gap-4'>
+                        <FormField
+                            control={form.control}
+                            name="deliveryNumber"
+                            render={({ field }) => (
+                                <FormItem className="flex flex-col gap-1 w-full">
+                                    <FormLabel className="customFormLabel">{"Numéro de payement"}</FormLabel>
+                                    <FormControl>
+                                        <Input {...field} className='w-full' placeholder='ex. 6 77...' />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name="phoneNumber"
+                            render={({ field }) => (
+                                <FormItem className="flex flex-col gap-1 w-full">
+                                    <FormLabel className="customFormLabel">{"Numéro à appeler"}</FormLabel>
+                                    <FormControl>
+                                        <Input {...field} className='w-full' placeholder='ex. 6 77...' />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                    </div>
+                    <div className='flex gap-2 items-center'>
+                        <Button className='h-[54px]' type='submit'>{"Proceder au paiement"}</Button>
+                        <img src="/images/momo.webp" alt="" className='w-[54px] h-[54px]' />
+                        <img src="/images/om.webp" alt="" className='w-[54px] h-[54px]' />
+                    </div>
+
+                </form>
+            </Form>
         </div>
     )
 }

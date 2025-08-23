@@ -18,7 +18,6 @@ import { Check, ChevronsUpDown } from 'lucide-react';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from '../ui/command';
 import { Input } from '../ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
-import NewTag from '../newTag';
 
 const formSchema = z.object({
     city: z.string().min(3, { message: "Selectionnez une ville" }),
