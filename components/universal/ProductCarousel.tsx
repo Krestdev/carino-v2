@@ -5,6 +5,7 @@ import React, { useEffect, useRef, useState } from "react";
 import ProductComp from "./ProductComp";
 import { Button } from "../ui/button";
 import { ArrowUpRight, ChevronLeft, ChevronRight } from "lucide-react";
+import Link from "next/link";
 
 type Props = {
   products: ProductData[];
@@ -135,10 +136,12 @@ const ProductCarousel = ({ products, category, isLeft = true }: Props) => {
                 ? category.description
                 : "Nos menu pour vous tous les jours"}
             </p>
-            <Button>
-              <ArrowUpRight />
-              {"Voir tout"}
-            </Button>
+            <Link href={`/catalogue/${category?.id}`}>
+              <Button>
+                <ArrowUpRight />
+                {"Voir tout"}
+              </Button>
+            </Link>
           </div>
         </div>
 

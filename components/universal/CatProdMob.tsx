@@ -3,6 +3,7 @@ import React from "react";
 import { Button } from "../ui/button";
 import { ArrowUpRight } from "lucide-react";
 import ProductGrid from "./ProductGrid";
+import Link from "next/link";
 
 type Props = {
   products: ProductData[];
@@ -30,10 +31,12 @@ const CatProdMob = ({ products, category }: Props) => {
               ? category.description
               : "Nos menu pour vous tous les jours"}
           </p>
-          <Button>
-            <ArrowUpRight />
-            {"Voir tout"}
-          </Button>
+          <Link href={`/catalogue/${category?.id}`}>
+            <Button>
+              <ArrowUpRight />
+              {"Voir tout"}
+            </Button>
+          </Link>
         </div>
       </div>
       <ProductGrid products={products.slice(0, 4)} />

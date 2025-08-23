@@ -1,6 +1,6 @@
 import { cartItem, ReceiptProps, User } from "@/types/types";
 import { create } from "zustand";
-import { persist, createJSONStorage } from "zustand/middleware";
+import { persist } from "zustand/middleware";
 
 export interface OptionProps {
   id: number;
@@ -24,7 +24,6 @@ type Actions = {
   emptyCart: () => void;
   login: (user: User, token: string) => void;
   logout: () => void;
-  setToken: (token: string) => void;
   totalPrice: () => number;
   setFees: (fees?: number) => void;
   setTransaction: (refString: string | null) => void;
@@ -54,7 +53,7 @@ const useStore = create<Store & Actions>()(
         }),
       removeFromCart: (itemId) =>
         set({
-          cart: get().cart.filter((element) => element.itemId !== itemId),
+          cart: get().cart.filter((element) => element.itemId != itemId),
         }),
       emptyCart: () => set({ cart: [] }),
       login: (user, token) =>
@@ -79,17 +78,7 @@ const useStore = create<Store & Actions>()(
       setReceiptData: (data) =>
         data ? set({ receiptData: data }) : set({ receiptData: null }),
     }),
-    {
-      name: "cartStore", // clé dans le storage
-      storage: createJSONStorage(() => localStorage), // utilise localStorage
-      partialize: (state) => ({
-        // tu peux choisir ce qui est persisté
-        cart: state.cart,
-        user: state.user,
-        token: state.token,
-        isFirstOrder: state.isFirstOrder,
-      }),
-    }
+    { name: "cartStore" }
   )
 );
 
