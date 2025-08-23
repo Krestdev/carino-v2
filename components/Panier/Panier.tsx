@@ -1,8 +1,14 @@
+import { cartItem } from '@/types/types'
 import React from 'react'
 
-const Panier = () => {
+interface Props {
+ items: cartItem[] 
+}
+
+const Panier = ({items}: Props) => {
   return (
     <div>
+      
       
     </div>
   )

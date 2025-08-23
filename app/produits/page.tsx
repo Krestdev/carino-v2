@@ -4,6 +4,7 @@ import Categories from "@/components/produits/categories";
 import Dishes from "@/components/produits/dishes";
 import DishGrid from "@/components/produits/dishGrid";
 import Hero from "@/components/produits/Hero";
+import Head from "@/components/universal/Head";
 import ProductQuery from "@/queries/productQuery";
 import { ProductData } from "@/types/types";
 import { useQuery } from "@tanstack/react-query";
@@ -31,7 +32,8 @@ const Page = () => {
   if (productData.isSuccess && categoryData.isSuccess) {
     return (
       <>
-        <Hero />
+        {/* <Hero /> */}
+        <Head image="/images/catalog.jpg" title="Tous nos Produits" />
         <div className=" pt-10 container mx-auto ">
           <Breadcumb />
           <DishGrid

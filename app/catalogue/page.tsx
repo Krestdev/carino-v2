@@ -2,6 +2,7 @@
 import Cataloguebreadcumb from "@/components/Catalogue/cataloguebreadcumb";
 import CatalogueHero from "@/components/Catalogue/catalogueHero";
 import ProductfilteredCarousel from "@/components/Catalogue/productfilteredCarousel";
+import Head from "@/components/universal/Head";
 import ProductQuery from "@/queries/productQuery";
 import { useQuery } from "@tanstack/react-query";
 
@@ -34,7 +35,8 @@ const Page = () => {
   if (productData.isSuccess && categoryData.isSuccess) {
     return (
       <>
-        <CatalogueHero />
+        {/* <CatalogueHero /> */}
+        <Head image="/images/catalog.jpg" title="Catalogue" />
         <div className="container mx-auto flex flex-col gap-4 ">
           <Cataloguebreadcumb />
           <h3>Catalogue</h3>

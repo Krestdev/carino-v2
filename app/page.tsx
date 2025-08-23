@@ -9,6 +9,7 @@ import ProductCarousel from "@/components/universal/ProductCarousel";
 import ProductQuery from "@/queries/productQuery";
 import { Categories, CategoryData, ProductData } from "@/types/types";
 import { useQuery } from "@tanstack/react-query";
+import Loading from "./loading";
 
 export default function Home() {
   const product = new ProductQuery();
@@ -22,7 +23,7 @@ export default function Home() {
   });
 
   if (productData.isLoading && categoryData.isLoading) {
-    return <div>Loading...</div>;
+    return <Loading />;
   }
   if (productData.isError && categoryData.isError) {
     return (
