@@ -5,6 +5,8 @@ import { config } from "../data/config";
 import Footer from "../components/footer";
 import Header from "../components/header";
 import QueryProvider from "@/providers/queryProvider";
+import { Toaster } from "@/components/ui/sonner";
+import Transaction from "@/components/universal/Transaction";
 
 // Police principale
 const ptSans = PT_Sans({
@@ -39,7 +41,9 @@ export default function RootLayout({
           <main>
             {children}
           </main>
+          <Transaction />
           <Footer />
+          <Toaster />
         </QueryProvider>
       </body>
     </html>

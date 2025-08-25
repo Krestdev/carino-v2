@@ -10,7 +10,7 @@ export default class ProductQuery {
   cRoute = "categories";
 
   getProductByName = async (product: string): Promise<ProductsResponse> => {
-    return api.get(`/${product}`).then((res) => res.data);
+    return api.get(`/products/${product}`).then((res) => res.data);
   };
   getAllCategoryProducts = async (
     category: string
