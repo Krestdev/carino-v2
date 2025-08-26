@@ -5,9 +5,10 @@ import React from "react";
 
 const Page = () => {
   return (
-    <>
-      <PrivacyHero />
-      <Homebutton />
+    <div>
+        <Head image={'/tempo/pub1.webp'} title='Politique & Confidentialité' />
+      <div className="pb-24 max-w-[1440px] w-full mx-auto">
+        <Homebutton />
 
       <div className="container mx-auto  flex flex-col gap-4 p-7   lg:p-3">
         <h3 className="text-center">Politique & confidentialité</h3>

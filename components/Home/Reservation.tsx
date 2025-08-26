@@ -1,5 +1,6 @@
 import React from "react";
 import { Button } from "../ui/button";
+import Link from "next/link";
 
 const Reservation = () => {
   return (
@@ -17,13 +18,15 @@ const Reservation = () => {
           <h1 className="font-mono text-white text-center text-[32px] md:text-[48px] lg:text-[88px]">
             {"Réserver une table"}
           </h1>
-          <h4 className="font-normal text-white text-center w-full max-w-[570px]">
+          <h4 className="font-normal text-white text-center w-[570px]">
             {
               "Réservez votre table en ligne facilement et profitez d’une ambiance conviviale avec nos spécialités savoureuses, fraîcheur et service chaleureux."
             }
           </h4>
         </div>
-        <Button className="w-fit">{"Reserver une table"}</Button>
+        <Link href={"/reservation"}>
+          <Button className="w-fit">{"Reserver une table"}</Button>
+        </Link>
       </div>
     </div>
   );

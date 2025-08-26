@@ -1,10 +1,10 @@
 import useStore from '@/context/store';
-import { CitiesResponse, City, orderMutation, OrderTypeProps, PostOrderProps, PostTakeAwayOrderProps } from '@/types/types';
+import { orderMutation, OrderTypeProps, PostTakeAwayOrderProps } from '@/types/types';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation } from '@tanstack/react-query';
 import { AxiosResponse } from 'axios';
 import { useRouter } from 'next/navigation';
-import React, { useEffect, useState } from 'react'
+import React, { useEffect } from 'react'
 import { useForm } from 'react-hook-form';
 import z from 'zod';
 import { ApplyPromotion, sendPackPromotion } from '../universal/promotions';
@@ -14,8 +14,7 @@ import { cn, isDeliveryOpen } from '@/lib/utils';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '../ui/form';
 import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover';
 import { Button } from '../ui/button';
-import { CalendarIcon, Check, ChevronsUpDown } from 'lucide-react';
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from '../ui/command';
+import { CalendarIcon } from 'lucide-react';
 import { Input } from '../ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
 import { Calendar } from '../ui/calendar';
@@ -39,7 +38,7 @@ const formSchema = z
             .refine(
                 (date) => {
                     const today = new Date();
-                    today.setHours(0, 0, 0, 0); // Reset time for comparison
+                    today.setHours(0, 0, 0, 0); 
 
                     const maxDate = new Date(today);
                     maxDate.setDate(today.getDate() + 2); // Max 2 days from today
@@ -204,7 +203,7 @@ const TakeawayForm = ({ fees, setFees, setPostOrderStatus }: OrderTypeProps) => 
                     // className="grid gap-y-7 gap-x-2 grid-cols-1 md:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2 max-w-2xl items-baseline"
                     className='flex flex-col gap-10 w-full items-end'
                 >
-                    <div className='grid grid-cols-2 max-w-[495px] w-full'>
+                    <div className='grid grid-cols-2 gap-4 max-w-[495px] w-full'>
                         <FormField
                             control={form.control}
                             name="takeDate"
@@ -217,7 +216,7 @@ const TakeawayForm = ({ fees, setFees, setPostOrderStatus }: OrderTypeProps) => 
                                                 <Button
                                                     variant={"outline"}
                                                     className={cn(
-                                                        "w-full pl-3 h-10 text-left font-normal normal-case tracking-normal border-input hover:bg-input hover:text-current bg-background",
+                                                        "w-full pl-3 h-10 text-left font-normal normal-case tracking-normal border-input hover:bg-input text-current bg-background",
                                                         !field.value && "text-muted-foreground"
                                                     )}
                                                 >
@@ -323,7 +322,7 @@ const TakeawayForm = ({ fees, setFees, setPostOrderStatus }: OrderTypeProps) => 
                         />
                     </div>
                     <div className='flex gap-2 items-center'>
-                        <Button className='h-[54px]' type='submit'>{"Proceder au paiement"}</Button>
+                        <Button disabled={isDisable()} className='h-[54px]' type='submit'>{"Proceder au paiement"}</Button>
                         <img src="/images/momo.webp" alt="" className='w-[54px] h-[54px]' />
                         <img src="/images/om.webp" alt="" className='w-[54px] h-[54px]' />
                     </div>
