@@ -1,5 +1,4 @@
 import Homebutton from "@/components/Privacy/homebutton";
-import PrivacyHero from "@/components/Privacy/PrivacyHero";
 import Head from "@/components/universal/Head";
 import { Mail, Phone } from "lucide-react";
 import React from "react";

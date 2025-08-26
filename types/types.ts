@@ -153,7 +153,7 @@ export interface OrderLog {
   id: number;
   zelty_order_id: string;
   reference: string;
-  items: string;
+  items: [product:string, price:number][];
   is_delivred: boolean;
   is_paid: boolean;
   prix_total: string;
@@ -420,7 +420,7 @@ export interface OrdersData {
   id: number;
   zelty_order_id?: number;
   reference: string;
-  items: string;
+  items: [product:string, price:number][];
   user_id: number;
   prix_total: number;
   lieu_livraison: string;

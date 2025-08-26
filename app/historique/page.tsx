@@ -2,7 +2,6 @@
 
 import axiosConfig from '@/api';
 import HistoryTable from '@/components/Historique/HistoryTable';
-import ProfilComp from '@/components/Profil/ProfilComp';
 import { Button } from '@/components/ui/button';
 import useStore from '@/context/store';
 import { PreviousOrders } from '@/types/types';
@@ -17,12 +16,16 @@ const Page = () => {
     const { user, token } = useStore();
     const axiosClient = axiosConfig();
     const { data, isLoading, isSuccess } = useQuery({
-        queryKey: ['userInfo', user?.id], // unique
-        queryFn: () => {
-            return axiosClient.get<any, AxiosResponse<PreviousOrders>>(`/auth/${user?.id}/all/user/orders`)
+        queryKey: ['userInfo', user?.id],
+        queryFn: async (): Promise<PreviousOrders> => {
+            const res = await axiosClient.get<PreviousOrders>(
+                `/auth/${user?.id}/all/user/orders`
+            )
+            return res.data
         },
-        enabled: user ? true : false
+        enabled: !!user,
     })
+
 
     if (!token) {
         redirect('/');
@@ -36,7 +39,7 @@ const Page = () => {
                         <ArrowLeft />
                         {"Retour a l'accueil"}
                     </Button>
-                    <HistoryTable title={'Historique des commandes'} data={data?.data.data} />
+                    <HistoryTable title={'Historique des commandes'} data={data?.data} />
                 </div>
             </div>
             : isLoading && null

@@ -1,6 +1,5 @@
 "use client";
 import Cataloguebreadcumb from "@/components/Catalogue/cataloguebreadcumb";
-import CatalogueHero from "@/components/Catalogue/catalogueHero";
 import ProductfilteredCarousel from "@/components/Catalogue/productfilteredCarousel";
 import Head from "@/components/universal/Head";
 import ProductQuery from "@/queries/productQuery";

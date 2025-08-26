@@ -34,8 +34,8 @@ function Transaction() {
   const axiosClient = axiosConfig();
   const { data, isSuccess } = useQuery({
     queryKey: ["transaction", transactionRef],
-    queryFn: () => {
-      return axiosClient.get<any, AxiosResponse<checkTransactionStatus>>(
+    queryFn: async () => {
+      return axiosClient.get<checkTransactionStatus>(
         `auth/${transactionRef}/check/status/transaction`
       );
     },
@@ -43,6 +43,7 @@ function Transaction() {
     refetchInterval: 10000,
     retry: true,
   });
+
   const sendReceipt = useMutation({
     mutationFn: (props: ReceiptProps) => {
       return axios.post("/api/ticket", props);
@@ -92,26 +93,25 @@ function Transaction() {
     } else {
       //setOpen(false);
     }
-  }, [isSuccess, transactionRef, data?.data.data[0].status]);
+  }, [isSuccess, transactionRef, data?.data.data[0].status, data?.data.data, emptyCart, receiptData, sendReceipt, setTransaction]);
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent>
         <DialogHeader>
           <DialogTitle
-            className={`py-5 min-h-[60px] justify-center flex items-center px-4 ${
-              paymentStatus === "success"
+            className={`py-5 min-h-[60px] justify-center flex items-center px-4 ${paymentStatus === "success"
                 ? "bg-green-500 text-gray-900"
                 : paymentStatus === "failed"
-                ? "bg-red-700 text-white"
-                : "bg-slate-200 text-slate-900"
-            }`}
+                  ? "bg-red-700 text-white"
+                  : "bg-slate-200 text-slate-900"
+              }`}
           >
             {paymentStatus === "success"
               ? "Paiement validé"
               : paymentStatus === "failed"
-              ? "Echec de paiement"
-              : "En attente de paiement"}
+                ? "Echec de paiement"
+                : "En attente de paiement"}
           </DialogTitle>
           <DialogDescription className="text-center px-4 py-1">
             {paymentStatus === "pending"

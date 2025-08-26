@@ -2,8 +2,7 @@
 
 import React from 'react'
 import z from 'zod/v3';
-import Head from '../universal/Head';
-import { Dialog, DialogClose, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '../ui/dialog';
+import { Dialog, DialogClose, DialogContent, DialogHeader } from '../ui/dialog';
 import { AlertCircle, CalendarIcon } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '../ui/button';
@@ -36,7 +35,7 @@ const formSchema = z.object({
     }),
   description: z.string(),
 }).refine(data => {
-  const [hours, mins] = data.time.split(":");
+  const [hours] = data.time.split(":");
 
   if (Number(hours) < 12 || Number(hours) > 21) {
     return false
@@ -49,7 +48,6 @@ const ReservationForm = () => {
 
   const { user } = useStore();
   const [open, setOpen] = React.useState(false);
-  const [selectedMenu, setSelectedMenu] = React.useState<string | null>(null);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -58,7 +56,7 @@ const ReservationForm = () => {
       email: user?.email,
       phone: user?.phone.substring(4),
       salle: "",
-      menu: selectedMenu ? selectedMenu : undefined
+      // menu: selectedMenu ? selectedMenu : undefined
     },
   });
 

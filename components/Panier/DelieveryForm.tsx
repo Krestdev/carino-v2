@@ -51,16 +51,17 @@ const DelieveryForm = ({ fees, setFees, setPostOrderStatus }: OrderTypeProps) =>
 
     const { data, isSuccess } = useQuery({
         queryKey: ["cities"],
-        queryFn: () => {
-            return axiosClient.get<any, AxiosResponse<CitiesResponse>>("/villes");
+        queryFn: async (): Promise<CitiesResponse> => {
+            const res = await axiosClient.get<CitiesResponse>("/villes")
+            return res.data
         },
-    });
+    })
 
     useEffect(() => {
         if (isSuccess) {
-            setAddresses(data.data.data);
+            setAddresses(data.data);
         }
-    }, [isSuccess, data?.data.data]);
+    }, [isSuccess, data?.data]);
 
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
@@ -77,14 +78,14 @@ const DelieveryForm = ({ fees, setFees, setPostOrderStatus }: OrderTypeProps) =>
     });
 
     const postOrder = useMutation({
-        mutationFn: ({
+        mutationFn: async ({
             phone,
             total_amount,
             user,
             Address,
             commande,
-        }: PostOrderProps) => {
-            return axiosClient.post<any, AxiosResponse<orderMutation>>(
+        }: PostOrderProps): Promise<orderMutation> => {
+            const res = await axiosClient.post<orderMutation>(
                 "/auth/orders",
                 {
                     phone,
@@ -93,9 +94,13 @@ const DelieveryForm = ({ fees, setFees, setPostOrderStatus }: OrderTypeProps) =>
                     Address,
                     commande,
                 }
-            );
+            )
+            return res.data
         },
-    });
+    })
+
+
+
 
     function onSubmit(values: z.infer<typeof formSchema>) {
         if (user !== null) {
@@ -148,7 +153,7 @@ const DelieveryForm = ({ fees, setFees, setPostOrderStatus }: OrderTypeProps) =>
             setPostOrderStatus(false);
         }
         if (postOrder.isSuccess) {
-            setTransaction(postOrder.data.data.data.ref);
+            setTransaction(postOrder.data.data.ref);
         }
         if (postOrder.isError) {
             //console.log(postOrder.error);
@@ -158,8 +163,9 @@ const DelieveryForm = ({ fees, setFees, setPostOrderStatus }: OrderTypeProps) =>
         postOrder.isError,
         postOrder.isSuccess,
         postOrder.isPending,
-        postOrder.data?.data.data.ref,
+        postOrder.data?.data.ref,
         setTransaction,
+        setPostOrderStatus
     ]);
 
     function isDisable() {

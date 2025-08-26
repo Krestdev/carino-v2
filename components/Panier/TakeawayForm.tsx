@@ -38,7 +38,7 @@ const formSchema = z
             .refine(
                 (date) => {
                     const today = new Date();
-                    today.setHours(0, 0, 0, 0); 
+                    today.setHours(0, 0, 0, 0);
 
                     const maxDate = new Date(today);
                     maxDate.setDate(today.getDate() + 2); // Max 2 days from today
@@ -107,20 +107,21 @@ const TakeawayForm = ({ fees, setFees, setPostOrderStatus }: OrderTypeProps) => 
             total_amount,
             user,
             commande,
-            due_date
+            due_date,
         }: PostTakeAwayOrderProps) => {
-            return axiosClient.post<any, AxiosResponse<orderMutation>>(
+            return axiosClient.post<orderMutation>(
                 "/auth/orders",
                 {
                     phone,
                     total_amount,
                     user,
                     commande,
-                    due_date
+                    due_date,
                 }
             );
         },
     });
+
 
     function onSubmit(values: z.infer<typeof formSchema>) {
         const dueDate = new Date(values.takeDate);
@@ -159,7 +160,7 @@ const TakeawayForm = ({ fees, setFees, setPostOrderStatus }: OrderTypeProps) => 
     }
     useEffect(() => {
         setFees(0);
-    }, [])
+    }, [setFees])
 
     useEffect(() => {
         if (postOrder.isPending) {

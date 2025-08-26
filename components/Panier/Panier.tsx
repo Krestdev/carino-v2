@@ -17,24 +17,24 @@ interface Props {
 
 const Panier = ({ items }: Props) => {
 
-  const { totalPrice, cart, transactionRef, removeFromCart, emptyCart } = useStore();
+  const { totalPrice, cart, removeFromCart, emptyCart } = useStore();
   const [deliveryMode, setDeliveryMode] = useState<string>("");
   const [postOrderStatus, setPostOrderStatus] = useState<boolean>(false);
   const [fees, setFees] = useState<number>(0);
 
-  function informationMessage() {
-    if (cart.length === 0) {
-      return "Votre panier est vide";
-    }
-    if (totalPrice() + fees < Number(process.env.NEXT_PUBLIC_MINIMUM_AMOUNT || 4999)) {
-      return `Le montant minimum de commande est de ${XAF.format(Number(process.env.NEXT_PUBLIC_MINIMUM_AMOUNT || 4999))}`;
-    }
-    if (postOrderStatus ||
-      !!transactionRef) {
-      return "Veuillez patienter une transaction est en cours";
-    }
-    return null;
-  }
+  // function informationMessage() {
+  //   if (cart.length === 0) {
+  //     return "Votre panier est vide";
+  //   }
+  //   if (totalPrice() + fees < Number(process.env.NEXT_PUBLIC_MINIMUM_AMOUNT || 4999)) {
+  //     return `Le montant minimum de commande est de ${XAF.format(Number(process.env.NEXT_PUBLIC_MINIMUM_AMOUNT || 4999))}`;
+  //   }
+  //   if (postOrderStatus ||
+  //     !!transactionRef) {
+  //     return "Veuillez patienter une transaction est en cours";
+  //   }
+  //   return null;
+  // }
 
   return (
     cart.length > 0 ?
@@ -64,6 +64,7 @@ const Panier = ({ items }: Props) => {
       </div>
       <div className='flex flex-col gap-6 items-start justify-start max-w-[600px] w-full'>
         <h3>{"Ma commande"}</h3>
+        {cart.length > 0 && <Button onClick={emptyCart}>{"Vider le panier"}</Button>}
         <div className='flex flex-col gap-4 max-h-[300px] overflow-auto'>
           <div className='flex flex-col gap-4'>
             {

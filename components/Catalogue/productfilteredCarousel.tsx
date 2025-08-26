@@ -15,9 +15,8 @@ const ProductfilteredCarousel = ({ product, categories }: Props) => {
       {categoryList.map((category, i: number) => {
         const isLeft = i % 2 === 0;
         return (
-          <>
+          <div key={i}>
             <ProductCarousel
-              key={i}
               products={product.filter((product) =>
                 product.cat.some(
                   (x) => x.id === category.id || x.id_parent === category.id
@@ -34,7 +33,7 @@ const ProductfilteredCarousel = ({ product, categories }: Props) => {
               )}
               category={category}
             />
-          </>
+          </div>
         );
       })}
     </>

@@ -1,13 +1,12 @@
 "use client";
 import CategoryCarousel from "@/components/Home/CategoryCarousel";
-import CategoryComp from "@/components/Home/CategoryComp";
 import Hero from "@/components/Home/Hero";
 import PubComp from "@/components/Home/PubComp";
 import Reservation from "@/components/Home/Reservation";
 import CatProdMob from "@/components/universal/CatProdMob";
 import ProductCarousel from "@/components/universal/ProductCarousel";
 import ProductQuery from "@/queries/productQuery";
-import { Categories, CategoryData, ProductsData } from "@/types/types";
+import { Categories, ProductsData } from "@/types/types";
 import { useQuery } from "@tanstack/react-query";
 import Loading from "./loading";
 

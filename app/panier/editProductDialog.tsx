@@ -32,7 +32,6 @@ import { Label } from "@radix-ui/react-label";
 import Link from "next/link";
 //import Image from "next/image";
 import { useQuery } from "@tanstack/react-query";
-import { AxiosResponse } from "axios";
 import ProductQuery from "@/queries/productQuery";
 
 const FormSchema = z.object({
@@ -307,7 +306,7 @@ function EditProductDialog({
     setCurrentPrice(
       XAF.format(getTotal(allOptions) * form.getValues().quantity)
     );
-  }, [form.watch()]);
+  }, [form.watch(), form, getTotal]);
 
   function onSubmit(data: z.infer<typeof FormSchema>) {
     const cartOption = () => {
