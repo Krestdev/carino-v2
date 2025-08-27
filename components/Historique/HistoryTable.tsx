@@ -69,7 +69,7 @@ const HistoryTable = ({ title, data }: Props) => {
                                     <TableCell className="truncate max-w-[200px]">
                                         {(() => {
                                             const items = order.items
-                                            const preview = items.slice(0, 3).join(", ")
+                                            const preview = items.slice(0, 3)
                                             return items.length > 3 ? `${preview} ...` : preview
                                         })()}
                                     </TableCell>

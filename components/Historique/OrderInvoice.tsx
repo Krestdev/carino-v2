@@ -8,7 +8,7 @@ interface OrderInvoiceProps {
         phoneNumber: string
         deliveryAddress: string
         location: string
-        products: [product:string, price:number][]
+        products: string[]
         deliveryFee: string
         itemsAmount: string
         totalAmount: string
@@ -54,7 +54,7 @@ const OrderInvoice = ({ order }: OrderInvoiceProps) => (
                     </View>
                     <View style={styles.section}>
                         {
-                            order.products.map((product: [string, number], index: number) => (
+                            order.products.map((product, index) => (
                                 <View key={index} style={styles.subSection}>
                                     <Text style={styles.subSectionLabel}>{`• ${product[0]}`}</Text>
                                     <Text style={styles.subSectionValue}>{`${product[1]} prix FCFA`}</Text>
