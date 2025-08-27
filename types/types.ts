@@ -508,3 +508,51 @@ export interface UserAddress {
   building?: string;
   code?: string;
 }
+
+export interface ReservationData {
+  id?: number;
+  reservation_id?: number;
+  user_id?: number;
+  transaction_ref?: string;
+  amount?: number;
+  menu?: string;
+  phone?: string;
+  note?: string;
+  created_at?: string;
+  updated_at?: string;
+  //
+  booking_for?: string;
+  places?: number;
+  comment?: string;
+  status?: number;
+  userId?: number;
+
+  //in comment
+  email?: string;
+  name?: string;
+  customerName?: string;
+}
+
+export interface ReservationResponse {
+  amount: number;
+  phone: string;
+  note: string;
+  menu: string;
+  id?: number;
+  uid?: string;
+  remote_id?: string;
+  id_customer?: number;
+  id_command?: number;
+  created_at?: Date;
+  booking_for: string;
+  id_restaurant?: number;
+  arrived_at?: null;
+  closed_at?: null;
+  table?: number;
+  places?: number;
+  status?: number;
+  cancel_reason?: number;
+  src?: string;
+  comment?: string;
+  final_price?: null;
+}
