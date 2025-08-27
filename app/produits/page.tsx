@@ -1,14 +1,9 @@
 "use client";
 import Breadcumb from "@/components/produits/breadcumb";
-import Categories from "@/components/produits/categories";
-import Dishes from "@/components/produits/dishes";
 import DishGrid from "@/components/produits/dishGrid";
-import Hero from "@/components/produits/Hero";
 import Head from "@/components/universal/Head";
 import ProductQuery from "@/queries/productQuery";
-import { ProductsData } from "@/types/types";
 import { useQuery } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
 
 const Page = () => {
   const product = new ProductQuery();

@@ -1,4 +1,4 @@
-import { Categories, ProductData } from "@/types/types";
+import { Categories, ProductsData } from "@/types/types";
 import React from "react";
 import { Button } from "../ui/button";
 import { ArrowUpRight } from "lucide-react";
@@ -6,7 +6,7 @@ import ProductGrid from "./ProductGrid";
 import Link from "next/link";
 
 type Props = {
-  products: ProductData[];
+  products: ProductsData[];
   category?: Categories;
 };
 

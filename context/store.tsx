@@ -54,7 +54,7 @@ const useStore = create<Store & Actions>()(
       emptyCart: () => set({ cart: [] }),
       login: (user, token) => set({ user: user, token: token, isFirstOrder: user.isFirstOrder }),
       logout: () => set(initialState),
-      setToken: (token) => set({ token }),
+      setToken: (token: string) => set({ token }),
       totalPrice: () =>
         get().cart.reduce(
           (accumulator, item) => accumulator + item.price * item.qte,

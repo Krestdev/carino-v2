@@ -25,8 +25,6 @@ import { Minus, Plus } from "lucide-react";
 import useStore from "@/context/store";
 import { useEffect, useState } from "react";
 import {
-  ProductOptionChild,
-  ProductsResponse,
   cartItemOption,
   otherOption,
 } from "@/types/types";
@@ -34,7 +32,6 @@ import { Label } from "@radix-ui/react-label";
 import Link from "next/link";
 //import Image from "next/image";
 import { useQuery } from "@tanstack/react-query";
-import { AxiosResponse } from "axios";
 import ProductQuery from "@/queries/productQuery";
 
 const FormSchema = z.object({
@@ -121,6 +118,7 @@ interface EditProps {
   itemId: number;
   optionsCurrent: Array<cartItemOption>;
   image: string;
+  children: React.JSX.Element
 }
 
 function EditProductDialog({
@@ -130,6 +128,7 @@ function EditProductDialog({
   itemId,
   optionsCurrent,
   image,
+  children
 }: EditProps) {
   const { editCart } = useStore();
 
@@ -143,64 +142,64 @@ function EditProductDialog({
 
   const accompagnements = productData.isSuccess
     ? productData.data.data[0].options.filter(
-        (option) => option.name.toLocaleLowerCase() === "accompagnement"
-      )
+      (option) => option.name.toLocaleLowerCase() === "accompagnement"
+    )
     : [];
 
   const suppSauce = productData.isSuccess
     ? productData.data.data[0].options.filter(
-        (option) => option.name.toLocaleLowerCase() === "supplément sauces"
-      )
+      (option) => option.name.toLocaleLowerCase() === "supplément sauces"
+    )
     : [];
   const cuissonPates = productData.isSuccess
     ? productData.data.data[0].options.filter(
-        (option) => option.name.toLocaleLowerCase() === "cuisson pates"
-      )
+      (option) => option.name.toLocaleLowerCase() === "cuisson pates"
+    )
     : [];
   const typePates = productData.isSuccess
     ? productData.data.data[0].options.filter(
-        (option) => option.name.toLocaleLowerCase() === "types de pâtes"
-      )
+      (option) => option.name.toLocaleLowerCase() === "types de pâtes"
+    )
     : [];
   const sauces = productData.isSuccess
     ? productData.data.data[0].options.filter(
-        (option) => option.name.toLocaleLowerCase() === "sauces"
-      )
+      (option) => option.name.toLocaleLowerCase() === "sauces"
+    )
     : [];
   const cuissonViande = productData.isSuccess
     ? productData.data.data[0].options.filter(
-        (option) => option.name.toLocaleLowerCase() === "cuisson viande"
-      )
+      (option) => option.name.toLocaleLowerCase() === "cuisson viande"
+    )
     : [];
   const flavors = productData.isSuccess
     ? productData.data.data[0].options.filter(
-        (option) => option.name.toLocaleLowerCase() === "saveurs"
-      )
+      (option) => option.name.toLocaleLowerCase() === "saveurs"
+    )
     : [];
   const supplements = productData.isSuccess
     ? productData.data.data[0].options
-        .map((option) => ({
-          name: option.name,
-          id_zelty: option.id_zelty,
-          enfants: option.enfants.map((enfant) => ({
-            name: enfant.name,
-            id_zelty: enfant.id_zelty,
-            price: Number(enfant.price),
-            max_choices: enfant.max_choices,
-            min_choices: enfant.min_choices,
-          })),
-        }))
-        .filter(
-          (option) =>
-            option.name.toLocaleLowerCase() != "accompagnement" &&
-            option.name.toLocaleLowerCase() != "supplément sauces" &&
-            option.name.toLocaleLowerCase() != "cuisson pates" &&
-            option.name.toLocaleLowerCase() !=
-              "Types de pâtes".toLocaleLowerCase() &&
-            option.name.toLocaleLowerCase() != "sauces" &&
-            option.name.toLocaleLowerCase() != "cuisson viande" &&
-            option.name.toLocaleLowerCase() != "saveurs"
-        )
+      .map((option) => ({
+        name: option.name,
+        id_zelty: option.id_zelty,
+        enfants: option.enfants.map((enfant) => ({
+          name: enfant.name,
+          id_zelty: enfant.id_zelty,
+          price: Number(enfant.price),
+          max_choices: enfant.max_choices,
+          min_choices: enfant.min_choices,
+        })),
+      }))
+      .filter(
+        (option) =>
+          option.name.toLocaleLowerCase() != "accompagnement" &&
+          option.name.toLocaleLowerCase() != "supplément sauces" &&
+          option.name.toLocaleLowerCase() != "cuisson pates" &&
+          option.name.toLocaleLowerCase() !=
+          "Types de pâtes".toLocaleLowerCase() &&
+          option.name.toLocaleLowerCase() != "sauces" &&
+          option.name.toLocaleLowerCase() != "cuisson viande" &&
+          option.name.toLocaleLowerCase() != "saveurs"
+      )
     : [];
 
   const form = useForm<z.infer<typeof FormSchema>>({
@@ -243,7 +242,7 @@ function EditProductDialog({
           option.name.toLocaleLowerCase() != "supplément sauces" &&
           option.name.toLocaleLowerCase() != "cuisson pates" &&
           option.name.toLocaleLowerCase() !=
-            "Types de pâtes".toLocaleLowerCase() &&
+          "Types de pâtes".toLocaleLowerCase() &&
           option.name.toLocaleLowerCase() != "sauces" &&
           option.name.toLocaleLowerCase() != "cuisson viande" &&
           option.name.toLocaleLowerCase() != "saveurs"
@@ -307,7 +306,7 @@ function EditProductDialog({
     setCurrentPrice(
       XAF.format(getTotal(allOptions) * form.getValues().quantity)
     );
-  }, [form.watch()]);
+  }, [form.watch(), form, getTotal]);
 
   function onSubmit(data: z.infer<typeof FormSchema>) {
     const cartOption = () => {
@@ -365,9 +364,7 @@ function EditProductDialog({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button size={"sm"} className="select-none" variant={"outline"}>
-          Modifier
-        </Button>
+        {children}
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
@@ -423,18 +420,18 @@ function EditProductDialog({
                                           return checked
                                             ? field.value.length <= 1
                                               ? field.onChange([
-                                                  ...field.value,
-                                                  {
-                                                    id: item.id_zelty,
-                                                    name: item.name,
-                                                    qte: 1,
-                                                    price: 0,
-                                                  },
-                                                ])
+                                                ...field.value,
+                                                {
+                                                  id: item.id_zelty,
+                                                  name: item.name,
+                                                  qte: 1,
+                                                  price: 0,
+                                                },
+                                              ])
                                               : null
                                             : field.value.length <= 1
-                                            ? field.onChange([])
-                                            : field.onChange([
+                                              ? field.onChange([])
+                                              : field.onChange([
                                                 ...field.value.filter(
                                                   (detail) =>
                                                     detail.id !== item.id_zelty
@@ -495,23 +492,23 @@ function EditProductDialog({
                                           return checked
                                             ? field.value.length <= 1
                                               ? field.onChange([
-                                                  ...field.value,
-                                                  {
-                                                    id: item.id_zelty,
-                                                    name: item.name,
-                                                    qte: 1,
-                                                    price: Number(item.price),
-                                                  },
-                                                ])
+                                                ...field.value,
+                                                {
+                                                  id: item.id_zelty,
+                                                  name: item.name,
+                                                  qte: 1,
+                                                  price: Number(item.price),
+                                                },
+                                              ])
                                               : null
                                             : field.value.length > 1 &&
-                                                field.onChange([
-                                                  ...field.value.filter(
-                                                    (detail) =>
-                                                      detail.id !==
-                                                      item.id_zelty
-                                                  ),
-                                                ]);
+                                            field.onChange([
+                                              ...field.value.filter(
+                                                (detail) =>
+                                                  detail.id !==
+                                                  item.id_zelty
+                                              ),
+                                            ]);
                                         }}
                                       />
                                     </FormControl>
@@ -563,13 +560,13 @@ function EditProductDialog({
                                         onCheckedChange={(checked) => {
                                           return checked
                                             ? field.onChange([
-                                                {
-                                                  id: item.id_zelty,
-                                                  name: item.name,
-                                                  qte: 1,
-                                                  price: Number(item.price),
-                                                },
-                                              ])
+                                              {
+                                                id: item.id_zelty,
+                                                name: item.name,
+                                                qte: 1,
+                                                price: Number(item.price),
+                                              },
+                                            ])
                                             : field.onChange([]);
                                         }}
                                       />
@@ -740,13 +737,13 @@ function EditProductDialog({
                                         onCheckedChange={(checked) => {
                                           return checked
                                             ? field.onChange([
-                                                {
-                                                  id: item.id_zelty,
-                                                  name: item.name,
-                                                  qte: 1,
-                                                  price: Number(item.price),
-                                                },
-                                              ])
+                                              {
+                                                id: item.id_zelty,
+                                                name: item.name,
+                                                qte: 1,
+                                                price: Number(item.price),
+                                              },
+                                            ])
                                             : field.onChange([]);
                                         }}
                                       />
@@ -851,25 +848,25 @@ function EditProductDialog({
                                   const detailIndex =
                                     optionIndex !== -1
                                       ? field.value[
-                                          optionIndex
-                                        ].details.findIndex(
-                                          (dt) => dt.name === item.name
-                                        )
+                                        optionIndex
+                                      ].details.findIndex(
+                                        (dt) => dt.name === item.name
+                                      )
                                       : -1;
                                   const currentQuantity =
                                     field.value.findIndex(
                                       (op) => op.name === option.name
                                     ) >= 0
                                       ? field.value[
-                                          field.value.findIndex(
-                                            (op) => op.name === option.name
-                                          )
-                                        ].details.findIndex(
-                                          (dt) => dt.name === item.name
-                                        ) >= 0
+                                        field.value.findIndex(
+                                          (op) => op.name === option.name
+                                        )
+                                      ].details.findIndex(
+                                        (dt) => dt.name === item.name
+                                      ) >= 0
                                         ? field.value[optionIndex].details[
-                                            detailIndex
-                                          ].qte
+                                          detailIndex
+                                        ].qte
                                         : 0
                                       : 0;
                                   return (
@@ -891,27 +888,27 @@ function EditProductDialog({
                                                       op.name === option.name
                                                         ? currentQuantity > 1
                                                           ? {
-                                                              name: op.name,
-                                                              details:
-                                                                op.details.map(
-                                                                  (dt) =>
-                                                                    dt.name ===
+                                                            name: op.name,
+                                                            details:
+                                                              op.details.map(
+                                                                (dt) =>
+                                                                  dt.name ===
                                                                     item.name
-                                                                      ? {
-                                                                          id: dt.id,
-                                                                          name: dt.name,
-                                                                          price:
-                                                                            dt.price,
-                                                                          qte:
-                                                                            dt.qte -
-                                                                            1,
-                                                                        }
-                                                                      : dt
-                                                                ),
-                                                            }
+                                                                    ? {
+                                                                      id: dt.id,
+                                                                      name: dt.name,
+                                                                      price:
+                                                                        dt.price,
+                                                                      qte:
+                                                                        dt.qte -
+                                                                        1,
+                                                                    }
+                                                                    : dt
+                                                              ),
+                                                          }
                                                           : currentQuantity ===
                                                             1
-                                                          ? {
+                                                            ? {
                                                               name: op.name,
                                                               details:
                                                                 op.details.filter(
@@ -920,7 +917,7 @@ function EditProductDialog({
                                                                     item.name
                                                                 ),
                                                             }
-                                                          : op
+                                                            : op
                                                         : op
                                                     )
                                                     .filter(
@@ -943,54 +940,54 @@ function EditProductDialog({
                                             onClick={(e) => {
                                               detailIndex >= 0
                                                 ? field.onChange(
-                                                    field.value.map((op) =>
-                                                      op.name === option.name
-                                                        ? {
-                                                            name: op.name,
-                                                            details:
-                                                              op.details.map(
-                                                                (dt) =>
-                                                                  dt.name ===
-                                                                  item.name
-                                                                    ? dt.qte < 3
-                                                                      ? {
-                                                                          id: dt.name,
-                                                                          name: dt.name,
-                                                                          price:
-                                                                            dt.price,
-                                                                          qte:
-                                                                            dt.qte +
-                                                                            1,
-                                                                        }
-                                                                      : dt
-                                                                    : dt
-                                                              ),
-                                                          }
-                                                        : op
-                                                    )
+                                                  field.value.map((op) =>
+                                                    op.name === option.name
+                                                      ? {
+                                                        name: op.name,
+                                                        details:
+                                                          op.details.map(
+                                                            (dt) =>
+                                                              dt.name ===
+                                                                item.name
+                                                                ? dt.qte < 3
+                                                                  ? {
+                                                                    id: dt.name,
+                                                                    name: dt.name,
+                                                                    price:
+                                                                      dt.price,
+                                                                    qte:
+                                                                      dt.qte +
+                                                                      1,
+                                                                  }
+                                                                  : dt
+                                                                : dt
+                                                          ),
+                                                      }
+                                                      : op
                                                   )
+                                                )
                                                 : detailIndex < 0 &&
                                                   optionIndex >= 0
-                                                ? field.onChange(
+                                                  ? field.onChange(
                                                     field.value.map((op) =>
                                                       op.name === option.name
                                                         ? {
-                                                            name: op.name,
-                                                            details: [
-                                                              ...op.details,
-                                                              {
-                                                                id: item.id_zelty,
-                                                                name: item.name,
-                                                                price:
-                                                                  item.price,
-                                                                qte: 1,
-                                                              },
-                                                            ],
-                                                          }
+                                                          name: op.name,
+                                                          details: [
+                                                            ...op.details,
+                                                            {
+                                                              id: item.id_zelty,
+                                                              name: item.name,
+                                                              price:
+                                                                item.price,
+                                                              qte: 1,
+                                                            },
+                                                          ],
+                                                        }
                                                         : op
                                                     )
                                                   )
-                                                : field.onChange([
+                                                  : field.onChange([
                                                     ...field.value,
                                                     {
                                                       name: option.name,

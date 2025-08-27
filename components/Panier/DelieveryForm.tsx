@@ -51,16 +51,17 @@ const DelieveryForm = ({ fees, setFees, setPostOrderStatus }: OrderTypeProps) =>
 
     const { data, isSuccess } = useQuery({
         queryKey: ["cities"],
-        queryFn: () => {
-            return axiosClient.get<any, AxiosResponse<CitiesResponse>>("/villes");
+        queryFn: async (): Promise<CitiesResponse> => {
+            const res = await axiosClient.get<CitiesResponse>("/villes")
+            return res.data
         },
-    });
+    })
 
     useEffect(() => {
         if (isSuccess) {
-            setAddresses(data.data.data);
+            setAddresses(data.data);
         }
-    }, [isSuccess, data?.data.data]);
+    }, [isSuccess, data?.data]);
 
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
@@ -77,14 +78,14 @@ const DelieveryForm = ({ fees, setFees, setPostOrderStatus }: OrderTypeProps) =>
     });
 
     const postOrder = useMutation({
-        mutationFn: ({
+        mutationFn: async ({
             phone,
             total_amount,
             user,
             Address,
             commande,
-        }: PostOrderProps) => {
-            return axiosClient.post<any, AxiosResponse<orderMutation>>(
+        }: PostOrderProps): Promise<orderMutation> => {
+            const res = await axiosClient.post<orderMutation>(
                 "/auth/orders",
                 {
                     phone,
@@ -93,12 +94,15 @@ const DelieveryForm = ({ fees, setFees, setPostOrderStatus }: OrderTypeProps) =>
                     Address,
                     commande,
                 }
-            );
+            )
+            return res.data
         },
-    });
+    })
+
+
+
 
     function onSubmit(values: z.infer<typeof formSchema>) {
-        // console.log(values);
         if (user !== null) {
             if (isDeliveryOpen()) {
                 postOrder.mutate({
@@ -149,7 +153,7 @@ const DelieveryForm = ({ fees, setFees, setPostOrderStatus }: OrderTypeProps) =>
             setPostOrderStatus(false);
         }
         if (postOrder.isSuccess) {
-            setTransaction(postOrder.data.data.data.ref);
+            setTransaction(postOrder.data.data.ref);
         }
         if (postOrder.isError) {
             //console.log(postOrder.error);
@@ -159,8 +163,9 @@ const DelieveryForm = ({ fees, setFees, setPostOrderStatus }: OrderTypeProps) =>
         postOrder.isError,
         postOrder.isSuccess,
         postOrder.isPending,
-        postOrder.data?.data.data.ref,
+        postOrder.data?.data.ref,
         setTransaction,
+        setPostOrderStatus
     ]);
 
     function isDisable() {
@@ -184,7 +189,7 @@ const DelieveryForm = ({ fees, setFees, setPostOrderStatus }: OrderTypeProps) =>
                     // className="grid gap-y-7 gap-x-2 grid-cols-1 md:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2 max-w-2xl items-baseline"
                     className='flex flex-col gap-10 w-full items-end'
                 >
-                    <div className='grid grid-cols-2 max-w-[495px] w-full'>
+                    <div className='grid grid-cols-2 gap-4 max-w-[495px] w-full'>
                         <FormField
                             control={form.control}
                             name="district"
@@ -198,7 +203,7 @@ const DelieveryForm = ({ fees, setFees, setPostOrderStatus }: OrderTypeProps) =>
                                                     variant="outline"
                                                     role="combobox"
                                                     className={cn(
-                                                        "justify-between max-w-[290px] w-full  rounded-[12px]",
+                                                        "justify-between max-w-[290px] w-full  rounded-[12px] text-black text-[12px]",
                                                         !field.value && "text-muted-foreground"
                                                     )}
                                                 >
@@ -289,7 +294,7 @@ const DelieveryForm = ({ fees, setFees, setPostOrderStatus }: OrderTypeProps) =>
                     <div className='grid grid-cols-2 max-w-[495px] w-full gap-4'>
                         <FormField
                             control={form.control}
-                            name="deliveryNumber"
+                            name="phoneNumber"
                             render={({ field }) => (
                                 <FormItem className="flex flex-col gap-1 w-full">
                                     <FormLabel className="customFormLabel">{"Numéro de payement"}</FormLabel>
@@ -302,7 +307,7 @@ const DelieveryForm = ({ fees, setFees, setPostOrderStatus }: OrderTypeProps) =>
                         />
                         <FormField
                             control={form.control}
-                            name="phoneNumber"
+                            name="deliveryNumber"
                             render={({ field }) => (
                                 <FormItem className="flex flex-col gap-1 w-full">
                                     <FormLabel className="customFormLabel">{"Numéro à appeler"}</FormLabel>
@@ -315,7 +320,7 @@ const DelieveryForm = ({ fees, setFees, setPostOrderStatus }: OrderTypeProps) =>
                         />
                     </div>
                     <div className='flex gap-2 items-center'>
-                        <Button className='h-[54px]' type='submit'>{"Proceder au paiement"}</Button>
+                        <Button disabled={isDisable()} className='h-[54px]' type='submit'>{"Proceder au paiement"}</Button>
                         <img src="/images/momo.webp" alt="" className='w-[54px] h-[54px]' />
                         <img src="/images/om.webp" alt="" className='w-[54px] h-[54px]' />
                     </div>

@@ -5,7 +5,7 @@ import useStore from '@/context/store';
 import { UserRegistration } from '@/types/types';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation } from '@tanstack/react-query';
-import React, { useEffect, useState } from 'react'
+import React, { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import z from 'zod';
 import { toast } from '../ui/use-toast';
@@ -41,7 +41,7 @@ const formSchema = z
 const SignupComp = () => {
 
     const axiosClient = axiosConfig();
-    const [displayError, setDisplayError] = useState(false);
+    // const [displayError, setDisplayError] = useState(false);
     const { token } = useStore();
     const { mutate, isError, isSuccess, error, isPending } = useMutation({
         mutationFn: ({
@@ -93,7 +93,7 @@ const SignupComp = () => {
             redirect("/connexion");
         }
         if (isError) {
-            setDisplayError(true);
+            // setDisplayError(true);
         }
     }, [isSuccess, isError]);
 

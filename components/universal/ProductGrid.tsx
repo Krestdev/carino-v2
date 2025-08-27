@@ -1,9 +1,9 @@
-import { ProductData } from "@/types/types";
+import { ProductsData } from "@/types/types";
 import React from "react";
 import ProductComp from "./ProductComp";
 
 type Props = {
-  products: ProductData[];
+  products: ProductsData[];
 };
 
 const ProductGrid = ({ products }: Props) => {

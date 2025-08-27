@@ -17,12 +17,16 @@ const Page = () => {
     const { user, token } = useStore();
     const axiosClient = axiosConfig();
     const { data, isLoading, isSuccess } = useQuery({
-        queryKey: ['userInfo', user?.id], // unique
-        queryFn: () => {
-            return axiosClient.get<any, AxiosResponse<PreviousOrders>>(`/auth/${user?.id}/all/user/orders`)
+        queryKey: ['userInfo', user?.id],
+        queryFn: async (): Promise<PreviousOrders> => {
+            const res = await axiosClient.get<PreviousOrders>(
+                `/auth/${user?.id}/all/user/orders`
+            )
+            return res.data
         },
-        enabled: user ? true : false
+        enabled: !!user,
     })
+
 
     if (!token) {
         redirect('/');
@@ -36,8 +40,8 @@ const Page = () => {
                         <ArrowLeft />
                         {"Retour a l'accueil"}
                     </Button>
-                    <ProfilComp orders={data?.data} />
-                    <HistoryTable title={'Dernieres Commandes'} data={data?.data.data.slice(-5)} />
+                    <ProfilComp orders={data} />
+                    <HistoryTable title={'Dernieres Commandes'} data={data?.data.slice(-5)} />
                 </div>
             </div>
             : isLoading && null

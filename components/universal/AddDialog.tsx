@@ -26,8 +26,6 @@ import useStore from "@/context/store";
 import { useEffect, useState } from "react";
 import {
   ProductsData,
-  ProductOption,
-  ProductOptionChild,
   otherOption,
   Option,
 } from "@/types/types";
@@ -120,15 +118,11 @@ interface DialogProps {
 }
 
 function AddDialog({
-  buttonSize = "full",
-  buttonText = "Ajouter au panier",
-  variant = "default",
   id,
   name,
   options = [],
   price,
   image,
-  disable,
   cat,
   description,
   children,

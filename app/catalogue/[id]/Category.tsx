@@ -3,7 +3,6 @@
 import Dishes from "@/components/produits/dishes";
 import Head from "@/components/universal/Head";
 import ProductQuery from "@/queries/productQuery";
-import { Categories } from "@/types/types";
 import { useQuery } from "@tanstack/react-query";
 import { ChevronRight } from "lucide-react";
 import Link from "next/link";
@@ -38,14 +37,14 @@ const Category = ({ id }: { id: number }) => {
     );
     return (
       <>
-      <Head image={category?.image ?? "/images/catalog.jpg"} title={category?.name} />
+        <Head image={category?.image ?? "/images/catalog.jpg"} title={category?.name} />
         <div className="container mx-auto">
           <div className="flex gap-2 border-b-[1px]  border-b-[#D9D9D9] pt-3 pr-5 pb-3 pl-5 ">
             <p className="text-orange-300">
               <Link href="/">Home</Link>
             </p>
-            <ChevronRight />
-            <p>Catalogue</p>
+            <ChevronRight className="text-orange-300" />
+            <Link className="text-orange-300" href="/catalogue">Catalogue</Link>
             <ChevronRight />
             <p>{category?.name}</p>
           </div>

@@ -1,6 +1,7 @@
 import { Categories } from '@/types/types'
 import React, { useEffect, useRef, useState } from 'react'
 import CategoryComp from './CategoryComp'
+import Link from 'next/link'
 
 interface Props {
     categories: Categories[]
@@ -74,13 +75,13 @@ const CategoryCarousel = ({ categories }: Props) => {
                             className="flex-shrink-0"
                             style={{ width: `${100 / visibleItems}%` }}
                         >
-                            <div className="px-2">
+                            <Link href={`/catalogue/${cat.id}`} className="px-2">
                                 <CategoryComp 
                                     nom={cat.name} 
                                     nbProduit="" 
                                     image={cat.image ? cat.image : "/images/imagePlaceholder.svg"} 
                                 />
-                            </div>
+                            </Link>
                         </div>
                     ))}
                 </div>

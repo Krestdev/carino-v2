@@ -1,9 +1,10 @@
-import { OrderLog, PreviousOrders } from '@/types/types'
-import React from 'react'
+import { OrderLog } from '@/types/types'
+import React, { useState } from 'react'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { XAF } from '@/lib/functions'
 import { Button } from '../ui/button'
 import { LuEye } from 'react-icons/lu'
+import ViewOrderDialog from './ViewOrderDialog'
 
 interface Props {
     title: string
@@ -11,22 +12,33 @@ interface Props {
 }
 
 const HistoryTable = ({ title, data }: Props) => {
+    const [selectedOrder, setSelectedOrder] = useState<OrderLog | null>(null)
+    const [dialogOpen, setDialogOpen] = useState(false)
 
     const jsonArray = (array: string) => {
         if (typeof array === 'string') {
-            return JSON.parse(array.replace(/\n/g, ''));
+            return JSON.parse(array.replace(/\n/g, ''))
         } else {
-            return array;
+            return array
         }
+    }
+
+    const handleViewOrder = (order: OrderLog) => {
+        setSelectedOrder(order)
+        setDialogOpen(true)
+    }
+
+    const handleCloseDialog = () => {
+        setDialogOpen(false)
+        setSelectedOrder(null)
     }
 
     return (
         <div className='flex flex-col gap-5 w-full'>
-            <h3>{title}</h3>
+            <h3 className="text-xl font-bold">{title}</h3>
             <Table className="max-w-[1440px] w-full mx-auto border border-gray-300">
                 <TableHeader>
                     <TableRow className="divide-x divide-gray-300">
-                        {/* <TableHead className="w-[100px]">{"ID"}</TableHead> */}
                         <TableHead className='font-bold'>{"References"}</TableHead>
                         <TableHead className='font-bold'>{"Statuts"}</TableHead>
                         <TableHead className='font-bold'>{"Etats de paiement"}</TableHead>
@@ -40,8 +52,7 @@ const HistoryTable = ({ title, data }: Props) => {
                     {
                         data.length === 0 ? (
                             <TableRow className="divide-x divide-gray-200">
-                                <TableCell></TableCell>
-                                <TableCell>{"Aucune donnée à afficher."}</TableCell>
+                                <TableCell colSpan={7} className="text-center">{"Aucune donnée à afficher."}</TableCell>
                             </TableRow>
                         ) : (
                             data.reverse().map((order, id) => (
@@ -57,16 +68,20 @@ const HistoryTable = ({ title, data }: Props) => {
                                     <TableCell>{order.is_paid ? "Payé" : "Non payé"}</TableCell>
                                     <TableCell className="truncate max-w-[200px]">
                                         {(() => {
-                                            const items = jsonArray(order.items);
-                                            const preview = items.slice(0, 3).join(", ");
-                                            return items.length > 3 ? `${preview} ...` : preview;
+                                            const items = order.items
+                                            const preview = items.slice(0, 3).join(", ")
+                                            return items.length > 3 ? `${preview} ...` : preview
                                         })()}
                                     </TableCell>
 
                                     <TableCell>{XAF.format(Number(order.prix_total))}</TableCell>
                                     <TableCell>{order.created_at.toString().slice(0, 10)}</TableCell>
                                     <TableCell>
-                                        <Button variant={"outline"} className='text-black border-[#848484]'>
+                                        <Button 
+                                            variant={"outline"} 
+                                            className='text-black border-[#848484]'
+                                            onClick={() => handleViewOrder(order)}
+                                        >
                                             <LuEye />
                                             {"voir"}
                                         </Button>
@@ -77,6 +92,14 @@ const HistoryTable = ({ title, data }: Props) => {
                     }
                 </TableBody>
             </Table>
+
+            {selectedOrder && (
+                <ViewOrderDialog 
+                    open={dialogOpen} 
+                    onClose={handleCloseDialog} 
+                    order={selectedOrder} 
+                />
+            )}
         </div>
     )
 }

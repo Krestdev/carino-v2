@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useEffect, useState } from 'react'
+import React, { useEffect } from 'react'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '../ui/form'
 import { Input } from '../ui/input'
 import { Button } from '../ui/button'
@@ -34,7 +34,7 @@ interface login {
 const LoginComp = () => {
 
     const axiosClient = axiosConfig();
-    const [displayError, setDisplayError] = useState(false);
+    // const [displayError, setDisplayError] = useState(false);
 
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
@@ -44,16 +44,17 @@ const LoginComp = () => {
         },
     });
 
-    const { login, token, setToken } = useStore();
+    const { login, token } = useStore();
     const { mutate, isError, error, isPending, data, isSuccess } = useMutation({
-        mutationFn: (credentials: credentialsType) => {
-            //console.log(credentials);
-            return axiosClient.post<any, AxiosResponse<login>>(
+        mutationFn: async (credentials: credentialsType): Promise<login> => {
+            const res = await axiosClient.post<login>(
                 "/auth/login",
                 credentials
-            );
+            )
+            return res.data
         },
-    });
+    })
+
 
     function onSubmit(values: z.infer<typeof formSchema>) {
         mutate(values);
@@ -61,16 +62,15 @@ const LoginComp = () => {
 
     useEffect(() => {
         if (isSuccess) {
-            setToken(data.data.data["bearer token"]);
-            login(data.data.data.user, data.data.data['bearer token']);
-            
+            login(data.data.user, data.data['bearer token']);
+
             toast({
                 title: "Connexion réussie !",
                 variant: "success",
             });
         }
         if (isError) {
-            setDisplayError(true);
+            // setDisplayError(true);
             //console.log(error);
         }
     }, [isSuccess, isError, data, error, login]);
