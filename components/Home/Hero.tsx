@@ -31,7 +31,10 @@ const Hero = () => {
             </p>
             <div className="flex flex-row gap-2">
               <Button className="bg-[#29235C]">{"Commander"}</Button>
-              <Button className="text-[#FFC336]" variant={"outline"}>
+              <Button
+                className="bg-[#FFC336] text-primary "
+                variant={"outline"}
+              >
                 {"Réserver une Table"}
               </Button>
             </div>

@@ -25,7 +25,9 @@ const Reservation = () => {
           </h4>
         </div>
         <Link href={"/reservation"}>
-          <Button className="w-fit">{"Reserver une table"}</Button>
+          <Button className="w-fit bg-[#FFC336] text-primary hover:text-white ">
+            {"Reserver une table"}
+          </Button>
         </Link>
       </div>
     </div>

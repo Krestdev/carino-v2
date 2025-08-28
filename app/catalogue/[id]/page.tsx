@@ -1,5 +1,4 @@
-import React from "react";
-import Category from "./Category";
+import CategoryDetail from "./Category";
 
 type Props = {
   params: Promise<{
