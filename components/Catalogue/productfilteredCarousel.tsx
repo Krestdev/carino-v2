@@ -10,6 +10,17 @@ const ProductfilteredCarousel = ({ product, categories }: Props) => {
   const categoryList = categories.filter(
     (x: Categories) => x.id_parent === null
   );
+  const importantCat = ["Suggestions du Chef", "Vacances"];
+  //filter important categories to be shown first
+  categoryList.sort((a, b) => {
+    if (importantCat.includes(a.name) && !importantCat.includes(b.name)) {
+      return -1;
+    }
+    if (!importantCat.includes(a.name) && importantCat.includes(b.name)) {
+      return 1;
+    }
+    return 0;
+  });
   return (
     <>
       {categoryList.map((category, i: number) => {
