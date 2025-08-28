@@ -1,5 +1,4 @@
-import React from "react";
-import Category from "./Category";
+import CategoryDetail from "./Category";
 
 type Props = {
   params: Promise<{
@@ -10,7 +9,7 @@ type Props = {
 const Categorydetail = async ({ params }: Props) => {
   const id = (await params).id;
 
-  return <Category id={id} />;
+  return <CategoryDetail id={id} />;
 };
 
 export default Categorydetail;

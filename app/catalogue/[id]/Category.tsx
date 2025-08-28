@@ -1,14 +1,17 @@
 "use client";
 
+import Category from "@/components/produits/categories";
 import Dishes from "@/components/produits/dishes";
 import Head from "@/components/universal/Head";
 import ProductQuery from "@/queries/productQuery";
+import { ProductsData } from "@/types/types";
 import { useQuery } from "@tanstack/react-query";
 import { ChevronRight } from "lucide-react";
 import Link from "next/link";
-import React from "react";
+import React, { useState } from "react";
 
-const Category = ({ id }: { id: number }) => {
+const CategoryDetail = ({ id }: { id: number }) => {
+  const [filteredItems, setfilteredItems] = useState<ProductsData[]>([]);
   const product = new ProductQuery();
   const productData = useQuery({
     queryKey: ["productFetchAll"],
@@ -29,10 +32,22 @@ const Category = ({ id }: { id: number }) => {
   }
   if (productData.isSuccess && categoryData.isSuccess) {
     const category = categoryData.data.data.find((x) => x.id == id);
+    const categories = categoryData.data.data.filter((x) => x.id_parent == id);
 
     const filteredProducts = productData.data.data.filter((product) =>
       product.cat.some((x) => x.id == id || x.id_parent == id)
     );
+
+    function handleFilter(filterId: number) {
+      if (filterId === -1) {
+        setfilteredItems(filteredProducts);
+      } else {
+        const filtered = filteredProducts.filter((product) =>
+          product.cat.some((x) => x.id === filterId)
+        );
+        setfilteredItems(filtered);
+      }
+    }
     return (
       <>
         <Head
@@ -51,11 +66,12 @@ const Category = ({ id }: { id: number }) => {
             <ChevronRight />
             <p>{category?.name}</p>
           </div>
-          <Dishes products={filteredProducts} />
+          <Category categories={categories} handleFilter={handleFilter} />
+          <Dishes products={filteredItems} />
         </div>
       </>
     );
   }
 };
 
-export default Category;
+export default CategoryDetail;
