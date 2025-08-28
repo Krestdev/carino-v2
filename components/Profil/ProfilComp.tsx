@@ -1,10 +1,9 @@
 import useStore from "@/context/store";
-import { PreviousOrders, UserOrdersResponse } from "@/types/types";
+import { UserOrdersResponse } from "@/types/types";
 import { redirect } from "next/navigation";
-import React from "react";
-import { Input } from "../ui/input";
-import { Button } from "../ui/button";
 import { LuSquarePen } from "react-icons/lu";
+import { Button } from "../ui/button";
+import { Input } from "../ui/input";
 
 const ProfilComp = ({ orders }: { orders: UserOrdersResponse }) => {
   const { user, token } = useStore();

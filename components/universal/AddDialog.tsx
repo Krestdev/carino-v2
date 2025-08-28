@@ -210,7 +210,15 @@ function AddDialog({
           uniqueOptions.length > 0
       );
     }
-  }, [open, form]);
+  }, [
+    open,
+    form,
+    accompagnements.length,
+    optSuppBurger.length,
+    optSuppPizza.length,
+    optSupplements.length,
+    uniqueOptions.length,
+  ]);
 
   const [currentPrice, setCurrentPrice] = useState(XAF.format(price));
   useEffect(() => {
@@ -267,9 +275,7 @@ function AddDialog({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>{children}</DialogTrigger>
-      <DialogContent
-        className={`max-h-[800px] ${showOptions ? "h-full" : "h-fit"}`}
-      >
+      <DialogContent className={`max-h-[80vh] flex flex-col`}>
         <DialogHeader className="sticky top-0 bg-white">
           <DialogTitle className="!relative py-5 min-h-[144px] flex items-center">
             <div className="absolute w-full h-full bg-gradient-to-t from-black/40 to-black/80 -z-10" />
@@ -286,673 +292,696 @@ function AddDialog({
           </DialogDescription>
         </DialogHeader>
 
-        {showOptions && (
-          <Form {...form}>
-            <form
-              onSubmit={form.handleSubmit(onSubmit)}
-              className="flex flex-col w-full odd:bg-gray-200 text-center pb-7 px-6 flex-1 overflow-y-auto border border-dashed border-gray-400 rounded-lg my-scrollbox"
-            >
-              {accompagnements.length > 0 &&
-                accompagnements.map((option, id) => (
-                  <div key={id} className="relative">
-                    <div className="productDetailTitle sticky top-0 backdrop-blur-lg">
-                      {option.name}
-                    </div>
-                    <div className="productDetailInput">
-                      {option.enfants.map((item) => (
-                        <div
-                          key={item.name}
-                          className="flex max-w-md w-full justify-between gap-3 py-2 flex-wrap"
-                        >
-                          <FormField
-                            control={form.control}
-                            name="accompaniement"
-                            render={({ field }) => (
-                              <FormItem className="flex flex-row items-center space-x-3 space-y-0">
-                                <FormControl>
-                                  <Checkbox
-                                    checked={field.value.some((el) =>
-                                      el.details.some(
-                                        (x) => x.id === item.id_zelty
-                                      )
-                                    )}
-                                    onCheckedChange={(checked) => {
-                                      return checked
-                                        ? field.value.filter(
-                                            (x) => x.name === option.name
-                                          ).length < 5
-                                          ? field.onChange([
-                                              ...field.value,
-                                              {
-                                                name: option.name,
-                                                id_zelty: option.id_zelty,
-                                                details: [
-                                                  {
-                                                    id: item.id_zelty,
-                                                    name: item.name,
-                                                    price: Number(item.price),
-                                                    qte: 1,
-                                                  },
-                                                ],
-                                              },
-                                            ])
-                                          : null
-                                        : field.onChange([
-                                            ...field.value.filter((el) =>
-                                              el.details.some(
-                                                (x) => x.id !== item.id_zelty
-                                              )
-                                            ),
-                                          ]);
-                                    }}
-                                  />
-                                </FormControl>
-                                <FormLabel className="text-base capitalize font-normal">
-                                  {item.name}
-                                </FormLabel>
-                              </FormItem>
+        <Form {...form}>
+          <form
+            onSubmit={form.handleSubmit(onSubmit)}
+            className="flex flex-col overflow-y-auto"
+          >
+            {showOptions && (
+              <div className="flex flex-col w-full text-center pb-7 px-6 flex-1 overflow-y-auto border border-dashed border-gray-400 rounded-lg my-scrollbox">
+                {accompagnements.length > 0 &&
+                  accompagnements.map((option, id) => (
+                    <div key={id} className="relative">
+                      <div className="productDetailTitle sticky top-0 backdrop-blur-lg">
+                        {option.name}
+                      </div>
+                      <div className="productDetailInput">
+                        {option.enfants.map((item) => (
+                          <div
+                            key={item.name}
+                            className="flex max-w-md w-full justify-between gap-3 py-2 flex-wrap odd:bg-gray-200 px-2"
+                          >
+                            <FormField
+                              control={form.control}
+                              name="accompaniement"
+                              render={({ field }) => (
+                                <FormItem className="flex flex-row items-center space-x-3 space-y-0">
+                                  <FormControl>
+                                    <Checkbox
+                                      className="border-gray-500"
+                                      checked={field.value.some((el) =>
+                                        el.details.some(
+                                          (x) => x.id === item.id_zelty
+                                        )
+                                      )}
+                                      onCheckedChange={(checked) => {
+                                        return checked
+                                          ? field.value.filter(
+                                              (x) => x.name === option.name
+                                            ).length < 5
+                                            ? field.onChange([
+                                                ...field.value,
+                                                {
+                                                  name: option.name,
+                                                  id_zelty: option.id_zelty,
+                                                  details: [
+                                                    {
+                                                      id: item.id_zelty,
+                                                      name: item.name,
+                                                      price: Number(item.price),
+                                                      qte: 1,
+                                                    },
+                                                  ],
+                                                },
+                                              ])
+                                            : null
+                                          : field.onChange([
+                                              ...field.value.filter((el) =>
+                                                el.details.some(
+                                                  (x) => x.id !== item.id_zelty
+                                                )
+                                              ),
+                                            ]);
+                                      }}
+                                    />
+                                  </FormControl>
+                                  <FormLabel className="text-base capitalize font-normal">
+                                    {item.name}
+                                  </FormLabel>
+                                </FormItem>
+                              )}
+                            />
+                            {item.price > 0 && (
+                              <div>{XAF.format(item.price)}</div>
                             )}
-                          />
-                          {item.price > 0 && (
-                            <div>{XAF.format(item.price)}</div>
-                          )}
-                        </div>
-                      ))}
-                      {form.getFieldState("accompaniement").error && (
-                        <Alert variant={"destructive"}>
-                          <AlertTitle>
-                            {"Veuillez selectionner un accompagnement"}
-                          </AlertTitle>
-                        </Alert>
-                      )}
+                          </div>
+                        ))}
+                        {form.getFieldState("accompaniement").error && (
+                          <Alert variant={"destructive"}>
+                            <AlertTitle>
+                              {"Veuillez selectionner un accompagnement"}
+                            </AlertTitle>
+                          </Alert>
+                        )}
+                      </div>
                     </div>
-                  </div>
-                ))}
-              {uniqueOptions.length > 0 &&
-                uniqueOptions.map((option, id) => (
-                  <div key={id} className=" relative">
-                    <div className="productDetailTitle sticky top-0 backdrop-blur-lg">
-                      {option.name}
+                  ))}
+                {uniqueOptions.length > 0 &&
+                  uniqueOptions.map((option, id) => (
+                    <div key={id} className=" relative">
+                      <div className="productDetailTitle sticky top-0 backdrop-blur-lg">
+                        {option.name}
+                      </div>
+                      <div className="productDetailInput">
+                        {option.enfants.map((item) => (
+                          <div
+                            key={item.name}
+                            className="flex max-w-md w-full justify-between gap-3 py-2 flex-wrap odd:bg-gray-200 px-2"
+                          >
+                            <FormField
+                              control={form.control}
+                              name="uniqueOptions"
+                              render={({ field }) => (
+                                <FormItem className="flex flex-row items-center space-x-3 space-y-0">
+                                  <FormControl>
+                                    <Checkbox
+                                      checked={field.value.some((el) =>
+                                        el.details.some(
+                                          (x) => x.id === item.id_zelty
+                                        )
+                                      )}
+                                      onCheckedChange={(checked) => {
+                                        return checked
+                                          ? field.onChange(
+                                              field.value.map((x) =>
+                                                x.id_zelty !== option.id_zelty
+                                                  ? x
+                                                  : {
+                                                      name: option.name,
+                                                      id_zelty: option.id_zelty,
+                                                      details: [
+                                                        {
+                                                          name: item.name,
+                                                          id: item.id_zelty,
+                                                          price: Number(
+                                                            item.price
+                                                          ),
+                                                          qte: 1,
+                                                        },
+                                                      ],
+                                                    }
+                                              )
+                                            )
+                                          : null; //field.onChange([...field.value.filter(el=>el.details.some(x=>x.id!==item.id_zelty))])
+                                      }}
+                                    />
+                                  </FormControl>
+                                  <FormLabel className="text-base capitalize font-normal">
+                                    {item.name}
+                                  </FormLabel>
+                                  <div className="absolute bottom-0 left-[50%] translate-x-[-50%]">
+                                    <FormMessage />
+                                  </div>
+                                </FormItem>
+                              )}
+                            />
+                            {item.price > 0 && (
+                              <div>{XAF.format(item.price)}</div>
+                            )}
+                          </div>
+                        ))}
+                      </div>
                     </div>
-                    <div className="productDetailInput">
-                      {option.enfants.map((item) => (
-                        <div
-                          key={item.name}
-                          className="flex max-w-md w-full justify-between gap-3 py-2 flex-wrap"
-                        >
-                          <FormField
-                            control={form.control}
-                            name="uniqueOptions"
-                            render={({ field }) => (
-                              <FormItem className="flex flex-row items-center space-x-3 space-y-0">
-                                <FormControl>
-                                  <Checkbox
-                                    checked={field.value.some((el) =>
-                                      el.details.some(
-                                        (x) => x.id === item.id_zelty
+                  ))}
+                {optSupplements.length > 0 &&
+                  optSupplements.map((option, id) => (
+                    <div key={id} className="relative">
+                      <div className="productDetailTitle sticky top-0 backdrop-blur-lg">
+                        {option.name}
+                      </div>
+                      <div className="productDetailInput">
+                        {option.enfants.map((item) => (
+                          <div
+                            key={item.name}
+                            className="flex max-w-md w-full justify-between gap-3 py-2 flex-wrap odd:bg-gray-200 px-2"
+                          >
+                            <FormField
+                              control={form.control}
+                              name="optionalSupplements"
+                              render={({ field }) => (
+                                <FormItem className="flex flex-row items-center space-x-3 space-y-0">
+                                  <FormControl>
+                                    <Checkbox
+                                      checked={field.value.some((el) =>
+                                        el.details.some(
+                                          (x) => x.id === item.id_zelty
+                                        )
+                                      )}
+                                      onCheckedChange={(checked) => {
+                                        return checked
+                                          ? field.value.filter(
+                                              (x) => x.name === option.name
+                                            ).length < 5
+                                            ? field.onChange([
+                                                ...field.value,
+                                                {
+                                                  name: option.name,
+                                                  id_zelty: option.id_zelty,
+                                                  details: [
+                                                    {
+                                                      id: item.id_zelty,
+                                                      name: item.name,
+                                                      price: Number(item.price),
+                                                      qte: 1,
+                                                    },
+                                                  ],
+                                                },
+                                              ])
+                                            : null
+                                          : field.onChange([
+                                              ...field.value.filter((el) =>
+                                                el.details.some(
+                                                  (x) => x.id !== item.id_zelty
+                                                )
+                                              ),
+                                            ]);
+                                      }}
+                                    />
+                                  </FormControl>
+                                  <FormLabel className="text-base capitalize font-normal">
+                                    {item.name}
+                                  </FormLabel>
+                                  <div className="absolute bottom-0 left-[50%] translate-x-[-50%]">
+                                    <FormMessage />
+                                  </div>
+                                </FormItem>
+                              )}
+                            />
+                            {item.price > 0 && (
+                              <div>{XAF.format(item.price)}</div>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                {optSuppBurger.length > 0 &&
+                  optSuppBurger.map((option, id) => (
+                    <div key={id} className="relative">
+                      <div className="productDetailTitle sticky top-0 backdrop-blur-lg">
+                        {option.name}
+                      </div>
+                      <div className="productDetailInput">
+                        {option.enfants.map((item) => (
+                          <div
+                            key={item.name}
+                            className="flex max-w-md w-full justify-between gap-3 py-2 flex-wrap odd:bg-gray-200 px-2"
+                          >
+                            <FormField
+                              control={form.control}
+                              name="supplementBurger"
+                              render={({ field }) => {
+                                const optionIndex = field.value.findIndex(
+                                  (val) => val.name === option.name
+                                );
+                                const detailIndex =
+                                  optionIndex !== -1
+                                    ? field.value[
+                                        optionIndex
+                                      ].details.findIndex(
+                                        (dt) => dt.name === item.name
                                       )
-                                    )}
-                                    onCheckedChange={(checked) => {
-                                      return checked
-                                        ? field.onChange(
-                                            field.value.map((x) =>
-                                              x.id_zelty !== option.id_zelty
-                                                ? x
-                                                : {
+                                    : -1;
+                                const currentQuantity =
+                                  detailIndex >= 0
+                                    ? field.value[optionIndex].details[
+                                        detailIndex
+                                      ].qte
+                                    : 0;
+                                return (
+                                  <FormItem
+                                    key={item.name}
+                                    className="flex flex-row items-start space-x-3 space-y-0"
+                                  >
+                                    <FormControl>
+                                      <div className="flex flex-row gap-1 items-center">
+                                        <span className="w-5">
+                                          {currentQuantity}
+                                        </span>
+                                        <Button
+                                          //   variant={"green"}
+                                          size={"icon"}
+                                          className="h-5 w-5 rounded"
+                                          onClick={(e) => {
+                                            optionIndex < 0
+                                              ? field.onChange([
+                                                  ...field.value,
+                                                  {
                                                     name: option.name,
                                                     id_zelty: option.id_zelty,
                                                     details: [
                                                       {
-                                                        name: item.name,
                                                         id: item.id_zelty,
+                                                        name: item.name,
                                                         price: Number(
                                                           item.price
                                                         ),
                                                         qte: 1,
                                                       },
                                                     ],
-                                                  }
-                                            )
-                                          )
-                                        : null; //field.onChange([...field.value.filter(el=>el.details.some(x=>x.id!==item.id_zelty))])
-                                    }}
-                                  />
-                                </FormControl>
-                                <FormLabel className="text-base capitalize font-normal">
-                                  {item.name}
-                                </FormLabel>
-                                <div className="absolute bottom-0 left-[50%] translate-x-[-50%]">
-                                  <FormMessage />
-                                </div>
-                              </FormItem>
-                            )}
-                          />
-                          {item.price > 0 && (
-                            <div>{XAF.format(item.price)}</div>
-                          )}
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                ))}
-              {optSupplements.length > 0 &&
-                optSupplements.map((option, id) => (
-                  <div key={id} className="relative">
-                    <div className="productDetailTitle sticky top-0 backdrop-blur-lg">
-                      {option.name}
-                    </div>
-                    <div className="productDetailInput">
-                      {option.enfants.map((item) => (
-                        <div
-                          key={item.name}
-                          className="flex max-w-md w-full justify-between gap-3 py-2 flex-wrap"
-                        >
-                          <FormField
-                            control={form.control}
-                            name="optionalSupplements"
-                            render={({ field }) => (
-                              <FormItem className="flex flex-row items-center space-x-3 space-y-0">
-                                <FormControl>
-                                  <Checkbox
-                                    checked={field.value.some((el) =>
-                                      el.details.some(
-                                        (x) => x.id === item.id_zelty
-                                      )
-                                    )}
-                                    onCheckedChange={(checked) => {
-                                      return checked
-                                        ? field.value.filter(
-                                            (x) => x.name === option.name
-                                          ).length < 5
-                                          ? field.onChange([
-                                              ...field.value,
-                                              {
-                                                name: option.name,
-                                                id_zelty: option.id_zelty,
-                                                details: [
-                                                  {
-                                                    id: item.id_zelty,
-                                                    name: item.name,
-                                                    price: Number(item.price),
-                                                    qte: 1,
                                                   },
-                                                ],
-                                              },
-                                            ])
-                                          : null
-                                        : field.onChange([
-                                            ...field.value.filter((el) =>
-                                              el.details.some(
-                                                (x) => x.id !== item.id_zelty
-                                              )
-                                            ),
-                                          ]);
-                                    }}
-                                  />
-                                </FormControl>
-                                <FormLabel className="text-base capitalize font-normal">
-                                  {item.name}
-                                </FormLabel>
-                                <div className="absolute bottom-0 left-[50%] translate-x-[-50%]">
-                                  <FormMessage />
-                                </div>
-                              </FormItem>
+                                                ])
+                                              : detailIndex < 0 &&
+                                                field.value[
+                                                  optionIndex
+                                                ].details.reduce(
+                                                  (total, el) => total + el.qte,
+                                                  0
+                                                ) < 3
+                                              ? field.onChange(
+                                                  field.value.map((op) =>
+                                                    op.name !== option.name
+                                                      ? op
+                                                      : {
+                                                          name: op.name,
+                                                          id_zelty: op.id_zelty,
+                                                          details: [
+                                                            ...op.details,
+                                                            {
+                                                              id: item.id_zelty,
+                                                              name: item.name,
+                                                              price: Number(
+                                                                item.price
+                                                              ),
+                                                              qte: 1,
+                                                            },
+                                                          ],
+                                                        }
+                                                  )
+                                                )
+                                              : detailIndex < 0 &&
+                                                field.value[
+                                                  optionIndex
+                                                ].details.reduce(
+                                                  (total, el) => total + el.qte,
+                                                  0
+                                                ) >= 3
+                                              ? null
+                                              : detailIndex >= 0 &&
+                                                field.value[
+                                                  optionIndex
+                                                ].details.reduce(
+                                                  (total, el) => total + el.qte,
+                                                  0
+                                                ) < 3
+                                              ? field.onChange(
+                                                  field.value.map((op) =>
+                                                    op.name !== option.name
+                                                      ? op
+                                                      : {
+                                                          name: op.name,
+                                                          id_zelty: op.id_zelty,
+                                                          details:
+                                                            op.details.map(
+                                                              (el) =>
+                                                                el.name !==
+                                                                item.name
+                                                                  ? el
+                                                                  : {
+                                                                      name: el.name,
+                                                                      id: el.id,
+                                                                      price:
+                                                                        Number(
+                                                                          el.price
+                                                                        ),
+                                                                      qte:
+                                                                        el.qte +
+                                                                        1,
+                                                                    }
+                                                            ),
+                                                        }
+                                                  )
+                                                )
+                                              : null;
+
+                                            //console.log(form.getValues())
+                                            e.preventDefault();
+                                          }}
+                                        >
+                                          <Plus size={16} />
+                                        </Button>
+                                        <Button
+                                          variant={"outline"}
+                                          size={"icon"}
+                                          className="h-5 w-5 rounded sha"
+                                          onClick={(e) => {
+                                            detailIndex >= 0 &&
+                                              field.onChange(
+                                                field.value
+                                                  .map((op) =>
+                                                    op.name === option.name
+                                                      ? currentQuantity > 1
+                                                        ? {
+                                                            name: op.name,
+                                                            id_zelty:
+                                                              op.id_zelty,
+                                                            details:
+                                                              op.details.map(
+                                                                (dt) =>
+                                                                  dt.name ===
+                                                                  item.name
+                                                                    ? {
+                                                                        id: dt.id,
+                                                                        name: dt.name,
+                                                                        price:
+                                                                          dt.price,
+                                                                        qte:
+                                                                          dt.qte -
+                                                                          1,
+                                                                      }
+                                                                    : dt
+                                                              ),
+                                                          }
+                                                        : currentQuantity === 1
+                                                        ? {
+                                                            name: op.name,
+                                                            id_zelty:
+                                                              op.id_zelty,
+                                                            details:
+                                                              op.details.filter(
+                                                                (dt) =>
+                                                                  dt.name !==
+                                                                  item.name
+                                                              ),
+                                                          }
+                                                        : op
+                                                      : op
+                                                  )
+                                                  .filter(
+                                                    (op) =>
+                                                      op.details.length > 0
+                                                  )
+                                              );
+                                            e.preventDefault();
+                                          }}
+                                        >
+                                          <Minus
+                                            size={16}
+                                            className="text-primary"
+                                          />
+                                        </Button>
+                                      </div>
+                                    </FormControl>
+                                    <FormLabel className="text-base capitalize font-normal">
+                                      {item.name}
+                                    </FormLabel>
+                                    <div className="absolute bottom-0 left-[50%] translate-x-[-50%]">
+                                      <FormMessage />
+                                    </div>
+                                  </FormItem>
+                                );
+                              }}
+                            />
+                            {item.price > 0 && (
+                              <div>{XAF.format(item.price)}</div>
                             )}
-                          />
-                          {item.price > 0 && (
-                            <div>{XAF.format(item.price)}</div>
-                          )}
-                        </div>
-                      ))}
+                          </div>
+                        ))}
+                      </div>
                     </div>
-                  </div>
-                ))}
-              {optSuppBurger.length > 0 &&
-                optSuppBurger.map((option, id) => (
-                  <div key={id} className="relative">
-                    <div className="productDetailTitle sticky top-0 backdrop-blur-lg">
-                      {option.name}
-                    </div>
-                    <div className="productDetailInput">
-                      {option.enfants.map((item) => (
-                        <div
-                          key={item.name}
-                          className="flex max-w-md w-full justify-between gap-3 py-2 flex-wrap"
-                        >
-                          <FormField
-                            control={form.control}
-                            name="supplementBurger"
-                            render={({ field }) => {
-                              const optionIndex = field.value.findIndex(
-                                (val) => val.name === option.name
-                              );
-                              const detailIndex =
-                                optionIndex !== -1
-                                  ? field.value[optionIndex].details.findIndex(
-                                      (dt) => dt.name === item.name
-                                    )
-                                  : -1;
-                              const currentQuantity =
-                                detailIndex >= 0
-                                  ? field.value[optionIndex].details[
-                                      detailIndex
-                                    ].qte
-                                  : 0;
-                              return (
-                                <FormItem
-                                  key={item.name}
-                                  className="flex flex-row items-start space-x-3 space-y-0"
-                                >
-                                  <FormControl>
-                                    <div className="flex flex-row gap-1 items-center">
-                                      <span className="w-5">
-                                        {currentQuantity}
-                                      </span>
-                                      <Button
-                                        //   variant={"green"}
-                                        size={"icon"}
-                                        className="h-5 w-5 rounded"
-                                        onClick={(e) => {
-                                          optionIndex < 0
-                                            ? field.onChange([
-                                                ...field.value,
-                                                {
-                                                  name: option.name,
-                                                  id_zelty: option.id_zelty,
-                                                  details: [
-                                                    {
-                                                      id: item.id_zelty,
-                                                      name: item.name,
-                                                      price: Number(item.price),
-                                                      qte: 1,
-                                                    },
-                                                  ],
-                                                },
-                                              ])
-                                            : detailIndex < 0 &&
-                                              field.value[
-                                                optionIndex
-                                              ].details.reduce(
-                                                (total, el) => total + el.qte,
-                                                0
-                                              ) < 3
-                                            ? field.onChange(
-                                                field.value.map((op) =>
-                                                  op.name !== option.name
-                                                    ? op
-                                                    : {
-                                                        name: op.name,
-                                                        id_zelty: op.id_zelty,
-                                                        details: [
-                                                          ...op.details,
-                                                          {
-                                                            id: item.id_zelty,
-                                                            name: item.name,
-                                                            price: Number(
-                                                              item.price
-                                                            ),
-                                                            qte: 1,
-                                                          },
-                                                        ],
-                                                      }
-                                                )
-                                              )
-                                            : detailIndex < 0 &&
-                                              field.value[
-                                                optionIndex
-                                              ].details.reduce(
-                                                (total, el) => total + el.qte,
-                                                0
-                                              ) >= 3
-                                            ? null
-                                            : detailIndex >= 0 &&
-                                              field.value[
-                                                optionIndex
-                                              ].details.reduce(
-                                                (total, el) => total + el.qte,
-                                                0
-                                              ) < 3
-                                            ? field.onChange(
-                                                field.value.map((op) =>
-                                                  op.name !== option.name
-                                                    ? op
-                                                    : {
-                                                        name: op.name,
-                                                        id_zelty: op.id_zelty,
-                                                        details: op.details.map(
-                                                          (el) =>
-                                                            el.name !==
-                                                            item.name
-                                                              ? el
-                                                              : {
-                                                                  name: el.name,
-                                                                  id: el.id,
-                                                                  price: Number(
-                                                                    el.price
-                                                                  ),
-                                                                  qte:
-                                                                    el.qte + 1,
-                                                                }
+                  ))}
+                {optSuppPizza.length > 0 &&
+                  optSuppPizza.map((option, id) => (
+                    <div key={id} className="relative">
+                      <div className="productDetailTitle sticky top-0 backdrop-blur-lg">
+                        {option.name}
+                      </div>
+                      <div className="productDetailInput">
+                        {option.enfants.map((item) => (
+                          <div
+                            key={item.name}
+                            className="flex max-w-md w-full justify-between gap-3 py-2 flex-wrap"
+                          >
+                            <FormField
+                              control={form.control}
+                              name="supplementPizza"
+                              render={({ field }) => {
+                                const optionIndex = field.value.findIndex(
+                                  (val) => val.name === option.name
+                                );
+                                const detailIndex =
+                                  optionIndex !== -1
+                                    ? field.value[
+                                        optionIndex
+                                      ].details.findIndex(
+                                        (dt) => dt.name === item.name
+                                      )
+                                    : -1;
+                                const currentQuantity =
+                                  detailIndex >= 0
+                                    ? field.value[optionIndex].details[
+                                        detailIndex
+                                      ].qte
+                                    : 0;
+                                return (
+                                  <FormItem
+                                    key={item.name}
+                                    className="flex flex-row items-start space-x-3 space-y-0"
+                                  >
+                                    <FormControl>
+                                      <div className="flex flex-row gap-1 items-center">
+                                        <span className="w-5">
+                                          {currentQuantity}
+                                        </span>
+                                        <Button
+                                          //   variant={"green"}
+                                          size={"icon"}
+                                          className="h-5 w-5 rounded"
+                                          onClick={(e) => {
+                                            optionIndex < 0
+                                              ? field.onChange([
+                                                  ...field.value,
+                                                  {
+                                                    name: option.name,
+                                                    id_zelty: option.id_zelty,
+                                                    details: [
+                                                      {
+                                                        id: item.id_zelty,
+                                                        name: item.name,
+                                                        price: Number(
+                                                          item.price
                                                         ),
-                                                      }
+                                                        qte: 1,
+                                                      },
+                                                    ],
+                                                  },
+                                                ])
+                                              : detailIndex < 0 &&
+                                                field.value[
+                                                  optionIndex
+                                                ].details.reduce(
+                                                  (total, el) => total + el.qte,
+                                                  0
+                                                ) < 22
+                                              ? field.onChange(
+                                                  field.value.map((op) =>
+                                                    op.name !== option.name
+                                                      ? op
+                                                      : {
+                                                          name: op.name,
+                                                          id_zelty: op.id_zelty,
+                                                          details: [
+                                                            ...op.details,
+                                                            {
+                                                              id: item.id_zelty,
+                                                              name: item.name,
+                                                              price: Number(
+                                                                item.price
+                                                              ),
+                                                              qte: 1,
+                                                            },
+                                                          ],
+                                                        }
+                                                  )
                                                 )
-                                              )
-                                            : null;
-
-                                          //console.log(form.getValues())
-                                          e.preventDefault();
-                                        }}
-                                      >
-                                        <Plus size={16} />
-                                      </Button>
-                                      <Button
-                                        variant={"outline"}
-                                        size={"icon"}
-                                        className="h-5 w-5 rounded sha"
-                                        onClick={(e) => {
-                                          detailIndex >= 0 &&
-                                            field.onChange(
-                                              field.value
-                                                .map((op) =>
-                                                  op.name === option.name
-                                                    ? currentQuantity > 1
-                                                      ? {
+                                              : detailIndex < 0 &&
+                                                field.value[
+                                                  optionIndex
+                                                ].details.reduce(
+                                                  (total, el) => total + el.qte,
+                                                  0
+                                                ) >= 22
+                                              ? null
+                                              : detailIndex >= 0 &&
+                                                field.value[
+                                                  optionIndex
+                                                ].details.reduce(
+                                                  (total, el) => total + el.qte,
+                                                  0
+                                                ) < 22
+                                              ? field.onChange(
+                                                  field.value.map((op) =>
+                                                    op.name !== option.name
+                                                      ? op
+                                                      : {
                                                           name: op.name,
                                                           id_zelty: op.id_zelty,
                                                           details:
                                                             op.details.map(
-                                                              (dt) =>
-                                                                dt.name ===
+                                                              (el) =>
+                                                                el.name !==
                                                                 item.name
-                                                                  ? {
-                                                                      id: dt.id,
-                                                                      name: dt.name,
+                                                                  ? el
+                                                                  : {
+                                                                      name: el.name,
+                                                                      id: el.id,
                                                                       price:
-                                                                        dt.price,
+                                                                        Number(
+                                                                          el.price
+                                                                        ),
                                                                       qte:
-                                                                        dt.qte -
+                                                                        el.qte +
                                                                         1,
                                                                     }
-                                                                  : dt
                                                             ),
                                                         }
-                                                      : currentQuantity === 1
-                                                      ? {
-                                                          name: op.name,
-                                                          id_zelty: op.id_zelty,
-                                                          details:
-                                                            op.details.filter(
-                                                              (dt) =>
-                                                                dt.name !==
-                                                                item.name
-                                                            ),
-                                                        }
-                                                      : op
-                                                    : op
+                                                  )
                                                 )
-                                                .filter(
-                                                  (op) => op.details.length > 0
-                                                )
-                                            );
-                                          e.preventDefault();
-                                        }}
-                                      >
-                                        <Minus
-                                          size={16}
-                                          className="text-primary"
-                                        />
-                                      </Button>
-                                    </div>
-                                  </FormControl>
-                                  <FormLabel className="text-base capitalize font-normal">
-                                    {item.name}
-                                  </FormLabel>
-                                  <div className="absolute bottom-0 left-[50%] translate-x-[-50%]">
-                                    <FormMessage />
-                                  </div>
-                                </FormItem>
-                              );
-                            }}
-                          />
-                          {item.price > 0 && (
-                            <div>{XAF.format(item.price)}</div>
-                          )}
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                ))}
-              {optSuppPizza.length > 0 &&
-                optSuppPizza.map((option, id) => (
-                  <div key={id} className="relative">
-                    <div className="productDetailTitle sticky top-0 backdrop-blur-lg">
-                      {option.name}
-                    </div>
-                    <div className="productDetailInput">
-                      {option.enfants.map((item) => (
-                        <div
-                          key={item.name}
-                          className="flex max-w-md w-full justify-between gap-3 py-2 flex-wrap"
-                        >
-                          <FormField
-                            control={form.control}
-                            name="supplementPizza"
-                            render={({ field }) => {
-                              const optionIndex = field.value.findIndex(
-                                (val) => val.name === option.name
-                              );
-                              const detailIndex =
-                                optionIndex !== -1
-                                  ? field.value[optionIndex].details.findIndex(
-                                      (dt) => dt.name === item.name
-                                    )
-                                  : -1;
-                              const currentQuantity =
-                                detailIndex >= 0
-                                  ? field.value[optionIndex].details[
-                                      detailIndex
-                                    ].qte
-                                  : 0;
-                              return (
-                                <FormItem
-                                  key={item.name}
-                                  className="flex flex-row items-start space-x-3 space-y-0"
-                                >
-                                  <FormControl>
-                                    <div className="flex flex-row gap-1 items-center">
-                                      <span className="w-5">
-                                        {currentQuantity}
-                                      </span>
-                                      <Button
-                                        //   variant={"green"}
-                                        size={"icon"}
-                                        className="h-5 w-5 rounded"
-                                        onClick={(e) => {
-                                          optionIndex < 0
-                                            ? field.onChange([
-                                                ...field.value,
-                                                {
-                                                  name: option.name,
-                                                  id_zelty: option.id_zelty,
-                                                  details: [
-                                                    {
-                                                      id: item.id_zelty,
-                                                      name: item.name,
-                                                      price: Number(item.price),
-                                                      qte: 1,
-                                                    },
-                                                  ],
-                                                },
-                                              ])
-                                            : detailIndex < 0 &&
-                                              field.value[
-                                                optionIndex
-                                              ].details.reduce(
-                                                (total, el) => total + el.qte,
-                                                0
-                                              ) < 22
-                                            ? field.onChange(
-                                                field.value.map((op) =>
-                                                  op.name !== option.name
-                                                    ? op
-                                                    : {
-                                                        name: op.name,
-                                                        id_zelty: op.id_zelty,
-                                                        details: [
-                                                          ...op.details,
-                                                          {
-                                                            id: item.id_zelty,
-                                                            name: item.name,
-                                                            price: Number(
-                                                              item.price
-                                                            ),
-                                                            qte: 1,
-                                                          },
-                                                        ],
-                                                      }
-                                                )
-                                              )
-                                            : detailIndex < 0 &&
-                                              field.value[
-                                                optionIndex
-                                              ].details.reduce(
-                                                (total, el) => total + el.qte,
-                                                0
-                                              ) >= 22
-                                            ? null
-                                            : detailIndex >= 0 &&
-                                              field.value[
-                                                optionIndex
-                                              ].details.reduce(
-                                                (total, el) => total + el.qte,
-                                                0
-                                              ) < 22
-                                            ? field.onChange(
-                                                field.value.map((op) =>
-                                                  op.name !== option.name
-                                                    ? op
-                                                    : {
-                                                        name: op.name,
-                                                        id_zelty: op.id_zelty,
-                                                        details: op.details.map(
-                                                          (el) =>
-                                                            el.name !==
-                                                            item.name
-                                                              ? el
-                                                              : {
-                                                                  name: el.name,
-                                                                  id: el.id,
-                                                                  price: Number(
-                                                                    el.price
-                                                                  ),
-                                                                  qte:
-                                                                    el.qte + 1,
-                                                                }
-                                                        ),
-                                                      }
-                                                )
-                                              )
-                                            : null;
+                                              : null;
 
-                                          //console.log(form.getValues())
-                                          e.preventDefault();
-                                        }}
-                                      >
-                                        <Plus size={16} />
-                                      </Button>
-                                      <Button
-                                        variant={"outline"}
-                                        size={"icon"}
-                                        className="h-5 w-5 rounded"
-                                        onClick={(e) => {
-                                          detailIndex >= 0 &&
-                                            field.onChange(
-                                              field.value
-                                                .map((op) =>
-                                                  op.name === option.name
-                                                    ? currentQuantity > 1
-                                                      ? {
-                                                          name: op.name,
-                                                          id_zelty: op.id_zelty,
-                                                          details:
-                                                            op.details.map(
-                                                              (dt) =>
-                                                                dt.name ===
-                                                                item.name
-                                                                  ? {
-                                                                      id: dt.id,
-                                                                      name: dt.name,
-                                                                      price:
-                                                                        dt.price,
-                                                                      qte:
-                                                                        dt.qte -
-                                                                        1,
-                                                                    }
-                                                                  : dt
-                                                            ),
-                                                        }
-                                                      : currentQuantity === 1
-                                                      ? {
-                                                          name: op.name,
-                                                          id_zelty: op.id_zelty,
-                                                          details:
-                                                            op.details.filter(
-                                                              (dt) =>
-                                                                dt.name !==
-                                                                item.name
-                                                            ),
-                                                        }
+                                            //console.log(form.getValues())
+                                            e.preventDefault();
+                                          }}
+                                        >
+                                          <Plus size={16} />
+                                        </Button>
+                                        <Button
+                                          variant={"outline"}
+                                          size={"icon"}
+                                          className="h-5 w-5 rounded"
+                                          onClick={(e) => {
+                                            detailIndex >= 0 &&
+                                              field.onChange(
+                                                field.value
+                                                  .map((op) =>
+                                                    op.name === option.name
+                                                      ? currentQuantity > 1
+                                                        ? {
+                                                            name: op.name,
+                                                            id_zelty:
+                                                              op.id_zelty,
+                                                            details:
+                                                              op.details.map(
+                                                                (dt) =>
+                                                                  dt.name ===
+                                                                  item.name
+                                                                    ? {
+                                                                        id: dt.id,
+                                                                        name: dt.name,
+                                                                        price:
+                                                                          dt.price,
+                                                                        qte:
+                                                                          dt.qte -
+                                                                          1,
+                                                                      }
+                                                                    : dt
+                                                              ),
+                                                          }
+                                                        : currentQuantity === 1
+                                                        ? {
+                                                            name: op.name,
+                                                            id_zelty:
+                                                              op.id_zelty,
+                                                            details:
+                                                              op.details.filter(
+                                                                (dt) =>
+                                                                  dt.name !==
+                                                                  item.name
+                                                              ),
+                                                          }
+                                                        : op
                                                       : op
-                                                    : op
-                                                )
-                                                .filter(
-                                                  (op) => op.details.length > 0
-                                                )
-                                            );
-                                          e.preventDefault();
-                                        }}
-                                      >
-                                        <Minus
-                                          size={16}
-                                          className="text-primary"
-                                        />
-                                      </Button>
+                                                  )
+                                                  .filter(
+                                                    (op) =>
+                                                      op.details.length > 0
+                                                  )
+                                              );
+                                            e.preventDefault();
+                                          }}
+                                        >
+                                          <Minus
+                                            size={16}
+                                            className="text-primary"
+                                          />
+                                        </Button>
+                                      </div>
+                                    </FormControl>
+                                    <FormLabel className="text-base capitalize font-normal">
+                                      {item.name}
+                                    </FormLabel>
+                                    <div className="absolute bottom-0 left-[50%] translate-x-[-50%]">
+                                      <FormMessage />
                                     </div>
-                                  </FormControl>
-                                  <FormLabel className="text-base capitalize font-normal">
-                                    {item.name}
-                                  </FormLabel>
-                                  <div className="absolute bottom-0 left-[50%] translate-x-[-50%]">
-                                    <FormMessage />
-                                  </div>
-                                </FormItem>
-                              );
-                            }}
-                          />
-                          {item.price > 0 && (
-                            <div>{XAF.format(item.price)}</div>
-                          )}
-                        </div>
-                      ))}
+                                  </FormItem>
+                                );
+                              }}
+                            />
+                            {item.price > 0 && (
+                              <div>{XAF.format(item.price)}</div>
+                            )}
+                          </div>
+                        ))}
+                      </div>
                     </div>
+                  ))}
+              </div>
+            )}
+            <div className="flex flex-col justify-center items-center gap-2">
+              <div className="productDetailInput">
+                <div className="flex max-w-md w-full justify-center items-center gap-3 py-2 flex-wrap">
+                  <div className="flex flex-col text-center">
+                    <Label className="uppercase">prix total</Label>
+                    <span className="font-bold text-xl">{currentPrice}</span>
                   </div>
-                ))}
-            </form>
-          </Form>
-        )}
-        <div className="flex flex-col justify-center items-center gap-2">
-          <div className="productDetailInput">
-            <div className="flex max-w-md w-full justify-center items-center gap-3 py-2 flex-wrap">
-              <div className="flex flex-col text-center">
-                <Label className="uppercase">prix total</Label>
-                <span className="font-bold text-xl">{currentPrice}</span>
+                </div>
+              </div>
+              <div className="w-full flex justify-center flex-wrap gap-4">
+                <Button type="submit">Ajouter au panier</Button>
               </div>
             </div>
-          </div>
-          <div className="w-full flex justify-center flex-wrap gap-4">
-            <Button type="submit">Ajouter au panier</Button>
-          </div>
-        </div>
+          </form>
+        </Form>
       </DialogContent>
     </Dialog>
   );

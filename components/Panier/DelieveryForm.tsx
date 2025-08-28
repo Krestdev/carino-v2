@@ -1,4 +1,6 @@
+import axiosConfig from "@/api";
 import useStore from "@/context/store";
+import { cn, isDeliveryOpen } from "@/lib/utils";
 import {
   CitiesResponse,
   City,
@@ -8,15 +10,19 @@ import {
 } from "@/types/types";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { AxiosResponse } from "axios";
+import { Check, ChevronsUpDown } from "lucide-react";
 import { useRouter } from "next/navigation";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import z from "zod";
-import { ApplyPromotion, sendPackPromotion } from "../universal/promotions";
-import { toast } from "../ui/use-toast";
-import axiosConfig from "@/api";
-import { cn, isDeliveryOpen } from "@/lib/utils";
+import { Button } from "../ui/button";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+} from "../ui/command";
 import {
   Form,
   FormControl,
@@ -25,17 +31,8 @@ import {
   FormLabel,
   FormMessage,
 } from "../ui/form";
-import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
-import { Button } from "../ui/button";
-import { Check, ChevronsUpDown } from "lucide-react";
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-} from "../ui/command";
 import { Input } from "../ui/input";
+import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import {
   Select,
   SelectContent,
@@ -43,6 +40,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui/select";
+import { toast } from "../ui/use-toast";
+import { ApplyPromotion, sendPackPromotion } from "../universal/promotions";
 
 const formSchema = z.object({
   city: z.string().min(3, { message: "Selectionnez une ville" }),

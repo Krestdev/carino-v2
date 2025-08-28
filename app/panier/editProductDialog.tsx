@@ -118,6 +118,18 @@ interface EditProps {
   children: React.JSX.Element;
 }
 
+const getTotal = (val: otherOption[], price: number) => {
+  let total = price;
+  if (val.length > 0) {
+    val.forEach((option) =>
+      option.details.forEach(
+        (detail) => (total = total + detail.price * detail.qte)
+      )
+    );
+  }
+  return total;
+};
+
 function EditProductDialog({
   nom,
   qte,
@@ -249,17 +261,17 @@ function EditProductDialog({
 
   const price = productData.isSuccess ? productData.data.data[0].price : 0;
 
-  const getTotal = (val: otherOption[]) => {
-    let total = price;
-    if (val.length > 0) {
-      val.forEach((option) =>
-        option.details.forEach(
-          (detail) => (total = total + detail.price * detail.qte)
-        )
-      );
-    }
-    return total;
-  };
+  // const getTotal = (val: otherOption[]) => {
+  //   let total = price;
+  //   if (val.length > 0) {
+  //     val.forEach((option) =>
+  //       option.details.forEach(
+  //         (detail) => (total = total + detail.price * detail.qte)
+  //       )
+  //     );
+  //   }
+  //   return total;
+  // };
 
   const [currentPrice, setCurrentPrice] = useState(XAF.format(price));
   useEffect(() => {
@@ -301,9 +313,9 @@ function EditProductDialog({
       allOptions.push({ name: "Saveurs", details: form.getValues().flavors });
     }
     setCurrentPrice(
-      XAF.format(getTotal(allOptions) * form.getValues().quantity)
+      XAF.format(getTotal(allOptions, price) * form.getValues().quantity)
     );
-  }, [form.watch(), form, getTotal]);
+  }, [form.watch(), form, price]);
 
   function onSubmit(data: z.infer<typeof FormSchema>) {
     const cartOption = () => {
@@ -338,7 +350,7 @@ function EditProductDialog({
       nom: nom,
       itemId: itemId,
       options: cartOption(),
-      price: getTotal(cartOption()),
+      price: getTotal(cartOption(), price),
       image: image ? image : "/images/imagePlaceholder.svg",
       cat: [],
     });

@@ -1,6 +1,16 @@
 "use client";
 
-import React, { useEffect } from "react";
+import useStore from "@/context/store";
+import UserQuery from "@/queries/userQueries";
+import { User } from "@/types/types";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useMutation } from "@tanstack/react-query";
+import Link from "next/link";
+import { redirect } from "next/navigation";
+import { useEffect } from "react";
+import { useForm } from "react-hook-form";
+import z from "zod";
+import { Button } from "../ui/button";
 import {
   Form,
   FormControl,
@@ -10,17 +20,7 @@ import {
   FormMessage,
 } from "../ui/form";
 import { Input } from "../ui/input";
-import { Button } from "../ui/button";
-import Link from "next/link";
-import z from "zod";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import useStore from "@/context/store";
-import { useMutation } from "@tanstack/react-query";
-import { credentialsType, User } from "@/types/types";
-import { redirect } from "next/navigation";
 import { toast } from "../ui/use-toast";
-import UserQuery from "@/queries/userQueries";
 
 const formSchema = z.object({
   email: z.string().email({ message: "Adresse mail invalide" }),
@@ -30,11 +30,6 @@ const formSchema = z.object({
 interface loginData {
   "bearer token": string;
   user: User;
-}
-
-interface login {
-  data: loginData;
-  message: string;
 }
 
 const LoginComp = () => {

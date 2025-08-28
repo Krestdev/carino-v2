@@ -1,17 +1,13 @@
 "use client";
 
-import axiosConfig from "@/api";
 import HistoryTable from "@/components/Historique/HistoryTable";
 import ProfilComp from "@/components/Profil/ProfilComp";
 import { Button } from "@/components/ui/button";
 import useStore from "@/context/store";
 import UserQuery from "@/queries/userQueries";
-import { PreviousOrders } from "@/types/types";
-import { useMutation, useQuery } from "@tanstack/react-query";
-import { AxiosResponse } from "axios";
+import { useQuery } from "@tanstack/react-query";
 import { ArrowLeft } from "lucide-react";
 import { redirect } from "next/navigation";
-import React from "react";
 
 const Page = () => {
   const { user, token } = useStore();

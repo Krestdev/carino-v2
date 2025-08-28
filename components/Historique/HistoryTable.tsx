@@ -1,5 +1,3 @@
-import { OrderLog, OrdersData } from "@/types/types";
-import React, { useState } from "react";
 import {
   Table,
   TableBody,
@@ -9,8 +7,10 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { XAF } from "@/lib/functions";
-import { Button } from "../ui/button";
+import { OrdersData } from "@/types/types";
+import { useState } from "react";
 import { LuEye } from "react-icons/lu";
+import { Button } from "../ui/button";
 import ViewOrderDialog from "./ViewOrderDialog";
 
 interface Props {
@@ -22,13 +22,13 @@ const HistoryTable = ({ title, data }: Props) => {
   const [selectedOrder, setSelectedOrder] = useState<OrdersData | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
 
-  const jsonArray = (array: string) => {
-    if (typeof array === "string") {
-      return JSON.parse(array.replace(/\n/g, ""));
-    } else {
-      return array;
-    }
-  };
+  // const jsonArray = (array: string) => {
+  //   if (typeof array === "string") {
+  //     return JSON.parse(array.replace(/\n/g, ""));
+  //   } else {
+  //     return array;
+  //   }
+  // };
 
   const handleViewOrder = (order: OrdersData) => {
     setSelectedOrder(order);
