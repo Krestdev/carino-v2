@@ -1,55 +1,80 @@
-"use client"
+"use client";
 
-import React, { useState } from 'react'
-import z from 'zod/v3';
-import { Dialog, DialogClose, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '../ui/dialog';
-import { AlertCircle, CalendarIcon, Loader } from 'lucide-react';
-import Link from 'next/link';
-import { Button } from '../ui/button';
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '../ui/form';
-import { Input } from '../ui/input';
-import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover';
-import { Calendar } from '../ui/calendar';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import useStore from '@/context/store';
-import { Textarea } from '../ui/textarea';
-import { cn } from '@/lib/utils';
-import { useMutation } from '@tanstack/react-query';
-import axiosConfig from '@/api';
-import { format } from 'date-fns';
-import { fr } from 'date-fns/locale';
+import React, { useState } from "react";
+import z from "zod/v3";
+import { Dialog, DialogClose, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "../ui/dialog";
+import { AlertCircle, CalendarIcon, Loader } from "lucide-react";
+import Link from "next/link";
+import { Button } from "../ui/button";
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "../ui/form";
+import { Input } from "../ui/input";
+import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
+import { Calendar } from "../ui/calendar";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../ui/select";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import useStore from "@/context/store";
+import { Textarea } from "../ui/textarea";
+import { cn } from "@/lib/utils";
+import axiosConfig from "@/api";
+import ReservationQuery from "@/queries/reservationQuery";
+import { useMutation } from "@tanstack/react-query";
+import { fr } from "date-fns/locale";
+import { format } from "date-fns";
 
-const formSchema = z.object({
-  name: z.string({ required_error: "Veuillez entrer votre nom" }).min(4, "Trop court"),
-  email: z.string().email({ message: "Adresse mail invalide" }),
-  booking_for: z.date({ required_error: "Veuillez choisir une date" }),
-  time: z.string({ required_error: "Selectionnez une heure" }),
-  menu: z.string({ required_error: "Veuillez choisir un menu pour continuer" }),
-  places: z
-    .string({ required_error: "Veuillez choisir le nombre de places" })
-    .refine((value) => /^\d*$/.test(value)),
-
-  comment: z.string(),
-  phone: z
-    .string({ required_error: "Veuillez entrer votre numéro de téléphone" })
-    .refine((value) => /^\d*$/.test(value), {
-      message: "Le numéro ne doit comporter que des chiffres",
+const formSchema = z
+  .object({
+    name: z
+      .string({ required_error: "Veuillez entrer votre nom" })
+      .min(4, "Trop court"),
+    email: z.string().email({ message: "Adresse mail invalide" }),
+    date: z.date({ required_error: "Veuillez choisir une date" }),
+    time: z.string({ required_error: "Selectionnez une heure" }),
+    menu: z.string({
+      required_error: "Veuillez choisir un menu pour continuer",
     }),
-  note: z.string(),
-}).refine(data => {
-  const [hours] = data.time.split(":");
+    places: z
+      .string({ required_error: "Veuillez choisir le nombre de places" })
+      .refine((value) => /^\d*$/.test(value)),
 
-  if (Number(hours) < 12 || Number(hours) > 21) {
-    return false
-  }
-  return true;
-}, { message: "Les réservations sont disponibles entre Midi et 22h", path: ["time"] });
+    salle: z.string(),
+    phone: z
+      .string({ required_error: "Veuillez entrer votre numéro de téléphone" })
+      .refine((value) => /^\d*$/.test(value), {
+        message: "Le numéro ne doit comporter que des chiffres",
+      }),
+    description: z.string(),
+  })
+  .refine(
+    (data) => {
+      const [hours] = data.time.split(":");
 
+      if (Number(hours) < 12 || Number(hours) > 21) {
+        return false;
+      }
+      return true;
+    },
+    {
+      message: "Les réservations sont disponibles entre Midi et 22h",
+      path: ["time"],
+    }
+  );
 
 const ReservationForm = () => {
-
   const { user } = useStore();
   const [open, setOpen] = React.useState(false);
   const [successModal, setSuccessModal] = useState(false)
@@ -61,86 +86,80 @@ const ReservationForm = () => {
       name: user?.name,
       email: user?.email,
       phone: user?.phone.substring(4),
-      comment: "",
-      note: "",
+      description: "",
+      // note: "",
       menu: "",
       places: "",
       time: "",
-      booking_for: new Date(),
+      date: new Date(),
     },
   });
 
-  const axiosClient = axiosConfig();
+  // const axiosClient = axiosConfig();
 
-  const postReservation = useMutation({
-    mutationFn: ({
-      name,
-      email,
-      booking_for,
-      comment,
-      places,
-      menu,
-      phone,
-      time,
-      note,
-    }: z.infer<typeof formSchema>) => {
-      const [hour, mins] = time.split(":");
-      const book_date = booking_for.setHours(Number(hour), Number(mins));
-      const date = new Date(book_date).toISOString();
-      const persons = Number(places);
-      const amount =
-        menu === "silver"
-          ? 12000 * persons
-          : menu === "gold"
-            ? 15000 * persons
-            : menu === "diamond"
-              ? 18000 * persons
-              : 0;
-      return axiosClient.post(
-        "/reservations",
-        {
-          name,
-          email,
-          booking_for,
-          comment,
-          places,
-          menu,
-          phone,
-          time,
-          note,
-        }
-      );
-    },
-    onSuccess: () => {
-      form.reset();
-      setSuccessModal(true)
-    }
-  });
+  // const postReservation = useMutation({
+  //   mutationFn: ({
+  //     name,
+  //     email,
+  //     booking_for,
+  //     comment,
+  //     places,
+  //     menu,
+  //     phone,
+  //     time,
+  //     note,
+  //   }: z.infer<typeof formSchema>) => {
+  //     const [hour, mins] = time.split(":");
+  //     const book_date = booking_for.setHours(Number(hour), Number(mins));
+  //     const date = new Date(book_date).toISOString();
+  //     const persons = Number(places);
+  //     const amount =
+  //       menu === "silver"
+  //         ? 12000 * persons
+  //         : menu === "gold"
+  //           ? 15000 * persons
+  //           : menu === "diamond"
+  //             ? 18000 * persons
+  //             : 0;
+  //     return axiosClient.post(
+  //       "/reservations",
+  //       {
+  //         name,
+  //         email,
+  //         booking_for,
+  //         comment,
+  //         places,
+  //         menu,
+  //         phone,
+  //         time,
+  //         note,
+  //       }
+  //     );
+  //   },
+  //   onSuccess: () => {
+  //     form.reset();
+  //     setSuccessModal(true)
+  //   }
+  // });
+
+  const reservations = new ReservationQuery();
+  const reservationData = useMutation({
+    mutationKey: ["reservations"],
+    mutationFn: (data: z.infer<typeof formSchema>) => reservations.createReservation({...data, places: Number(data.places)}),
+  })
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    // console.log(values);
-    postReservation.mutate(
-      {
-        name: values.name,
-        email: values.email,
-        booking_for: values.booking_for,
-        comment: values.comment,
-        places: values.places,
-        menu: values.menu,
-        phone: values.phone,
-        time: values.time,
-        note: values.note
-      },
-      {
-        onSuccess: () => {
-          form.reset();
-        },
-      }
-    );
+    console.log(values);
+    if (user) {
+      reservationData.mutate(values);
+      // console.log(values);
+    } else {
+      setOpen(true);
+    }
   }
 
   return (
-    <div className='flex flex-col gap-8 max-w-[1040px] w-full mx-auto my-20'>
+    <div className="flex flex-col gap-8 max-w-[1040px] w-full mx-auto my-20">
       <div className="max-w-[640px] w-full mx-auto spaced flex flex-col gap-10">
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogContent className="p-5 flex flex-col gap-5">
@@ -151,7 +170,8 @@ const ReservationForm = () => {
               </span>
             </DialogHeader>
             <p className="text-sm pb-5">
-              {"Vous devez être connecté pour réserver au restaurant !"}<br />
+              {"Vous devez être connecté pour réserver au restaurant !"}
+              <br />
               {`Si vous ne disposez pas de compte sur notre site veuillez vous `}
               <Link href="/inscription" className="font-semibold text-primary">
                 {"inscrire"}
@@ -211,7 +231,7 @@ const ReservationForm = () => {
             />
             <FormField
               control={form.control}
-              name="booking_for"
+              name="date"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>{"Date de la réservation"}</FormLabel>
@@ -273,9 +293,12 @@ const ReservationForm = () => {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>{"Menu"}</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                  >
                     <FormControl>
-                      <SelectTrigger className='w-full'>
+                      <SelectTrigger className="w-full">
                         <SelectValue placeholder="Choissisez un menu" />
                       </SelectTrigger>
                     </FormControl>
@@ -283,7 +306,9 @@ const ReservationForm = () => {
                       {/* {buffets.map(buffet =>
                       <SelectItem key={buffet.value} value={buffet.value}>{buffet.name}</SelectItem>
                     )} */}
-                      <SelectItem value="custom">{"Menu personnalisé"}</SelectItem>
+                      <SelectItem value="custom">
+                        {"Menu personnalisé"}
+                      </SelectItem>
                     </SelectContent>
                   </Select>
                   <FormDescription>
@@ -318,18 +343,20 @@ const ReservationForm = () => {
             />
             <FormField
               control={form.control}
-              name="comment"
+              name="salle"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>{"Salle"}</FormLabel>
                   <Select onValueChange={field.onChange}>
                     <FormControl>
-                      <SelectTrigger className='w-full'>
+                      <SelectTrigger className="w-full">
                         <SelectValue placeholder="Choissisez une salle" />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value="terrasse">{"Espace Fumeur"}</SelectItem>
+                      <SelectItem value="terrasse">
+                        {"Espace Fumeur"}
+                      </SelectItem>
                       <SelectItem value="intérieure">
                         {"Espace Non-Fumeur"}
                       </SelectItem>
@@ -354,7 +381,7 @@ const ReservationForm = () => {
             />
             <FormField
               control={form.control}
-              name="note"
+              name="description"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>{"Commentaires"}</FormLabel>
@@ -369,11 +396,11 @@ const ReservationForm = () => {
             />
             <Button
               type='button'
-              disabled={postReservation.isPending}
+              disabled={reservationData.isPending}
             // disabled={isPending}
             onClick={(e) => { e.preventDefault(); setConfirm(true) }}
             >
-              {postReservation.isPending && (
+              {reservationData.isPending && (
                 <Loader className="mr-2 h-4 w-4 animate-spin" />
               )}
               {"Soumettre ma réservation"}
@@ -395,7 +422,7 @@ const ReservationForm = () => {
                 </div>
                 <div className="grid gap-2">
                   <span className="text-sm text-gray-400">{"Date de la réservation"}</span>
-                  <p>{!!form.getValues("booking_for") && format(new Date(form.getValues("booking_for")), "PPP", { locale: fr })} {form.getValues("time")}</p>
+                  <p>{!!form.getValues("date") && format(new Date(form.getValues("date")), "PPP", { locale: fr })} {form.getValues("time")}</p>
                 </div>
                 <div className="grid gap-2">
                   <span className="text-sm text-gray-400">{"Menu"}</span>
@@ -407,7 +434,7 @@ const ReservationForm = () => {
                 </div>
                 <div className="grid gap-2">
                   <span className="text-sm text-gray-400">{"Commentaires"}</span>
-                  <p>{!!form.getValues("comment") && form.getValues("comment")}</p>
+                  <p>{!!form.getValues("description") && form.getValues("description")}</p>
                 </div>
                 <div className="inline-flex gap-2">
                   <Button type="submit" onClick={(e) => { e.preventDefault(); form.handleSubmit(onSubmit)(); setConfirm(false) }}>{"Confirmer"}</Button>
@@ -419,9 +446,17 @@ const ReservationForm = () => {
           </form>
         </Form>
       </div>
-      <iframe src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d4077844.007903163!2d11.0906982!3d3.525072!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x108bcf3b75e0d501%3A0x71a28a857f271156!2sLe%20Carino%20Pizzeria!5e0!3m2!1sfr!2scm!4v1756116288352!5m2!1sfr!2scm" width="full" height="310" style={{ border: 0 }} allowFullScreen loading="lazy" referrerPolicy="no-referrer-when-downgrade"></iframe>
+      <iframe
+        src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d4077844.007903163!2d11.0906982!3d3.525072!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x108bcf3b75e0d501%3A0x71a28a857f271156!2sLe%20Carino%20Pizzeria!5e0!3m2!1sfr!2scm!4v1756116288352!5m2!1sfr!2scm"
+        width="full"
+        height="310"
+        style={{ border: 0 }}
+        allowFullScreen
+        loading="lazy"
+        referrerPolicy="no-referrer-when-downgrade"
+      ></iframe>
     </div>
-  )
-}
+  );
+};
 
-export default ReservationForm
+export default ReservationForm;

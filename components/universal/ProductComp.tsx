@@ -51,8 +51,9 @@ const ProductComp = ({ produit }: Props) => {
         >
           <Button
             disabled={produit.disable}
-            className={`${produit.disable ? "bg-gray-300 cursor-not-allowed" : ""
-              }`}
+            className={`${
+              produit.disable ? "bg-gray-300 cursor-not-allowed" : ""
+            }`}
           >
             <LuPlus />
             {"Ajouter au panier"}

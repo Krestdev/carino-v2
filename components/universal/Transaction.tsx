@@ -14,19 +14,14 @@ import useStore from "@/context/store";
 import { config } from "@/data/config";
 import { checkTransactionStatus, ReceiptProps } from "@/types/types";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import axios, { AxiosResponse } from "axios";
+import axios from "axios";
 import { useEffect, useState } from "react";
 import { CgSpinner } from "react-icons/cg";
 import { FaRegCheckCircle } from "react-icons/fa";
 /* import DownloadReceipt from "@/components/downloadReceipt";
  */
 function Transaction() {
-  const {
-    transactionRef,
-    setTransaction,
-    emptyCart,
-    receiptData,
-  } = useStore();
+  const { transactionRef, setTransaction, emptyCart, receiptData } = useStore();
   const [open, setOpen] = useState(false);
   const [paymentStatus, setPaymentStatus] = useState<
     "pending" | "success" | "failed"
@@ -71,7 +66,9 @@ function Transaction() {
           setOpen(true);
           emptyCart();
           setTimeout(() => setTransaction(null), 9000);
-        } else if (data.data.data[0].status.toLocaleLowerCase().includes("fail")) {
+        } else if (
+          data.data.data[0].status.toLocaleLowerCase().includes("fail")
+        ) {
           toast({
             title: "Transaction échouée",
             variant: "destructive",
@@ -93,29 +90,39 @@ function Transaction() {
     } else {
       //setOpen(false);
     }
-  }, [isSuccess, transactionRef, data?.data.data[0].status, data?.data.data, emptyCart, receiptData, sendReceipt, setTransaction]);
+  }, [
+    isSuccess,
+    transactionRef,
+    data?.data.data[0].status,
+    data?.data.data,
+    emptyCart,
+    receiptData,
+    sendReceipt,
+    setTransaction,
+  ]);
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent>
         <DialogHeader>
           <DialogTitle
-            className={`py-5 min-h-[60px] justify-center flex items-center px-4 ${paymentStatus === "success"
+            className={`py-5 min-h-[60px] justify-center flex items-center px-4 ${
+              paymentStatus === "success"
                 ? "bg-green-500 text-gray-900"
                 : paymentStatus === "failed"
-                  ? "bg-red-700 text-white"
-                  : "bg-slate-200 text-slate-900"
-              }`}
+                ? "bg-red-700 text-white"
+                : "bg-slate-200 text-slate-900"
+            }`}
           >
             {paymentStatus === "success"
               ? "Paiement validé"
               : paymentStatus === "failed"
-                ? "Echec de paiement"
-                : "En attente de paiement"}
+              ? "Echec de paiement"
+              : "En attente de paiement"}
           </DialogTitle>
           <DialogDescription className="text-center px-4 py-1">
-            {paymentStatus === "pending"
-              && "Un ordre de retrait a été émis. Validez le paiement pour finaliser votre commande."}
+            {paymentStatus === "pending" &&
+              "Un ordre de retrait a été émis. Validez le paiement pour finaliser votre commande."}
           </DialogDescription>
         </DialogHeader>
         {paymentStatus === "success" ? (
@@ -130,7 +137,12 @@ function Transaction() {
           <div className="px-7 flex flex-col items-center justify-center py-10 gap-6">
             <div className="grid grid-cols-1 gap-3 text-center">
               <h3>{"Le paiement de votre Commande a échoué"}</h3>
-              <p>{"Si vous rencontrez cette erreur après avoir validé le paiement et que votre compte a été débité, merci de vous rapprocher de notre "}<a href={`mailto:${config.contact.email}`}>{"support"}</a></p>
+              <p>
+                {
+                  "Si vous rencontrez cette erreur après avoir validé le paiement et que votre compte a été débité, merci de vous rapprocher de notre "
+                }
+                <a href={`mailto:${config.contact.email}`}>{"support"}</a>
+              </p>
             </div>
             <img src="/images/transaction_failed.gif" className="h-32 w-auto" />
           </div>
