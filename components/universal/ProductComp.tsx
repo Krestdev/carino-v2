@@ -19,13 +19,22 @@ const ProductComp = ({ produit }: Props) => {
           {"Indisponible"}
         </Badge>
       )}
-      {
+      <AddDialog
+        {...produit}
+        id={0}
+        name={produit.name}
+        image={produit.image}
+        description={produit.description}
+        price={produit.price}
+        cat={produit.cat}
+      >
+
         <img
           src={produit.image ? produit.image : "/images/imagePlaceholder.svg"}
           alt={produit.name}
-          className="md:max-w-[351px] aspect-[149/162] md:aspect-[4/3] md:h-auto object-cover"
+          className="md:max-w-[351px] aspect-[149/162] md:aspect-[4/3] md:h-auto object-cover cursor-pointer"
         />
-      }
+      </AddDialog>
       <div className="flex flex-col md:justify-between h-full justify-end">
         <div className="flex flex-col gap-2">
           <p className="text-[14px] font-bold uppercase">{produit.name}</p>

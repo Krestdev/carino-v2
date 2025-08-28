@@ -32,12 +32,16 @@ const ViewOrderDialog = ({ open, onClose, order }: ViewOrderDialogProps) => {
 
   if (!order) return null
 
+  
+  const metadata = JSON.parse(order.metadata.replace(/\n/g, ''));
+
+
   const orderData = {
-    zelty_order_id: order.zelty_order_id,
-    customerName: "ATANGANA CHARLES",
-    phoneNumber: "+237 675757575",
-    deliveryAddress: "POSTE CENTRALE",
-    location: "À la monté de l'avenue Kenedy",
+    id: order.id,
+    customerName: metadata.customer.name ? metadata.customer.name : "-",
+    phoneNumber: metadata.customer.phone ? metadata.customer.phone : "-",
+    deliveryAddress:  metadata.address && metadata.address.name ? metadata.address.name : "-",
+    location:  metadata.address && metadata.address.street ? metadata.address.street : "-",
     products: jsonArray(order.items),
     deliveryFee: "2 000",
     itemsAmount: (Number(order.prix_total) - 2000).toString(),
@@ -46,12 +50,7 @@ const ViewOrderDialog = ({ open, onClose, order }: ViewOrderDialogProps) => {
     is_delivred: order.is_delivred,
     created_at: order.created_at,
   }
-
-  console.log(order);
-  console.log(orderData.products);
   
-
-
   return (
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="max-w-4xl p-0">
@@ -103,7 +102,7 @@ const ViewOrderDialog = ({ open, onClose, order }: ViewOrderDialogProps) => {
                   <div className="flex flex-col gap-1 w-full border-b border-[#848484] pb-2">
                     <div className="flex justify-between">
                       <h4 className="font-normal">{"ID de transaction:"}</h4>
-                      <h4>{'#' + orderData.zelty_order_id}</h4>
+                      <h4>{'#LCP' + orderData.id}</h4>
                     </div>
                     <div className="flex justify-between">
                       <h4 className="font-normal">{"Numéro de tel:"}</h4>

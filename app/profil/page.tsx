@@ -34,7 +34,7 @@ const Page = () => {
 
     return (
         isSuccess ?
-            <div className='pt-24 pb-10'>
+            <div className='pt-24 pb-10 px-7'>
                 <div className='max-w-[1440px] w-full mx-auto flex flex-col gap-5'>
                     <Button onClick={() => redirect('/')} className='w-fit'>
                         <ArrowLeft />

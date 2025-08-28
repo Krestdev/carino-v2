@@ -1,9 +1,9 @@
 "use client"
 
-import React from 'react'
+import React, { useState } from 'react'
 import z from 'zod/v3';
-import { Dialog, DialogClose, DialogContent, DialogHeader } from '../ui/dialog';
-import { AlertCircle, CalendarIcon } from 'lucide-react';
+import { Dialog, DialogClose, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '../ui/dialog';
+import { AlertCircle, CalendarIcon, Loader } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '../ui/button';
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '../ui/form';
@@ -16,24 +16,28 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import useStore from '@/context/store';
 import { Textarea } from '../ui/textarea';
 import { cn } from '@/lib/utils';
+import { useMutation } from '@tanstack/react-query';
+import axiosConfig from '@/api';
+import { format } from 'date-fns';
+import { fr } from 'date-fns/locale';
 
 const formSchema = z.object({
   name: z.string({ required_error: "Veuillez entrer votre nom" }).min(4, "Trop court"),
   email: z.string().email({ message: "Adresse mail invalide" }),
-  date: z.date({ required_error: "Veuillez choisir une date" }),
+  booking_for: z.date({ required_error: "Veuillez choisir une date" }),
   time: z.string({ required_error: "Selectionnez une heure" }),
   menu: z.string({ required_error: "Veuillez choisir un menu pour continuer" }),
   places: z
     .string({ required_error: "Veuillez choisir le nombre de places" })
     .refine((value) => /^\d*$/.test(value)),
 
-  salle: z.string(),
+  comment: z.string(),
   phone: z
     .string({ required_error: "Veuillez entrer votre numéro de téléphone" })
     .refine((value) => /^\d*$/.test(value), {
       message: "Le numéro ne doit comporter que des chiffres",
     }),
-  description: z.string(),
+  note: z.string(),
 }).refine(data => {
   const [hours] = data.time.split(":");
 
@@ -48,6 +52,8 @@ const ReservationForm = () => {
 
   const { user } = useStore();
   const [open, setOpen] = React.useState(false);
+  const [successModal, setSuccessModal] = useState(false)
+  const [confirm, setConfirm] = useState(false)
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -55,20 +61,82 @@ const ReservationForm = () => {
       name: user?.name,
       email: user?.email,
       phone: user?.phone.substring(4),
-      salle: "",
-      // menu: selectedMenu ? selectedMenu : undefined
+      comment: "",
+      note: "",
+      menu: "",
+      places: "",
+      time: "",
+      booking_for: new Date(),
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values);
-    if (user) {
-      // mutate(values);
-      console.log(values);
-      
-    } else {
-      setOpen(true);
+  const axiosClient = axiosConfig();
+
+  const postReservation = useMutation({
+    mutationFn: ({
+      name,
+      email,
+      booking_for,
+      comment,
+      places,
+      menu,
+      phone,
+      time,
+      note,
+    }: z.infer<typeof formSchema>) => {
+      const [hour, mins] = time.split(":");
+      const book_date = booking_for.setHours(Number(hour), Number(mins));
+      const date = new Date(book_date).toISOString();
+      const persons = Number(places);
+      const amount =
+        menu === "silver"
+          ? 12000 * persons
+          : menu === "gold"
+            ? 15000 * persons
+            : menu === "diamond"
+              ? 18000 * persons
+              : 0;
+      return axiosClient.post(
+        "/reservations",
+        {
+          name,
+          email,
+          booking_for,
+          comment,
+          places,
+          menu,
+          phone,
+          time,
+          note,
+        }
+      );
+    },
+    onSuccess: () => {
+      form.reset();
+      setSuccessModal(true)
     }
+  });
+
+  function onSubmit(values: z.infer<typeof formSchema>) {
+    // console.log(values);
+    postReservation.mutate(
+      {
+        name: values.name,
+        email: values.email,
+        booking_for: values.booking_for,
+        comment: values.comment,
+        places: values.places,
+        menu: values.menu,
+        phone: values.phone,
+        time: values.time,
+        note: values.note
+      },
+      {
+        onSuccess: () => {
+          form.reset();
+        },
+      }
+    );
   }
 
   return (
@@ -99,7 +167,7 @@ const ReservationForm = () => {
             </div>
           </DialogContent>
         </Dialog>
-        {/* <Dialog open={successModal} onOpenChange={setSuccessModal}>
+        <Dialog open={successModal} onOpenChange={setSuccessModal}>
           <DialogContent>
             <DialogHeader>
               <DialogTitle className="font-sans font-semibold tracking-tighter">{"Réservation enregistrée"}</DialogTitle>
@@ -109,7 +177,7 @@ const ReservationForm = () => {
               <Button>{"Fermer"}</Button>
             </DialogClose>
           </DialogContent>
-        </Dialog> */}
+        </Dialog>
         <Form {...form}>
           <form
             onSubmit={form.handleSubmit(onSubmit)}
@@ -143,7 +211,7 @@ const ReservationForm = () => {
             />
             <FormField
               control={form.control}
-              name="date"
+              name="booking_for"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>{"Date de la réservation"}</FormLabel>
@@ -250,7 +318,7 @@ const ReservationForm = () => {
             />
             <FormField
               control={form.control}
-              name="salle"
+              name="comment"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>{"Salle"}</FormLabel>
@@ -286,7 +354,7 @@ const ReservationForm = () => {
             />
             <FormField
               control={form.control}
-              name="description"
+              name="note"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>{"Commentaires"}</FormLabel>
@@ -300,16 +368,21 @@ const ReservationForm = () => {
               )}
             />
             <Button
+              type='button'
+              disabled={postReservation.isPending}
             // disabled={isPending}
-            // onClick={(e) => { e.preventDefault(); setConfirm(true) }}
+            onClick={(e) => { e.preventDefault(); setConfirm(true) }}
             >
+              {postReservation.isPending && (
+                <Loader className="mr-2 h-4 w-4 animate-spin" />
+              )}
               {"Soumettre ma réservation"}
             </Button>
-            {/* <Dialog open={confirm} onOpenChange={setConfirm}>
+            <Dialog open={confirm} onOpenChange={setConfirm}>
             <DialogContent>
-              <DialogHeader className="bg-primary text-gray-900">
+              <DialogHeader className="bg-primary text-white p-2">
                 <DialogTitle className="font-sans font-semibold tracking-tighter">{"Confirmer la réservation"}</DialogTitle>
-                <DialogDescription className="text-gray-800">{"Vérifiez les informations liées à votre réservation"}</DialogDescription>
+                <DialogDescription className="text-white">{"Vérifiez les informations liées à votre réservation"}</DialogDescription>
               </DialogHeader>
               <div className="px-7 pb-7 grid gap-4">
                 <div className="grid gap-2">
@@ -330,7 +403,7 @@ const ReservationForm = () => {
                 </div>
                 <div className="grid gap-2">
                   <span className="text-sm text-gray-400">{"Téléphone"}</span>
-                  <p>{!!form.getValues("country_code") && form.getValues("country_code")} {!!form.getValues("phone") && form.getValues("phone")}</p>
+                  <p>{!!form.getValues("phone") && form.getValues("phone")}</p>
                 </div>
                 <div className="grid gap-2">
                   <span className="text-sm text-gray-400">{"Commentaires"}</span>
@@ -338,11 +411,11 @@ const ReservationForm = () => {
                 </div>
                 <div className="inline-flex gap-2">
                   <Button type="submit" onClick={(e) => { e.preventDefault(); form.handleSubmit(onSubmit)(); setConfirm(false) }}>{"Confirmer"}</Button>
-                  <Button className="w-fit" variant={"outline"} onClick={(e) => { e.preventDefault(); setConfirm(false) }}>{"Annuler"}</Button>
+                  <Button className="w-fit text-black border-black" variant={"outline"} onClick={(e) => { e.preventDefault(); setConfirm(false) }}>{"Annuler"}</Button>
                 </div>
               </div>
             </DialogContent>
-          </Dialog> */}
+          </Dialog>
           </form>
         </Form>
       </div>

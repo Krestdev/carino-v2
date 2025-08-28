@@ -3,7 +3,7 @@ import { Document, Page, Text, View, StyleSheet, Image } from '@react-pdf/render
 
 interface OrderInvoiceProps {
     order: {
-        zelty_order_id: string | number
+        id: string | number
         customerName: string
         phoneNumber: string
         deliveryAddress: string
@@ -31,7 +31,7 @@ const OrderInvoice = ({ order }: OrderInvoiceProps) => (
                     <View style={styles.section}>
                         <View style={styles.subSection}>
                             <Text style={styles.subSectionLabel}>{"ID de transaction:"}</Text>
-                            <Text style={styles.subSectionValue}>{order.zelty_order_id}</Text>
+                            <Text style={styles.subSectionValue}>{'#LCP' + order.id}</Text>
                         </View>
                         <View style={styles.subSection}>
                             <Text style={styles.subSectionLabel}>{"Numéro de tel:"}</Text>
@@ -56,7 +56,7 @@ const OrderInvoice = ({ order }: OrderInvoiceProps) => (
                         {
                             order.products.map((product, index) => (
                                 <View key={index} style={styles.subSection}>
-                                    <Text style={styles.subSectionLabel}>{`• ${product[0]}`}</Text>
+                                    <Text style={styles.subSectionLabel}>{`• ${product}`}</Text>
                                     <Text style={styles.subSectionValue}>{`${product[1]} prix FCFA`}</Text>
                                 </View>
                             ))

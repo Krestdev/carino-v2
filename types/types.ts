@@ -160,6 +160,7 @@ export interface OrderLog {
   created_at: Date;
   updated_at: Date;
   user_id: number;
+  metadata: string;
 }
 
 export interface otherOption {

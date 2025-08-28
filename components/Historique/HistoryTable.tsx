@@ -77,8 +77,8 @@ const HistoryTable = ({ title, data }: Props) => {
                                     <TableCell>{XAF.format(Number(order.prix_total))}</TableCell>
                                     <TableCell>{order.created_at.toString().slice(0, 10)}</TableCell>
                                     <TableCell>
-                                        <Button 
-                                            variant={"outline"} 
+                                        <Button
+                                            variant={"outline"}
                                             className='text-black border-[#848484]'
                                             onClick={() => handleViewOrder(order)}
                                         >
@@ -94,10 +94,10 @@ const HistoryTable = ({ title, data }: Props) => {
             </Table>
 
             {selectedOrder && (
-                <ViewOrderDialog 
-                    open={dialogOpen} 
-                    onClose={handleCloseDialog} 
-                    order={selectedOrder} 
+                <ViewOrderDialog
+                    open={dialogOpen}
+                    onClose={handleCloseDialog}
+                    order={selectedOrder}
                 />
             )}
         </div>
