@@ -153,7 +153,7 @@ export interface OrderLog {
   id: number;
   zelty_order_id: string;
   reference: string;
-  items: string;
+  items: [product:string, price:number][];
   is_delivred: boolean;
   is_paid: boolean;
   prix_total: string;
@@ -420,7 +420,7 @@ export interface OrdersData {
   id: number;
   zelty_order_id?: number;
   reference: string;
-  items: string;
+  items: [product:string, price:number][];
   user_id: number;
   prix_total: number;
   lieu_livraison: string;
@@ -507,4 +507,52 @@ export interface UserAddress {
   door?: string;
   building?: string;
   code?: string;
+}
+
+export interface ReservationData {
+  id?: number;
+  reservation_id?: number;
+  user_id?: number;
+  transaction_ref?: string;
+  amount?: number;
+  menu?: string;
+  phone?: string;
+  note?: string;
+  created_at?: string;
+  updated_at?: string;
+  //
+  booking_for?: string;
+  places?: number;
+  comment?: string;
+  status?: number;
+  userId?: number;
+
+  //in comment
+  email?: string;
+  name?: string;
+  customerName?: string;
+}
+
+export interface ReservationResponse {
+  amount: number;
+  phone: string;
+  note: string;
+  menu: string;
+  id?: number;
+  uid?: string;
+  remote_id?: string;
+  id_customer?: number;
+  id_command?: number;
+  created_at?: Date;
+  booking_for: string;
+  id_restaurant?: number;
+  arrived_at?: null;
+  closed_at?: null;
+  table?: number;
+  places?: number;
+  status?: number;
+  cancel_reason?: number;
+  src?: string;
+  comment?: string;
+  final_price?: null;
 }

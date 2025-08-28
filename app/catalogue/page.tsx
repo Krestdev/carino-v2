@@ -1,6 +1,5 @@
 "use client";
 import Cataloguebreadcumb from "@/components/Catalogue/cataloguebreadcumb";
-import CatalogueHero from "@/components/Catalogue/catalogueHero";
 import ProductfilteredCarousel from "@/components/Catalogue/productfilteredCarousel";
 import Head from "@/components/universal/Head";
 import ProductQuery from "@/queries/productQuery";
@@ -31,7 +30,6 @@ const Page = () => {
       </div>
     );
   }
-  console.log(categoryData.data, productData.data, categoryData.isSuccess);
   if (productData.isSuccess && categoryData.isSuccess) {
     return (
       <>

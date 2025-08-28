@@ -1,20 +1,15 @@
-import React, { useState } from "react";
-import { Button } from "../ui/button";
-import { Plus } from "lucide-react";
-import ProductQuery from "@/queries/productQuery";
-import { useQuery } from "@tanstack/react-query";
-import Categories from "./categories";
+import React from "react";
 import ProductComp from "../universal/ProductComp";
-import { ProductData } from "@/types/types";
+import { ProductsData } from "@/types/types";
 interface Props {
-  products: ProductData[];
+  products: ProductsData[];
 }
 const Dishes = ({ products }: Props) => {
   return (
-    <div className="  grid grid-cols-1   md:grid-cols-4  gap-5  w-full pt-7 pr-5 pb-7 pl-5 justify-center items-center    ">
-      {products.map((value: ProductData, i: number) => {
+    <div className="grid grid-cols-1   md:grid-cols-4  gap-5  w-full pt-7 pr-5 pb-7 pl-5 justify-center items-center    ">
+      {products.map((value: ProductsData, i: number) => {
         return (
-          <div className=" ">
+          <div key={i} className=" ">
             <ProductComp produit={value} />
           </div>
         );

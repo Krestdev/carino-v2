@@ -9,7 +9,8 @@ const Homebutton = () => {
   const router = useRouter();
   return (
     <Button onClick={() => router.push("/")} className="rounded-[27px] ml-3 pt-3 pr-4 pb-3 pl-4  mt-4">
-      <ArrowLeft /> Retour à l'accueil
+      <ArrowLeft />
+      {" Retour à l'accueil"}
     </Button>
   );
 };

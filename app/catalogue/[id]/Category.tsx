@@ -4,7 +4,6 @@ import Category from "@/components/produits/categories";
 import Dishes from "@/components/produits/dishes";
 import Head from "@/components/universal/Head";
 import ProductQuery from "@/queries/productQuery";
-import { Categories, ProductsData } from "@/types/types";
 import { useQuery } from "@tanstack/react-query";
 import { ChevronRight } from "lucide-react";
 import Link from "next/link";
@@ -32,11 +31,6 @@ const CategoryDetail = ({ id }: { id: number }) => {
   }
   if (productData.isSuccess && categoryData.isSuccess) {
     const category = categoryData.data.data.find((x) => x.id == id);
-
-    const categories = categoryData.data.data.filter((x) => x.id_parent == id);
-    //
-
-    console.log(category);
 
     const filteredProducts = productData.data.data.filter((product) =>
       product.cat.some((x) => x.id == id || x.id_parent == id)

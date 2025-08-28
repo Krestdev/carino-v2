@@ -1,6 +1,6 @@
 "use client";
 
-import { Categories, ProductData } from "@/types/types";
+import { Categories, ProductsData } from "@/types/types";
 import React, { useEffect, useRef, useState } from "react";
 import ProductComp from "./ProductComp";
 import { Button } from "../ui/button";
@@ -8,7 +8,7 @@ import { ArrowUpRight, ChevronLeft, ChevronRight } from "lucide-react";
 import Link from "next/link";
 
 type Props = {
-  products: ProductData[];
+  products: ProductsData[];
   category?: Categories;
   isLeft?: boolean;
 };
@@ -56,7 +56,7 @@ const ProductCarousel = ({ products, category, isLeft = true }: Props) => {
         clearInterval(autoScrollRef.current);
       }
     };
-  }, [products.length, visibleCount]);
+  }, [products.length, visibleCount, startAutoScroll]);
 
   // Scroll vers une "page"
   const scrollToPage = (page: number) => {
@@ -106,7 +106,7 @@ const ProductCarousel = ({ products, category, isLeft = true }: Props) => {
 
     container.addEventListener("scroll", handleScroll);
     return () => container.removeEventListener("scroll", handleScroll);
-  }, [currentPage, visibleCount]);
+  }, [currentPage, visibleCount, startAutoScroll]);
 
   const totalPages = Math.ceil(products.length / visibleCount);
 
