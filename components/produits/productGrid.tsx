@@ -1,13 +1,13 @@
-import { Categories, ProductsData } from "@/types/types";
-import React, { useState } from "react";
+import { Categories, ProductData } from "@/types/types";
+import { useState } from "react";
 import Category from "./categories";
 import Dishes from "./dishes";
 interface Props {
-  dishes: ProductsData[];
+  dishes: ProductData[];
   categories: Categories[];
 }
 
-const DishGrid = ({ dishes, categories }: Props) => {
+const ProductGrid = ({ dishes, categories }: Props) => {
   // list of filtered dishes
   const [filteredItems, setfilteredItems] = useState(dishes);
 
@@ -34,4 +34,4 @@ const DishGrid = ({ dishes, categories }: Props) => {
   );
 };
 
-export default DishGrid;
+export default ProductGrid;
