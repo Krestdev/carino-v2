@@ -30,21 +30,24 @@ const Category = ({ id }: { id: number }) => {
   if (productData.isSuccess && categoryData.isSuccess) {
     const category = categoryData.data.data.find((x) => x.id == id);
 
-    console.log(category);
-
     const filteredProducts = productData.data.data.filter((product) =>
       product.cat.some((x) => x.id == id || x.id_parent == id)
     );
     return (
       <>
-        <Head image={category?.image ?? "/images/catalog.jpg"} title={category?.name} />
+        <Head
+          image={category?.image ?? "/images/catalog.jpg"}
+          title={category?.name}
+        />
         <div className="container mx-auto">
           <div className="flex gap-2 border-b-[1px]  border-b-[#D9D9D9] pt-3 pr-5 pb-3 pl-5 ">
             <p className="text-orange-300">
               <Link href="/">Home</Link>
             </p>
             <ChevronRight className="text-orange-300" />
-            <Link className="text-orange-300" href="/catalogue">Catalogue</Link>
+            <Link className="text-orange-300" href="/catalogue">
+              Catalogue
+            </Link>
             <ChevronRight />
             <p>{category?.name}</p>
           </div>

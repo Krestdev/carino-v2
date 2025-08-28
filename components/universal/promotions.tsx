@@ -1,8 +1,7 @@
 import { cartItem } from "@/types/types";
 
 export function ApplyPromotion(data: cartItem[]): cartItem[] {
-
-  console.log("en cours");
+  // console.log("en cours");
 
   const today = new Date();
   const startDate = new Date(today.getFullYear(), 6, 10);
@@ -11,8 +10,8 @@ export function ApplyPromotion(data: cartItem[]): cartItem[] {
   const includedCategoryIds = [403441, 403438, 406718, 403440];
 
   if (today >= startDate && today <= endDate) {
-    const eligibleItems = data.filter(item =>
-      item.cat.some(cat => includedCategoryIds.includes(cat.id))
+    const eligibleItems = data.filter((item) =>
+      item.cat.some((cat) => includedCategoryIds.includes(cat.id))
     );
 
     const freePizza = Math.floor(
@@ -36,7 +35,7 @@ export function ApplyPromotion(data: cartItem[]): cartItem[] {
             name: "Les Classiques Indémodables",
             id: 403441,
             // id_zelty: "6100",
-            id_parent: 253199
+            id_parent: 253199,
           },
         ],
       },
@@ -45,7 +44,6 @@ export function ApplyPromotion(data: cartItem[]): cartItem[] {
 
   return data;
 }
-
 
 export function SendWithPromotion(data: cartItem[]): cartItem[] {
   const result = [...data];
@@ -56,8 +54,8 @@ export function SendWithPromotion(data: cartItem[]): cartItem[] {
   const includedCategoryIds = [403441, 403438, 406718, 403440];
 
   if (today >= startDate && today <= endDate) {
-    const eligibleItems = data.filter(item =>
-      item.cat.some(cat => includedCategoryIds.includes(cat.id))
+    const eligibleItems = data.filter((item) =>
+      item.cat.some((cat) => includedCategoryIds.includes(cat.id))
     );
 
     const freePizza = Math.floor(
@@ -79,7 +77,7 @@ export function SendWithPromotion(data: cartItem[]): cartItem[] {
           name: "Les Classiques Indémodables",
           id: 403441,
           id_zelty: "6100",
-          id_parent: 253199
+          id_parent: 253199,
         },
       ],
     }));
@@ -90,7 +88,11 @@ export function SendWithPromotion(data: cartItem[]): cartItem[] {
   return result;
 }
 
-export function deliveryPromotion(data: cartItem[], fees: number, address: string): number {
+export function deliveryPromotion(
+  data: cartItem[],
+  fees: number,
+  address: string
+): number {
   const today = new Date();
   const startDate = new Date(today.getFullYear(), 6, 10);
   const endDate = new Date(today.getFullYear(), 8, 5);
@@ -98,8 +100,8 @@ export function deliveryPromotion(data: cartItem[], fees: number, address: strin
   const includedCategoryIds = [403441, 403438, 406718, 403440];
 
   if (today >= startDate && today <= endDate) {
-    const eligibleItems = data.filter(item =>
-      item.cat.some(cat => includedCategoryIds.includes(cat.id))
+    const eligibleItems = data.filter((item) =>
+      item.cat.some((cat) => includedCategoryIds.includes(cat.id))
     );
 
     const freePizza = Math.floor(
@@ -117,7 +119,6 @@ export function deliveryPromotion(data: cartItem[], fees: number, address: strin
 
   return fees;
 }
-
 
 export function sendPackPromotion(data: cartItem[]): cartItem[] {
   const result = [...data];
@@ -142,7 +143,7 @@ export function sendPackPromotion(data: cartItem[]): cartItem[] {
   for (const item of data) {
     const bonusItems = promotions[item.id];
     if (bonusItems && item.qte > 0) {
-      bonusItems.forEach(bonus => {
+      bonusItems.forEach((bonus) => {
         for (let i = 0; i < item.qte; i++) {
           result.push({
             id: bonus.id,
@@ -151,8 +152,8 @@ export function sendPackPromotion(data: cartItem[]): cartItem[] {
             itemId: parseInt(bonus.id),
             options: [],
             price: 0,
-            image: "", 
-            cat: [], 
+            image: "",
+            cat: [],
           });
         }
       });

@@ -1,51 +1,75 @@
-"use client"
+"use client";
 
-import React from 'react'
-import z from 'zod/v3';
-import { Dialog, DialogClose, DialogContent, DialogHeader } from '../ui/dialog';
-import { AlertCircle, CalendarIcon } from 'lucide-react';
-import Link from 'next/link';
-import { Button } from '../ui/button';
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '../ui/form';
-import { Input } from '../ui/input';
-import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover';
-import { Calendar } from '../ui/calendar';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import useStore from '@/context/store';
-import { Textarea } from '../ui/textarea';
-import { cn } from '@/lib/utils';
+import React from "react";
+import z from "zod/v3";
+import { Dialog, DialogClose, DialogContent, DialogHeader } from "../ui/dialog";
+import { AlertCircle, CalendarIcon } from "lucide-react";
+import Link from "next/link";
+import { Button } from "../ui/button";
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "../ui/form";
+import { Input } from "../ui/input";
+import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
+import { Calendar } from "../ui/calendar";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../ui/select";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import useStore from "@/context/store";
+import { Textarea } from "../ui/textarea";
+import { cn } from "@/lib/utils";
 
-const formSchema = z.object({
-  name: z.string({ required_error: "Veuillez entrer votre nom" }).min(4, "Trop court"),
-  email: z.string().email({ message: "Adresse mail invalide" }),
-  date: z.date({ required_error: "Veuillez choisir une date" }),
-  time: z.string({ required_error: "Selectionnez une heure" }),
-  menu: z.string({ required_error: "Veuillez choisir un menu pour continuer" }),
-  places: z
-    .string({ required_error: "Veuillez choisir le nombre de places" })
-    .refine((value) => /^\d*$/.test(value)),
-
-  salle: z.string(),
-  phone: z
-    .string({ required_error: "Veuillez entrer votre numéro de téléphone" })
-    .refine((value) => /^\d*$/.test(value), {
-      message: "Le numéro ne doit comporter que des chiffres",
+const formSchema = z
+  .object({
+    name: z
+      .string({ required_error: "Veuillez entrer votre nom" })
+      .min(4, "Trop court"),
+    email: z.string().email({ message: "Adresse mail invalide" }),
+    date: z.date({ required_error: "Veuillez choisir une date" }),
+    time: z.string({ required_error: "Selectionnez une heure" }),
+    menu: z.string({
+      required_error: "Veuillez choisir un menu pour continuer",
     }),
-  description: z.string(),
-}).refine(data => {
-  const [hours] = data.time.split(":");
+    places: z
+      .string({ required_error: "Veuillez choisir le nombre de places" })
+      .refine((value) => /^\d*$/.test(value)),
 
-  if (Number(hours) < 12 || Number(hours) > 21) {
-    return false
-  }
-  return true;
-}, { message: "Les réservations sont disponibles entre Midi et 22h", path: ["time"] });
+    salle: z.string(),
+    phone: z
+      .string({ required_error: "Veuillez entrer votre numéro de téléphone" })
+      .refine((value) => /^\d*$/.test(value), {
+        message: "Le numéro ne doit comporter que des chiffres",
+      }),
+    description: z.string(),
+  })
+  .refine(
+    (data) => {
+      const [hours] = data.time.split(":");
 
+      if (Number(hours) < 12 || Number(hours) > 21) {
+        return false;
+      }
+      return true;
+    },
+    {
+      message: "Les réservations sont disponibles entre Midi et 22h",
+      path: ["time"],
+    }
+  );
 
 const ReservationForm = () => {
-
   const { user } = useStore();
   const [open, setOpen] = React.useState(false);
 
@@ -64,15 +88,14 @@ const ReservationForm = () => {
     console.log(values);
     if (user) {
       // mutate(values);
-      console.log(values);
-      
+      // console.log(values);
     } else {
       setOpen(true);
     }
   }
 
   return (
-    <div className='flex flex-col gap-8 max-w-[1040px] w-full mx-auto my-20'>
+    <div className="flex flex-col gap-8 max-w-[1040px] w-full mx-auto my-20">
       <div className="max-w-[640px] w-full mx-auto spaced flex flex-col gap-10">
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogContent className="p-5 flex flex-col gap-5">
@@ -83,7 +106,8 @@ const ReservationForm = () => {
               </span>
             </DialogHeader>
             <p className="text-sm pb-5">
-              {"Vous devez être connecté pour réserver au restaurant !"}<br />
+              {"Vous devez être connecté pour réserver au restaurant !"}
+              <br />
               {`Si vous ne disposez pas de compte sur notre site veuillez vous `}
               <Link href="/inscription" className="font-semibold text-primary">
                 {"inscrire"}
@@ -205,9 +229,12 @@ const ReservationForm = () => {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>{"Menu"}</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                  >
                     <FormControl>
-                      <SelectTrigger className='w-full'>
+                      <SelectTrigger className="w-full">
                         <SelectValue placeholder="Choissisez un menu" />
                       </SelectTrigger>
                     </FormControl>
@@ -215,7 +242,9 @@ const ReservationForm = () => {
                       {/* {buffets.map(buffet =>
                       <SelectItem key={buffet.value} value={buffet.value}>{buffet.name}</SelectItem>
                     )} */}
-                      <SelectItem value="custom">{"Menu personnalisé"}</SelectItem>
+                      <SelectItem value="custom">
+                        {"Menu personnalisé"}
+                      </SelectItem>
                     </SelectContent>
                   </Select>
                   <FormDescription>
@@ -256,12 +285,14 @@ const ReservationForm = () => {
                   <FormLabel>{"Salle"}</FormLabel>
                   <Select onValueChange={field.onChange}>
                     <FormControl>
-                      <SelectTrigger className='w-full'>
+                      <SelectTrigger className="w-full">
                         <SelectValue placeholder="Choissisez une salle" />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value="terrasse">{"Espace Fumeur"}</SelectItem>
+                      <SelectItem value="terrasse">
+                        {"Espace Fumeur"}
+                      </SelectItem>
                       <SelectItem value="intérieure">
                         {"Espace Non-Fumeur"}
                       </SelectItem>
@@ -346,9 +377,17 @@ const ReservationForm = () => {
           </form>
         </Form>
       </div>
-      <iframe src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d4077844.007903163!2d11.0906982!3d3.525072!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x108bcf3b75e0d501%3A0x71a28a857f271156!2sLe%20Carino%20Pizzeria!5e0!3m2!1sfr!2scm!4v1756116288352!5m2!1sfr!2scm" width="full" height="310" style={{ border: 0 }} allowFullScreen loading="lazy" referrerPolicy="no-referrer-when-downgrade"></iframe>
+      <iframe
+        src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d4077844.007903163!2d11.0906982!3d3.525072!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x108bcf3b75e0d501%3A0x71a28a857f271156!2sLe%20Carino%20Pizzeria!5e0!3m2!1sfr!2scm!4v1756116288352!5m2!1sfr!2scm"
+        width="full"
+        height="310"
+        style={{ border: 0 }}
+        allowFullScreen
+        loading="lazy"
+        referrerPolicy="no-referrer-when-downgrade"
+      ></iframe>
     </div>
-  )
-}
+  );
+};
 
-export default ReservationForm
+export default ReservationForm;

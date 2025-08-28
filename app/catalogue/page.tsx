@@ -30,7 +30,6 @@ const Page = () => {
       </div>
     );
   }
-  console.log(categoryData.data, productData.data, categoryData.isSuccess);
   if (productData.isSuccess && categoryData.isSuccess) {
     return (
       <>

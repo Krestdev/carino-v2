@@ -12,13 +12,12 @@ const axiosConfig = () => {
   });
   axiosClient.interceptors.response.use(
     (response) => {
-      // console.log(response.data.data);
       return response;
     },
     (error) => {
       try {
         const { response } = error;
-        console.log(response, process.env.NEXT_PUBLIC_API);
+        // console.log(response, process.env.NEXT_PUBLIC_API);
         if (response.status === 401) {
           logout();
         }

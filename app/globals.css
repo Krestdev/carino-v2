@@ -223,7 +223,7 @@ body {
     @apply shrink-0 text-sm;
   }
   .productDetailTitle{
-    @apply pb-2 pt-3 border-b font-semibold;
+    @apply pb-2 pt-3 border-b font-semibold w-full;
   }
   .productDiv {
     @apply px-4 xl:px-10 py-8 sm:py-10 md:py-12 lg:py-14 xl:py-16 w-full flex flex-col gap-4 sm:gap-6 lg:gap-10;
@@ -264,4 +264,28 @@ body {
   .cartScroll::-webkit-scrollbar-thumb{
     @apply bg-slate-700;
   }
+}
+
+/* Target only the component with the .my-scrollbox class */
+.my-scrollbox::-webkit-scrollbar {
+  width: 6px;
+}
+
+.my-scrollbox::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.my-scrollbox::-webkit-scrollbar-thumb {
+  background-color: #888;
+  border-radius: 9999px;
+}
+
+.my-scrollbox::-webkit-scrollbar-thumb:hover {
+  background-color: #555;
+}
+
+/* Firefox support */
+.my-scrollbox {
+  scrollbar-width: thin;
+  scrollbar-color: #888 transparent;
 }
