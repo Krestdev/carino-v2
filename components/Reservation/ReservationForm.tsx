@@ -34,6 +34,7 @@ import ReservationQuery from "@/queries/reservationQuery";
 import { useMutation } from "@tanstack/react-query";
 import { fr } from "date-fns/locale";
 import { format } from "date-fns";
+import { config } from "@/data/config";
 
 const formSchema = z
   .object({
@@ -94,72 +95,24 @@ const ReservationForm = () => {
     },
   });
 
-  // const axiosClient = axiosConfig();
-
-  // const postReservation = useMutation({
-  //   mutationFn: ({
-  //     name,
-  //     email,
-  //     booking_for,
-  //     comment,
-  //     places,
-  //     menu,
-  //     phone,
-  //     time,
-  //     note,
-  //   }: z.infer<typeof formSchema>) => {
-  //     const [hour, mins] = time.split(":");
-  //     const book_date = booking_for.setHours(Number(hour), Number(mins));
-  //     const date = new Date(book_date).toISOString();
-  //     const persons = Number(places);
-  //     const amount =
-  //       menu === "silver"
-  //         ? 12000 * persons
-  //         : menu === "gold"
-  //           ? 15000 * persons
-  //           : menu === "diamond"
-  //             ? 18000 * persons
-  //             : 0;
-  //     return axiosClient.post(
-  //       "/reservations",
-  //       {
-  //         name,
-  //         email,
-  //         booking_for,
-  //         comment,
-  //         places,
-  //         menu,
-  //         phone,
-  //         time,
-  //         note,
-  //       }
-  //     );
-  //   },
-  //   onSuccess: () => {
-  //     form.reset();
-  //     setSuccessModal(true)
-  //   }
-  // });
-
   const reservations = new ReservationQuery();
   const reservationData = useMutation({
     mutationKey: ["reservations"],
-    mutationFn: (data: z.infer<typeof formSchema>) => reservations.createReservation({...data, places: Number(data.places)}),
+    mutationFn: (data: z.infer<typeof formSchema>) => reservations.createReservation({ ...data, places: Number(data.places) }),
   })
 
   function onSubmit(values: z.infer<typeof formSchema>) {
     console.log(values);
     if (user) {
       reservationData.mutate(values);
-      // console.log(values);
     } else {
       setOpen(true);
     }
   }
 
   return (
-    <div className="flex flex-col gap-8 max-w-[1040px] w-full mx-auto my-20">
-      <div className="max-w-[640px] w-full mx-auto spaced flex flex-col gap-10">
+    <div className="flex justify-center items-end max-w-[1040px] w-full mx-auto mb-10">
+      <div className="flex flex-col items-center gap-10">
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogContent className="p-5 flex flex-col gap-5">
             <DialogHeader className="uppercase tracking-widest pb-3 border-b">
@@ -200,184 +153,190 @@ const ReservationForm = () => {
         <Form {...form}>
           <form
             onSubmit={form.handleSubmit(onSubmit)}
-            className="max-w-screen-md w-full px-7 mx-auto flex flex-col gap-7"
+            className="w-fit flex flex-col gap-5 px-7"
           >
-            <FormField
-              control={form.control}
-              name="name"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{"Nom de la réservation"}</FormLabel>
-                  <FormControl>
-                    <Input type="text" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="email"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{"Adresse mail"}</FormLabel>
-                  <FormControl>
-                    <Input type="email" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="date"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{"Date de la réservation"}</FormLabel>
-                  <Popover>
-                    <PopoverTrigger asChild>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="w-full flex flex-col gap-7">
+                <FormField
+                  control={form.control}
+                  name="name"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{"Nom de la réservation"}</FormLabel>
                       <FormControl>
-                        <Button
-                          variant={"outline"}
-                          className={cn(
-                            "w-full pl-3 h-10 text-left font-normal normal-case tracking-normal border-input hover:bg-input text-[14px] text-current bg-background",
-                            !field.value && "text-muted-foreground"
-                          )}
-                        >
-                          {field.value ? (
-                            field.value.toLocaleDateString("fr-FR", {
-                              year: "numeric",
-                              month: "long",
-
-                              day: "numeric",
-                            })
-                          ) : (
-                            <span>{"Choisir une date"}</span>
-                          )}
-                          <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                        </Button>
+                        <Input type="text" {...field} />
                       </FormControl>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0" align="start">
-                      <Calendar
-                        mode="single"
-                        selected={field.value}
-                        onSelect={field.onChange}
-                        disabled={
-                          (date) => date < new Date()
-                          //date < new Date(new Date().setDate(new Date().getDate() + 14))
-                        }
-                        initialFocus
-                      />
-                    </PopoverContent>
-                  </Popover>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="time"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{"Heure"}</FormLabel>
-                  <Input type="time" {...field} />
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="menu"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{"Menu"}</FormLabel>
-                  <Select
-                    onValueChange={field.onChange}
-                    defaultValue={field.value}
-                  >
-                    <FormControl>
-                      <SelectTrigger className="w-full">
-                        <SelectValue placeholder="Choissisez un menu" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {/* {buffets.map(buffet =>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="email"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{"Adresse mail"}</FormLabel>
+                      <FormControl>
+                        <Input type="email" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="date"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{"Date de la réservation"}</FormLabel>
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <FormControl>
+                            <Button
+                              variant={"outline"}
+                              className={cn(
+                                "w-full pl-3 h-10 text-left font-normal normal-case tracking-normal border-input hover:bg-input text-[14px] text-current bg-background",
+                                !field.value && "text-muted-foreground"
+                              )}
+                            >
+                              {field.value ? (
+                                field.value.toLocaleDateString("fr-FR", {
+                                  year: "numeric",
+                                  month: "long",
+
+                                  day: "numeric",
+                                })
+                              ) : (
+                                <span>{"Choisir une date"}</span>
+                              )}
+                              <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                            </Button>
+                          </FormControl>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0" align="start">
+                          <Calendar
+                            mode="single"
+                            selected={field.value}
+                            onSelect={field.onChange}
+                            disabled={
+                              (date) => date < new Date()
+                              //date < new Date(new Date().setDate(new Date().getDate() + 14))
+                            }
+                            initialFocus
+                          />
+                        </PopoverContent>
+                      </Popover>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="time"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{"Heure"}</FormLabel>
+                      <Input type="time" {...field} />
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+              <div className="w-full flex flex-col gap-7">
+                <FormField
+                  control={form.control}
+                  name="places"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{"Nombre de places"}</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="number"
+                          {...field}
+                          min={2}
+                          max={100}
+                          placeholder="2"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="salle"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{"Salle"}</FormLabel>
+                      <Select onValueChange={field.onChange}>
+                        <FormControl>
+                          <SelectTrigger className="w-full">
+                            <SelectValue placeholder="Choissisez une salle" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="terrasse">
+                            {"Espace Fumeur"}
+                          </SelectItem>
+                          <SelectItem value="intérieure">
+                            {"Espace Non-Fumeur"}
+                          </SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="phone"
+                  render={({ field }) => (
+                    <FormItem className="w-full">
+                      <FormLabel>{"Numéro de téléphone"}</FormLabel>
+                      <FormControl>
+                        <Input type="text" {...field} placeholder="ex. 678890890" />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="menu"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{"Menu"}</FormLabel>
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger className="w-full">
+                            <SelectValue placeholder="Choissisez un menu" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {/* {buffets.map(buffet =>
                       <SelectItem key={buffet.value} value={buffet.value}>{buffet.name}</SelectItem>
                     )} */}
-                      <SelectItem value="custom">
-                        {"Menu personnalisé"}
-                      </SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <FormDescription>
-                    {/* {buffets
+                          <SelectItem value="custom">
+                            {"Menu personnalisé"}
+                          </SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormDescription>
+                        {/* {buffets
                     .filter((buffet) => buffet.value === field.value)
                     .map((buffet, id) => (
                       <ModalMenu key={id} {...buffet} />
                     ))} */}
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="places"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{"Nombre de places"}</FormLabel>
-                  <FormControl>
-                    <Input
-                      type="number"
-                      {...field}
-                      min={2}
-                      max={100}
-                      placeholder="2"
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="salle"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{"Salle"}</FormLabel>
-                  <Select onValueChange={field.onChange}>
-                    <FormControl>
-                      <SelectTrigger className="w-full">
-                        <SelectValue placeholder="Choissisez une salle" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value="terrasse">
-                        {"Espace Fumeur"}
-                      </SelectItem>
-                      <SelectItem value="intérieure">
-                        {"Espace Non-Fumeur"}
-                      </SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="phone"
-              render={({ field }) => (
-                <FormItem className="w-full">
-                  <FormLabel>{"Numéro de téléphone"}</FormLabel>
-                  <FormControl>
-                    <Input type="text" {...field} placeholder="ex. 678890890" />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+            </div>
             <FormField
               control={form.control}
               name="description"
@@ -396,15 +355,16 @@ const ReservationForm = () => {
             <Button
               type='button'
               disabled={reservationData.isPending}
-            // disabled={isPending}
-            onClick={(e) => { e.preventDefault(); setConfirm(true) }}
+              // disabled={isPending}
+              onClick={(e) => { e.preventDefault(); setConfirm(true) }}
             >
               {reservationData.isPending && (
                 <Loader className="mr-2 h-4 w-4 animate-spin" />
               )}
               {"Soumettre ma réservation"}
             </Button>
-            <Dialog open={confirm} onOpenChange={setConfirm}>
+          </form>
+          <Dialog open={confirm} onOpenChange={setConfirm}>
             <DialogContent>
               <DialogHeader className="bg-primary text-white p-2">
                 <DialogTitle className="font-sans font-semibold tracking-tighter">{"Confirmer la réservation"}</DialogTitle>
@@ -442,18 +402,27 @@ const ReservationForm = () => {
               </div>
             </DialogContent>
           </Dialog>
-          </form>
         </Form>
       </div>
-      <iframe
-        src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d4077844.007903163!2d11.0906982!3d3.525072!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x108bcf3b75e0d501%3A0x71a28a857f271156!2sLe%20Carino%20Pizzeria!5e0!3m2!1sfr!2scm!4v1756116288352!5m2!1sfr!2scm"
-        width="full"
-        height="310"
-        style={{ border: 0 }}
-        allowFullScreen
-        loading="lazy"
-        referrerPolicy="no-referrer-when-downgrade"
-      ></iframe>
+      <div className="max-w-[300px] w-full flex flex-col gap-4">
+        <div className="flex flex-col gap-2">
+          <h2 className="text-4xl font-bold text-primary">{"Nous trouver"}</h2>
+          <div className="flex flex-col">
+            <p className="font-bold">{config.siteName}</p>
+            <Link href={`mailto:${config.contact.email}`} className="font-bold">{config.contact.email}</Link>
+            <Link href={`tel:${config.contact.phone}`} className="font-bold">{config.contact.phone}</Link>
+          </div>
+        </div>
+        <iframe
+          src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d4077844.007903163!2d11.0906982!3d3.525072!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x108bcf3b75e0d501%3A0x71a28a857f271156!2sLe%20Carino%20Pizzeria!5e0!3m2!1sfr!2scm!4v1756116288352!5m2!1sfr!2scm"
+          width="full"
+          height="330"
+          style={{ border: 0 }}
+          allowFullScreen
+          loading="lazy"
+          referrerPolicy="no-referrer-when-downgrade"
+        ></iframe>
+      </div>
     </div>
   );
 };
