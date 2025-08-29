@@ -206,10 +206,10 @@ function AddDialog({
       form.reset();
       setshowOptions(
         accompagnements.length > 0 ||
-        optSuppBurger.length > 0 ||
-        optSuppPizza.length > 0 ||
-        optSupplements.length > 0 ||
-        uniqueOptions.length > 0
+          optSuppBurger.length > 0 ||
+          optSuppPizza.length > 0 ||
+          optSupplements.length > 0 ||
+          uniqueOptions.length > 0
       );
     }
   }, [
@@ -289,7 +289,7 @@ function AddDialog({
             />
             <span className="px-4 text-white font-sans">{name}</span>
           </DialogTitle>
-          <DialogDescription className="text-black text-[18px] text-center">
+          <DialogDescription className="text-black text-[18px] text-center line-clamp-3">
             {description}
           </DialogDescription>
         </DialogHeader>
@@ -329,31 +329,31 @@ function AddDialog({
                                       onCheckedChange={(checked) => {
                                         return checked
                                           ? field.value.filter(
-                                            (x) => x.name === option.name
-                                          ).length < 5
+                                              (x) => x.name === option.name
+                                            ).length < 5
                                             ? field.onChange([
-                                              ...field.value,
-                                              {
-                                                name: option.name,
-                                                id_zelty: option.id_zelty,
-                                                details: [
-                                                  {
-                                                    id: item.id_zelty,
-                                                    name: item.name,
-                                                    price: Number(item.price),
-                                                    qte: 1,
-                                                  },
-                                                ],
-                                              },
-                                            ])
+                                                ...field.value,
+                                                {
+                                                  name: option.name,
+                                                  id_zelty: option.id_zelty,
+                                                  details: [
+                                                    {
+                                                      id: item.id_zelty,
+                                                      name: item.name,
+                                                      price: Number(item.price),
+                                                      qte: 1,
+                                                    },
+                                                  ],
+                                                },
+                                              ])
                                             : null
                                           : field.onChange([
-                                            ...field.value.filter((el) =>
-                                              el.details.some(
-                                                (x) => x.id !== item.id_zelty
-                                              )
-                                            ),
-                                          ]);
+                                              ...field.value.filter((el) =>
+                                                el.details.some(
+                                                  (x) => x.id !== item.id_zelty
+                                                )
+                                              ),
+                                            ]);
                                       }}
                                     />
                                   </FormControl>
@@ -405,25 +405,25 @@ function AddDialog({
                                       onCheckedChange={(checked) => {
                                         return checked
                                           ? field.onChange(
-                                            field.value.map((x) =>
-                                              x.id_zelty !== option.id_zelty
-                                                ? x
-                                                : {
-                                                  name: option.name,
-                                                  id_zelty: option.id_zelty,
-                                                  details: [
-                                                    {
-                                                      name: item.name,
-                                                      id: item.id_zelty,
-                                                      price: Number(
-                                                        item.price
-                                                      ),
-                                                      qte: 1,
-                                                    },
-                                                  ],
-                                                }
+                                              field.value.map((x) =>
+                                                x.id_zelty !== option.id_zelty
+                                                  ? x
+                                                  : {
+                                                      name: option.name,
+                                                      id_zelty: option.id_zelty,
+                                                      details: [
+                                                        {
+                                                          name: item.name,
+                                                          id: item.id_zelty,
+                                                          price: Number(
+                                                            item.price
+                                                          ),
+                                                          qte: 1,
+                                                        },
+                                                      ],
+                                                    }
+                                              )
                                             )
-                                          )
                                           : null; //field.onChange([...field.value.filter(el=>el.details.some(x=>x.id!==item.id_zelty))])
                                       }}
                                     />
@@ -472,31 +472,31 @@ function AddDialog({
                                       onCheckedChange={(checked) => {
                                         return checked
                                           ? field.value.filter(
-                                            (x) => x.name === option.name
-                                          ).length < 5
+                                              (x) => x.name === option.name
+                                            ).length < 5
                                             ? field.onChange([
-                                              ...field.value,
-                                              {
-                                                name: option.name,
-                                                id_zelty: option.id_zelty,
-                                                details: [
-                                                  {
-                                                    id: item.id_zelty,
-                                                    name: item.name,
-                                                    price: Number(item.price),
-                                                    qte: 1,
-                                                  },
-                                                ],
-                                              },
-                                            ])
+                                                ...field.value,
+                                                {
+                                                  name: option.name,
+                                                  id_zelty: option.id_zelty,
+                                                  details: [
+                                                    {
+                                                      id: item.id_zelty,
+                                                      name: item.name,
+                                                      price: Number(item.price),
+                                                      qte: 1,
+                                                    },
+                                                  ],
+                                                },
+                                              ])
                                             : null
                                           : field.onChange([
-                                            ...field.value.filter((el) =>
-                                              el.details.some(
-                                                (x) => x.id !== item.id_zelty
-                                              )
-                                            ),
-                                          ]);
+                                              ...field.value.filter((el) =>
+                                                el.details.some(
+                                                  (x) => x.id !== item.id_zelty
+                                                )
+                                              ),
+                                            ]);
                                       }}
                                     />
                                   </FormControl>
@@ -539,16 +539,16 @@ function AddDialog({
                                 const detailIndex =
                                   optionIndex !== -1
                                     ? field.value[
-                                      optionIndex
-                                    ].details.findIndex(
-                                      (dt) => dt.name === item.name
-                                    )
+                                        optionIndex
+                                      ].details.findIndex(
+                                        (dt) => dt.name === item.name
+                                      )
                                     : -1;
                                 const currentQuantity =
                                   detailIndex >= 0
                                     ? field.value[optionIndex].details[
-                                      detailIndex
-                                    ].qte
+                                        detailIndex
+                                      ].qte
                                     : 0;
                                 return (
                                   <FormItem
@@ -567,22 +567,22 @@ function AddDialog({
                                           onClick={(e) => {
                                             optionIndex < 0
                                               ? field.onChange([
-                                                ...field.value,
-                                                {
-                                                  name: option.name,
-                                                  id_zelty: option.id_zelty,
-                                                  details: [
-                                                    {
-                                                      id: item.id_zelty,
-                                                      name: item.name,
-                                                      price: Number(
-                                                        item.price
-                                                      ),
-                                                      qte: 1,
-                                                    },
-                                                  ],
-                                                },
-                                              ])
+                                                  ...field.value,
+                                                  {
+                                                    name: option.name,
+                                                    id_zelty: option.id_zelty,
+                                                    details: [
+                                                      {
+                                                        id: item.id_zelty,
+                                                        name: item.name,
+                                                        price: Number(
+                                                          item.price
+                                                        ),
+                                                        qte: 1,
+                                                      },
+                                                    ],
+                                                  },
+                                                ])
                                               : detailIndex < 0 &&
                                                 field.value[
                                                   optionIndex
@@ -590,56 +590,56 @@ function AddDialog({
                                                   (total, el) => total + el.qte,
                                                   0
                                                 ) < 3
-                                                ? field.onChange(
+                                              ? field.onChange(
                                                   field.value.map((op) =>
                                                     op.name !== option.name
                                                       ? op
                                                       : {
-                                                        name: op.name,
-                                                        id_zelty: op.id_zelty,
-                                                        details: [
-                                                          ...op.details,
-                                                          {
-                                                            id: item.id_zelty,
-                                                            name: item.name,
-                                                            price: Number(
-                                                              item.price
-                                                            ),
-                                                            qte: 1,
-                                                          },
-                                                        ],
-                                                      }
+                                                          name: op.name,
+                                                          id_zelty: op.id_zelty,
+                                                          details: [
+                                                            ...op.details,
+                                                            {
+                                                              id: item.id_zelty,
+                                                              name: item.name,
+                                                              price: Number(
+                                                                item.price
+                                                              ),
+                                                              qte: 1,
+                                                            },
+                                                          ],
+                                                        }
                                                   )
                                                 )
-                                                : detailIndex < 0 &&
-                                                  field.value[
-                                                    optionIndex
-                                                  ].details.reduce(
-                                                    (total, el) => total + el.qte,
-                                                    0
-                                                  ) >= 3
-                                                  ? null
-                                                  : detailIndex >= 0 &&
-                                                    field.value[
-                                                      optionIndex
-                                                    ].details.reduce(
-                                                      (total, el) => total + el.qte,
-                                                      0
-                                                    ) < 3
-                                                    ? field.onChange(
-                                                      field.value.map((op) =>
-                                                        op.name !== option.name
-                                                          ? op
-                                                          : {
-                                                            name: op.name,
-                                                            id_zelty: op.id_zelty,
-                                                            details:
-                                                              op.details.map(
-                                                                (el) =>
-                                                                  el.name !==
-                                                                    item.name
-                                                                    ? el
-                                                                    : {
+                                              : detailIndex < 0 &&
+                                                field.value[
+                                                  optionIndex
+                                                ].details.reduce(
+                                                  (total, el) => total + el.qte,
+                                                  0
+                                                ) >= 3
+                                              ? null
+                                              : detailIndex >= 0 &&
+                                                field.value[
+                                                  optionIndex
+                                                ].details.reduce(
+                                                  (total, el) => total + el.qte,
+                                                  0
+                                                ) < 3
+                                              ? field.onChange(
+                                                  field.value.map((op) =>
+                                                    op.name !== option.name
+                                                      ? op
+                                                      : {
+                                                          name: op.name,
+                                                          id_zelty: op.id_zelty,
+                                                          details:
+                                                            op.details.map(
+                                                              (el) =>
+                                                                el.name !==
+                                                                item.name
+                                                                  ? el
+                                                                  : {
                                                                       name: el.name,
                                                                       id: el.id,
                                                                       price:
@@ -650,11 +650,11 @@ function AddDialog({
                                                                         el.qte +
                                                                         1,
                                                                     }
-                                                              ),
-                                                          }
-                                                      )
-                                                    )
-                                                    : null;
+                                                            ),
+                                                        }
+                                                  )
+                                                )
+                                              : null;
 
                                             //console.log(form.getValues())
                                             e.preventDefault();
@@ -665,7 +665,7 @@ function AddDialog({
                                         <Button
                                           variant={"outline"}
                                           size={"icon"}
-                                          className="h-5 w-5 rounded sha"
+                                          className="h-5 w-5 rounded"
                                           onClick={(e) => {
                                             detailIndex >= 0 &&
                                               field.onChange(
@@ -674,28 +674,28 @@ function AddDialog({
                                                     op.name === option.name
                                                       ? currentQuantity > 1
                                                         ? {
-                                                          name: op.name,
-                                                          id_zelty:
-                                                            op.id_zelty,
-                                                          details:
-                                                            op.details.map(
-                                                              (dt) =>
-                                                                dt.name ===
+                                                            name: op.name,
+                                                            id_zelty:
+                                                              op.id_zelty,
+                                                            details:
+                                                              op.details.map(
+                                                                (dt) =>
+                                                                  dt.name ===
                                                                   item.name
-                                                                  ? {
-                                                                    id: dt.id,
-                                                                    name: dt.name,
-                                                                    price:
-                                                                      dt.price,
-                                                                    qte:
-                                                                      dt.qte -
-                                                                      1,
-                                                                  }
-                                                                  : dt
-                                                            ),
-                                                        }
+                                                                    ? {
+                                                                        id: dt.id,
+                                                                        name: dt.name,
+                                                                        price:
+                                                                          dt.price,
+                                                                        qte:
+                                                                          dt.qte -
+                                                                          1,
+                                                                      }
+                                                                    : dt
+                                                              ),
+                                                          }
                                                         : currentQuantity === 1
-                                                          ? {
+                                                        ? {
                                                             name: op.name,
                                                             id_zelty:
                                                               op.id_zelty,
@@ -706,7 +706,7 @@ function AddDialog({
                                                                   item.name
                                                               ),
                                                           }
-                                                          : op
+                                                        : op
                                                       : op
                                                   )
                                                   .filter(
@@ -764,16 +764,16 @@ function AddDialog({
                                 const detailIndex =
                                   optionIndex !== -1
                                     ? field.value[
-                                      optionIndex
-                                    ].details.findIndex(
-                                      (dt) => dt.name === item.name
-                                    )
+                                        optionIndex
+                                      ].details.findIndex(
+                                        (dt) => dt.name === item.name
+                                      )
                                     : -1;
                                 const currentQuantity =
                                   detailIndex >= 0
                                     ? field.value[optionIndex].details[
-                                      detailIndex
-                                    ].qte
+                                        detailIndex
+                                      ].qte
                                     : 0;
                                 return (
                                   <FormItem
@@ -792,22 +792,22 @@ function AddDialog({
                                           onClick={(e) => {
                                             optionIndex < 0
                                               ? field.onChange([
-                                                ...field.value,
-                                                {
-                                                  name: option.name,
-                                                  id_zelty: option.id_zelty,
-                                                  details: [
-                                                    {
-                                                      id: item.id_zelty,
-                                                      name: item.name,
-                                                      price: Number(
-                                                        item.price
-                                                      ),
-                                                      qte: 1,
-                                                    },
-                                                  ],
-                                                },
-                                              ])
+                                                  ...field.value,
+                                                  {
+                                                    name: option.name,
+                                                    id_zelty: option.id_zelty,
+                                                    details: [
+                                                      {
+                                                        id: item.id_zelty,
+                                                        name: item.name,
+                                                        price: Number(
+                                                          item.price
+                                                        ),
+                                                        qte: 1,
+                                                      },
+                                                    ],
+                                                  },
+                                                ])
                                               : detailIndex < 0 &&
                                                 field.value[
                                                   optionIndex
@@ -815,56 +815,56 @@ function AddDialog({
                                                   (total, el) => total + el.qte,
                                                   0
                                                 ) < 22
-                                                ? field.onChange(
+                                              ? field.onChange(
                                                   field.value.map((op) =>
                                                     op.name !== option.name
                                                       ? op
                                                       : {
-                                                        name: op.name,
-                                                        id_zelty: op.id_zelty,
-                                                        details: [
-                                                          ...op.details,
-                                                          {
-                                                            id: item.id_zelty,
-                                                            name: item.name,
-                                                            price: Number(
-                                                              item.price
-                                                            ),
-                                                            qte: 1,
-                                                          },
-                                                        ],
-                                                      }
+                                                          name: op.name,
+                                                          id_zelty: op.id_zelty,
+                                                          details: [
+                                                            ...op.details,
+                                                            {
+                                                              id: item.id_zelty,
+                                                              name: item.name,
+                                                              price: Number(
+                                                                item.price
+                                                              ),
+                                                              qte: 1,
+                                                            },
+                                                          ],
+                                                        }
                                                   )
                                                 )
-                                                : detailIndex < 0 &&
-                                                  field.value[
-                                                    optionIndex
-                                                  ].details.reduce(
-                                                    (total, el) => total + el.qte,
-                                                    0
-                                                  ) >= 22
-                                                  ? null
-                                                  : detailIndex >= 0 &&
-                                                    field.value[
-                                                      optionIndex
-                                                    ].details.reduce(
-                                                      (total, el) => total + el.qte,
-                                                      0
-                                                    ) < 22
-                                                    ? field.onChange(
-                                                      field.value.map((op) =>
-                                                        op.name !== option.name
-                                                          ? op
-                                                          : {
-                                                            name: op.name,
-                                                            id_zelty: op.id_zelty,
-                                                            details:
-                                                              op.details.map(
-                                                                (el) =>
-                                                                  el.name !==
-                                                                    item.name
-                                                                    ? el
-                                                                    : {
+                                              : detailIndex < 0 &&
+                                                field.value[
+                                                  optionIndex
+                                                ].details.reduce(
+                                                  (total, el) => total + el.qte,
+                                                  0
+                                                ) >= 22
+                                              ? null
+                                              : detailIndex >= 0 &&
+                                                field.value[
+                                                  optionIndex
+                                                ].details.reduce(
+                                                  (total, el) => total + el.qte,
+                                                  0
+                                                ) < 22
+                                              ? field.onChange(
+                                                  field.value.map((op) =>
+                                                    op.name !== option.name
+                                                      ? op
+                                                      : {
+                                                          name: op.name,
+                                                          id_zelty: op.id_zelty,
+                                                          details:
+                                                            op.details.map(
+                                                              (el) =>
+                                                                el.name !==
+                                                                item.name
+                                                                  ? el
+                                                                  : {
                                                                       name: el.name,
                                                                       id: el.id,
                                                                       price:
@@ -875,11 +875,11 @@ function AddDialog({
                                                                         el.qte +
                                                                         1,
                                                                     }
-                                                              ),
-                                                          }
-                                                      )
-                                                    )
-                                                    : null;
+                                                            ),
+                                                        }
+                                                  )
+                                                )
+                                              : null;
 
                                             //console.log(form.getValues())
                                             e.preventDefault();
@@ -899,28 +899,28 @@ function AddDialog({
                                                     op.name === option.name
                                                       ? currentQuantity > 1
                                                         ? {
-                                                          name: op.name,
-                                                          id_zelty:
-                                                            op.id_zelty,
-                                                          details:
-                                                            op.details.map(
-                                                              (dt) =>
-                                                                dt.name ===
+                                                            name: op.name,
+                                                            id_zelty:
+                                                              op.id_zelty,
+                                                            details:
+                                                              op.details.map(
+                                                                (dt) =>
+                                                                  dt.name ===
                                                                   item.name
-                                                                  ? {
-                                                                    id: dt.id,
-                                                                    name: dt.name,
-                                                                    price:
-                                                                      dt.price,
-                                                                    qte:
-                                                                      dt.qte -
-                                                                      1,
-                                                                  }
-                                                                  : dt
-                                                            ),
-                                                        }
+                                                                    ? {
+                                                                        id: dt.id,
+                                                                        name: dt.name,
+                                                                        price:
+                                                                          dt.price,
+                                                                        qte:
+                                                                          dt.qte -
+                                                                          1,
+                                                                      }
+                                                                    : dt
+                                                              ),
+                                                          }
                                                         : currentQuantity === 1
-                                                          ? {
+                                                        ? {
                                                             name: op.name,
                                                             id_zelty:
                                                               op.id_zelty,
@@ -931,7 +931,7 @@ function AddDialog({
                                                                   item.name
                                                               ),
                                                           }
-                                                          : op
+                                                        : op
                                                       : op
                                                   )
                                                   .filter(
@@ -973,7 +973,8 @@ function AddDialog({
             <div className="flex flex-col justify-center items-center gap-2">
               <div className="productDetailInput">
                 <p className="text-sm text-red-500 mt-1">
-                  La quantité choisie s’appliquera aux mêmes options sélectionnées.
+                  La quantité choisie s’appliquera aux mêmes options
+                  sélectionnées.
                 </p>
                 <div className="flex max-w-md w-full justify-center items-center gap-5 divide-x py-2 flex-wrap">
                   <div className="flex items-center justify-center pr-5">
@@ -981,12 +982,14 @@ function AddDialog({
                       control={form.control}
                       name="quantity"
                       render={({ field }) => (
-                        <FormItem >
+                        <FormItem>
                           <FormLabel className="font-bold">Quantité</FormLabel>
                           <div className="flex items-center gap-2">
                             <Button
                               type="button"
-                              onClick={() => field.onChange(Number(field.value || 0) - 1)}
+                              onClick={() =>
+                                field.onChange(Number(field.value || 0) - 1)
+                              }
                               variant="outline"
                               size="icon"
                               className="h-5 w-5 rounded"
@@ -999,20 +1002,23 @@ function AddDialog({
                                 type="number"
                                 {...field}
                                 value={field.value ?? 0}
-                                onChange={(e) => field.onChange(Number(e.target.value))}
+                                onChange={(e) =>
+                                  field.onChange(Number(e.target.value))
+                                }
                                 className="w-10 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none [appearance:textfield]"
                               />
                             </FormControl>
 
                             <Button
                               type="button"
-                              onClick={() => field.onChange(Number(field.value || 0) + 1)}
+                              onClick={() =>
+                                field.onChange(Number(field.value || 0) + 1)
+                              }
                               size="icon"
                               className="h-5 w-5 rounded"
                             >
                               <LuPlus className="cursor-pointer" />
                             </Button>
-
                           </div>
                           <div className="absolute bottom-0 left-[50%] translate-x-[-50%]">
                             <FormMessage />
