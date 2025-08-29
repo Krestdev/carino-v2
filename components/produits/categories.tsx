@@ -15,16 +15,16 @@ const Category = ({ categories, handleFilter }: Props) => {
           handleFilter(-1);
           setSelected(-1);
         }}
-        className={`pt-3 pr-4 pb-3 pl-4 rounded-[27px] h-14 ${
+        className={`py-2 px-3 rounded-[27px] ${
           selected === -1 ? "bg-black text-white" : "bg-white text-black"
-        }  border-[1px] border-[#191537] `}
+        }  border-[1px] border-[#191537]`}
       >
         {"Tous"}
       </Button>
       {categories.map((value, i) => {
         return (
           <Button
-            className={`pt-3 pr-4 pb-3 pl-4 rounded-[27px] h-14 ${
+            className={`py-2 px-3 rounded-[27px] ${
               selected === value.id
                 ? "bg-black text-white"
                 : "bg-white text-black"

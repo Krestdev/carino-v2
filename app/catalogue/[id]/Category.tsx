@@ -11,12 +11,34 @@ import Link from "next/link";
 import React, { useState } from "react";
 
 const CategoryDetail = ({ id }: { id: number }) => {
-  const [filteredItems, setfilteredItems] = useState<ProductsData[]>([]);
+  const [filteredItems, setFilteredItems] = useState<ProductsData[]>([]);
   const product = new ProductQuery();
   const productData = useQuery({
     queryKey: ["productFetchAll"],
-    queryFn: () => product.getAllProducts(),
+    queryFn: () =>
+      product.getAllProducts().then((res) => {
+        setFilteredItems(
+          res.data.filter((product) =>
+            product.cat.some((x) => x.id == id || x.id_parent == id)
+          )
+        );
+        return res;
+      }),
   });
+
+  /*     const productData = useQuery({
+    queryKey: ["productFetchAll"],
+    queryFn: async () => {
+      const products = await product.getAllProducts();
+      setFilteredItems(
+        products.data.filter((product) =>
+          product.cat.some((x) => x.id == id || x.id_parent == id)
+        )
+      );
+      return products;
+    },
+  }); */
+
   const categoryData = useQuery({
     queryKey: ["categoryFetchAll"],
     queryFn: () => product.getCategories(),
@@ -40,12 +62,12 @@ const CategoryDetail = ({ id }: { id: number }) => {
 
     function handleFilter(filterId: number) {
       if (filterId === -1) {
-        setfilteredItems(filteredProducts);
+        setFilteredItems(filteredProducts);
       } else {
         const filtered = filteredProducts.filter((product) =>
           product.cat.some((x) => x.id === filterId)
         );
-        setfilteredItems(filtered);
+        setFilteredItems(filtered);
       }
     }
     return (
