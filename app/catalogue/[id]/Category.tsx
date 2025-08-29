@@ -25,6 +25,20 @@ const CategoryDetail = ({ id }: { id: number }) => {
         return res;
       }),
   });
+
+  /*     const productData = useQuery({
+    queryKey: ["productFetchAll"],
+    queryFn: async () => {
+      const products = await product.getAllProducts();
+      setFilteredItems(
+        products.data.filter((product) =>
+          product.cat.some((x) => x.id == id || x.id_parent == id)
+        )
+      );
+      return products;
+    },
+  }); */
+
   const categoryData = useQuery({
     queryKey: ["categoryFetchAll"],
     queryFn: () => product.getCategories(),
