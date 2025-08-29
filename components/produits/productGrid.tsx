@@ -1,9 +1,9 @@
-import { Categories, ProductData } from "@/types/types";
+import { Categories, ProductsData } from "@/types/types";
 import { useState } from "react";
 import Category from "./categories";
 import Dishes from "./dishes";
 interface Props {
-  dishes: ProductData[];
+  dishes: ProductsData[];
   categories: Categories[];
 }
 

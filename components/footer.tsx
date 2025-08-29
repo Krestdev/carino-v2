@@ -127,7 +127,7 @@ function Footer() {
           <p className="text-slate-400 md:text-center">@ 2024 le Carino.</p>
           <p className="text-[#A3A0B9] md:text-center">
             Designé et implementé par
-            <Link className="text-[#F4F4F7]" href={"https://www.krestdev.com/"}>
+            <Link target="_blank" className="text-[#F4F4F7]" href={"https://www.krestdev.com/"}>
               {" "}
               KRESTDEV
             </Link>

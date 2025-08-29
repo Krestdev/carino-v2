@@ -88,7 +88,7 @@ function Transaction() {
         }
       }
     } else {
-      //setOpen(false);
+      // setOpen(false);
     }
   }, [
     isSuccess,

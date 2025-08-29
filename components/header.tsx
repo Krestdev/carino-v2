@@ -38,7 +38,7 @@ const Header = () => {
               <Button variant={"link"}>{"Catalogue"}</Button>
             </Link>
             <Link href={"/produits"} className={isActiveTab("/produits") ? "border-b-2 border-black" : ""}>
-              <Button variant={"link"}>{"À Emporter"}</Button>
+              <Button variant={"link"}>{"Tous nos produits"}</Button>
             </Link>
             <Link href={"/reservation"} className={isActiveTab("/reservation") ? "border-b-2 border-black" : ""}>
               <Button variant={"link"}>{"Réserver"}</Button>

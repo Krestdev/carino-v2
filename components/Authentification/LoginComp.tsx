@@ -27,11 +27,6 @@ const formSchema = z.object({
   password: z.string(),
 });
 
-interface loginData {
-  "bearer token": string;
-  user: User;
-}
-
 const LoginComp = () => {
   // const [displayError, setDisplayError] = useState(false);
 

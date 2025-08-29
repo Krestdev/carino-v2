@@ -24,12 +24,22 @@ const ViewOrderDialog = ({ open, onClose, order }: ViewOrderDialogProps) => {
 
   if (!order) return null;
 
+  const jsonArray = (array: string) => {
+    if (typeof array === "string") {
+      return JSON.parse(array.replace(/\n/g, ""));
+    } else {
+      return array;
+    }
+  };
+
+  const metadata = jsonArray(order.metadata!);
+
   const orderData = {
-    zelty_order_id: order.zelty_order_id,
-    customerName: "ATANGANA CHARLES",
-    phoneNumber: "+237 675757575",
-    deliveryAddress: "POSTE CENTRALE",
-    location: "À la monté de l'avenue Kenedy",
+    id: order.id,
+    customerName: metadata.customer.name ? metadata.customer.name : "-",
+    phoneNumber: metadata.customer.phone ? metadata.customer.phone : "-",
+    deliveryAddress:  metadata.address && metadata.address.name ? metadata.address.name : "-",
+    location:  metadata.address && metadata.address.street ? metadata.address.street : "-",
     products: order.items,
     deliveryFee: "2 000",
     itemsAmount: (Number(order.prix_total) - 2000).toString(),
@@ -38,6 +48,9 @@ const ViewOrderDialog = ({ open, onClose, order }: ViewOrderDialogProps) => {
     is_delivred: order.is_delivred,
     created_at: order.created_at,
   };
+
+  console.log(orderData.products);
+  
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
@@ -96,7 +109,7 @@ const ViewOrderDialog = ({ open, onClose, order }: ViewOrderDialogProps) => {
                   <div className="flex flex-col gap-1 w-full border-b border-[#848484] pb-2">
                     <div className="flex justify-between">
                       <h4 className="font-normal">{"ID de transaction:"}</h4>
-                      <h4>{"#" + orderData.zelty_order_id}</h4>
+                      <h4>{"#" + orderData.id}</h4>
                     </div>
                     <div className="flex justify-between">
                       <h4 className="font-normal">{"Numéro de tel:"}</h4>
@@ -112,11 +125,11 @@ const ViewOrderDialog = ({ open, onClose, order }: ViewOrderDialogProps) => {
                     </div>
                   </div>
                   <div className="flex flex-col gap-1 w-full border-b border-[#848484] pb-2">
-                    {orderData.products.map(
+                    {orderData.products && orderData.products.map(
                       (product: [string, number], index: number) => {
                         return (
                           <div key={index} className="flex justify-between">
-                            <h4 className="font-normal w-[220px]">{`• ${product[0]}`}</h4>
+                            <h4 className="font-normal w-[220px]">{`• ${product}`}</h4>
                             <h4>{`${product[1]} FCFA`}</h4>
                           </div>
                         );
@@ -148,6 +161,7 @@ const ViewOrderDialog = ({ open, onClose, order }: ViewOrderDialogProps) => {
                     ...orderData,
                     is_paid: Boolean(orderData.is_paid),
                     is_delivred: Boolean(orderData.is_delivred),
+                    zelty_order_id: String(orderData.id),
                   }}
                 />
               </PDFViewer>

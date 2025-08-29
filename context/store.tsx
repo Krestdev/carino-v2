@@ -18,7 +18,7 @@ type Store = {
 };
 
 type Actions = {
-  addToCart: (item: cartItem) => void;
+  addToCart: (item: cartItem, qte?: number) => void;
   editCart: (item: cartItem) => void;
   removeFromCart: (itemId: number) => void;
   emptyCart: () => void;
@@ -44,7 +44,28 @@ const useStore = create<Store & Actions>()(
   persist(
     (set, get) => ({
       ...initialState,
-      addToCart: (item) => set({ cart: [item, ...get().cart] }),
+      addToCart: (item: cartItem) =>
+        set((state) => {
+          // Vérifier si le produit existe déjà avec les mêmes options
+          const existingIndex = state.cart.findIndex(
+            (cartItem) =>
+              cartItem.itemId === item.itemId &&
+              JSON.stringify(cartItem.options) === JSON.stringify(item.options)
+          );
+
+          if (existingIndex !== -1) {
+            // Produit trouvé → incrémenter la quantité avec celle passée dans item.qte
+            const updatedCart = [...state.cart];
+            updatedCart[existingIndex] = {
+              ...updatedCart[existingIndex],
+              qte: updatedCart[existingIndex].qte + item.qte,
+            };
+            return { cart: updatedCart };
+          } else {
+            // Sinon on ajoute directement
+            return { cart: [item, ...state.cart] };
+          }
+        }),
       editCart: (item) =>
         set({
           cart: get().cart.map((cartItem) =>

@@ -153,13 +153,14 @@ export interface OrderLog {
   id: number;
   zelty_order_id: string;
   reference: string;
-  items: [product:string, price:number][];
+  items: string;
   is_delivred: boolean;
   is_paid: boolean;
   prix_total: string;
   created_at: Date;
   updated_at: Date;
   user_id: number;
+  metadata: string;
 }
 
 export interface otherOption {

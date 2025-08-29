@@ -223,6 +223,7 @@ const TakeawayForm = ({
     postOrder.isPending,
     postOrder.data?.data.data.ref,
     setTransaction,
+    setPostOrderStatus
   ]);
 
   function isDisable() {
