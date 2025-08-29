@@ -39,7 +39,7 @@ const HistoryTable = ({ title, data }: Props) => {
     setDialogOpen(false);
     setSelectedOrder(null);
   };
-
+  
   return (
     <div className="flex flex-col gap-5 w-full">
       <h3 className="text-xl font-bold">{title}</h3>

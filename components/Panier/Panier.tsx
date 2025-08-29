@@ -104,7 +104,7 @@ const Panier = ({ items }: Props) => {
                       className="w-20 h-20 rounded-[12px] object-cover"
                     />
                     <div className="flex flex-col gap-0">
-                      <p className="text-[18px] font-bold">{item.nom}</p>
+                      <p className="text-[18px] font-bold">{`${item.nom }(x${item.qte})`}</p>
                       <p
                         className={`text-[18px] font-bold ${
                           item.price === 0 ? "font-mono" : ""

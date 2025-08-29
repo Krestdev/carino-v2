@@ -24,7 +24,15 @@ const ViewOrderDialog = ({ open, onClose, order }: ViewOrderDialogProps) => {
 
   if (!order) return null;
 
-  const metadata = JSON.parse(order.metadata!);
+  const jsonArray = (array: string) => {
+    if (typeof array === "string") {
+      return JSON.parse(array.replace(/\n/g, ""));
+    } else {
+      return array;
+    }
+  };
+
+  const metadata = jsonArray(order.metadata!);
 
   const orderData = {
     id: order.id,
@@ -40,6 +48,9 @@ const ViewOrderDialog = ({ open, onClose, order }: ViewOrderDialogProps) => {
     is_delivred: order.is_delivred,
     created_at: order.created_at,
   };
+
+  console.log(orderData.products);
+  
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
@@ -114,7 +125,7 @@ const ViewOrderDialog = ({ open, onClose, order }: ViewOrderDialogProps) => {
                     </div>
                   </div>
                   <div className="flex flex-col gap-1 w-full border-b border-[#848484] pb-2">
-                    {orderData.products.map(
+                    {orderData.products && orderData.products.map(
                       (product: [string, number], index: number) => {
                         return (
                           <div key={index} className="flex justify-between">

@@ -30,7 +30,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import useStore from "@/context/store";
 import { Textarea } from "../ui/textarea";
 import { cn } from "@/lib/utils";
-import axiosConfig from "@/api";
 import ReservationQuery from "@/queries/reservationQuery";
 import { useMutation } from "@tanstack/react-query";
 import { fr } from "date-fns/locale";
