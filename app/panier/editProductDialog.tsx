@@ -30,6 +30,8 @@ import Link from "next/link";
 //import Image from "next/image";
 import { useQuery } from "@tanstack/react-query";
 import ProductQuery from "@/queries/productQuery";
+import { LuMinus, LuPlus } from "react-icons/lu";
+import { Input } from "@/components/ui/input";
 
 const FormSchema = z.object({
   quantity: z.number().positive({ message: "Doit être supérieur à 0" }),
@@ -373,8 +375,8 @@ function EditProductDialog({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>{children}</DialogTrigger>
-      <DialogContent>
-        <DialogHeader>
+      <DialogContent className={`max-h-[80vh] flex flex-col`}>
+        <DialogHeader className="sticky top-0 bg-white">
           <DialogTitle className="!relative py-5 min-h-[100px] flex items-center">
             <div className="absolute w-full h-full bg-gradient-to-t from-black/40 to-black/80 -z-10" />
             <img
@@ -392,628 +394,63 @@ function EditProductDialog({
             <Form {...form}>
               <form
                 onSubmit={form.handleSubmit(onSubmit)}
-                className="flex flex-col w-full odd:bg-gray-200 text-center pb-7 px-6"
+                className="flex flex-col overflow-y-auto"
               >
-                {accompagnements.length > 0 && (
-                  <div>
-                    <div className="productDetailTitle">
-                      {"Accompagnements"}
-                      <p className="text-sm font-normal normal-case">
-                        Vous pouvez en sélectionner 2 au plus
-                      </p>
-                    </div>
-                    <div className="productDetailInput">
-                      {accompagnements[0].enfants.map((item, id) => (
-                        <div
-                          key={id}
-                          className="flex max-w-md w-full justify-between gap-3 py-2 flex-wrap"
-                        >
-                          <FormItem>
-                            <FormField
-                              control={form.control}
-                              name="accompaniment"
-                              render={({ field }) => {
-                                return (
-                                  <FormItem
-                                    key={id}
-                                    className="flex flex-row items-start space-x-3 space-y-0"
-                                  >
-                                    <FormControl>
-                                      <Checkbox
-                                        checked={field.value.some(
-                                          (el) => el.id === item.id_zelty
-                                        )}
-                                        onCheckedChange={(checked) => {
-                                          return checked
-                                            ? field.value.length <= 1
-                                              ? field.onChange([
-                                                  ...field.value,
-                                                  {
-                                                    id: item.id_zelty,
-                                                    name: item.name,
-                                                    qte: 1,
-                                                    price: 0,
-                                                  },
-                                                ])
-                                              : null
-                                            : field.value.length <= 1
-                                            ? field.onChange([])
-                                            : field.onChange([
-                                                ...field.value.filter(
-                                                  (detail) =>
-                                                    detail.id !== item.id_zelty
-                                                ),
-                                              ]);
-                                        }}
-                                      />
-                                    </FormControl>
-                                    <FormLabel className="text-base capitalize font-normal">
-                                      {item.name}
-                                    </FormLabel>
-                                    <div className="absolute bottom-0 left-[50%] translate-x-[-50%]">
-                                      <FormMessage />
-                                    </div>
-                                  </FormItem>
-                                );
-                              }}
-                            />
-                          </FormItem>
-                          {item.price > 0 && (
-                            <div>{XAF.format(item.price)}</div>
-                          )}
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-                {flavors.length > 0 && (
-                  <div>
-                    <div className="productDetailTitle">
-                      {flavors[0].name}
-                      <p className="text-sm font-normal normal-case">
-                        Vous pouvez en sélectionner 2 au plus
-                      </p>
-                    </div>
-                    <div className="productDetailInput">
-                      {flavors[0].enfants.map((item, id) => (
-                        <div
-                          key={id}
-                          className="flex max-w-md w-full justify-between gap-3 py-2 flex-wrap"
-                        >
-                          <FormItem>
-                            <FormField
-                              control={form.control}
-                              name="flavors"
-                              render={({ field }) => {
-                                return (
-                                  <FormItem
-                                    key={id}
-                                    className="flex flex-row items-start space-x-3 space-y-0"
-                                  >
-                                    <FormControl>
-                                      <Checkbox
-                                        checked={field.value.some(
-                                          (el) => el.id === item.id_zelty
-                                        )}
-                                        onCheckedChange={(checked) => {
-                                          return checked
-                                            ? field.value.length <= 1
-                                              ? field.onChange([
-                                                  ...field.value,
-                                                  {
-                                                    id: item.id_zelty,
-                                                    name: item.name,
-                                                    qte: 1,
-                                                    price: Number(item.price),
-                                                  },
-                                                ])
-                                              : null
-                                            : field.value.length > 1 &&
-                                                field.onChange([
+                <div className="flex flex-col w-full text-center pb-7 px-6 flex-1 overflow-y-auto border border-dashed border-gray-400 rounded-lg my-scrollbox">
+                  {accompagnements.length > 0 && (
+                    <div>
+                      <div className="productDetailTitle">
+                        {"Accompagnements"}
+                        <p className="text-sm font-normal normal-case">
+                          Vous pouvez en sélectionner 2 au plus
+                        </p>
+                      </div>
+                      <div className="productDetailInput">
+                        {accompagnements[0].enfants.map((item, id) => (
+                          <div
+                            key={id}
+                            className="flex max-w-md w-full justify-between gap-3 py-2 flex-wrap odd:bg-gray-200 px-2"
+                          >
+                            <FormItem>
+                              <FormField
+                                control={form.control}
+                                name="accompaniment"
+                                render={({ field }) => {
+                                  return (
+                                    <FormItem
+                                      key={id}
+                                      className="flex flex-row items-start space-x-3 space-y-0"
+                                    >
+                                      <FormControl>
+                                        <Checkbox
+                                          className="border-gray-400"
+                                          checked={field.value.some(
+                                            (el) => el.id === item.id_zelty
+                                          )}
+                                          onCheckedChange={(checked) => {
+                                            return checked
+                                              ? field.value.length <= 1
+                                                ? field.onChange([
+                                                    ...field.value,
+                                                    {
+                                                      id: item.id_zelty,
+                                                      name: item.name,
+                                                      qte: 1,
+                                                      price: 0,
+                                                    },
+                                                  ])
+                                                : null
+                                              : field.value.length <= 1
+                                              ? field.onChange([])
+                                              : field.onChange([
                                                   ...field.value.filter(
                                                     (detail) =>
                                                       detail.id !==
                                                       item.id_zelty
                                                   ),
                                                 ]);
-                                        }}
-                                      />
-                                    </FormControl>
-                                    <FormLabel className="text-base capitalize font-normal">
-                                      {item.name}
-                                    </FormLabel>
-                                    <div className="absolute bottom-0 left-[50%] translate-x-[-50%]">
-                                      <FormMessage />
-                                    </div>
-                                  </FormItem>
-                                );
-                              }}
-                            />
-                          </FormItem>
-                          {item.price > 0 && (
-                            <div>{XAF.format(item.price)}</div>
-                          )}
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-                {suppSauce.length > 0 && (
-                  <div>
-                    <div className="productDetailTitle">
-                      {suppSauce[0].name}
-                    </div>
-                    <div className="productDetailInput">
-                      {suppSauce[0].enfants.map((item, id) => (
-                        <div
-                          key={id}
-                          className="flex max-w-md w-full justify-between gap-3 py-2 flex-wrap"
-                        >
-                          <FormItem>
-                            <FormField
-                              control={form.control}
-                              name="suppSauce"
-                              render={({ field }) => {
-                                return (
-                                  <FormItem
-                                    key={id}
-                                    className="flex flex-row items-start space-x-3 space-y-0"
-                                  >
-                                    <FormControl>
-                                      <Checkbox
-                                        checked={field.value.some(
-                                          (el) => el.id === item.id_zelty
-                                        )}
-                                        onCheckedChange={(checked) => {
-                                          return checked
-                                            ? field.onChange([
-                                                {
-                                                  id: item.id_zelty,
-                                                  name: item.name,
-                                                  qte: 1,
-                                                  price: Number(item.price),
-                                                },
-                                              ])
-                                            : field.onChange([]);
-                                        }}
-                                      />
-                                    </FormControl>
-                                    <FormLabel className="text-base capitalize font-normal">
-                                      {item.name}
-                                    </FormLabel>
-                                    <div className="absolute bottom-0 left-[50%] translate-x-[-50%]">
-                                      <FormMessage />
-                                    </div>
-                                  </FormItem>
-                                );
-                              }}
-                            />
-                          </FormItem>
-                          {item.price > 0 && (
-                            <div>{XAF.format(item.price)}</div>
-                          )}
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-                {cuissonPates.length > 0 && (
-                  <div>
-                    <div className="productDetailTitle">
-                      {cuissonPates[0].name}
-                    </div>
-                    <div className="productDetailInput">
-                      {cuissonPates[0].enfants.map((item, id) => (
-                        <div
-                          key={id}
-                          className="flex max-w-md w-full justify-between gap-3 py-2 flex-wrap"
-                        >
-                          <FormItem>
-                            <FormField
-                              control={form.control}
-                              name="cuissonPates"
-                              render={({ field }) => {
-                                return (
-                                  <FormItem
-                                    key={id}
-                                    className="flex flex-row items-start space-x-3 space-y-0"
-                                  >
-                                    <FormControl>
-                                      <Checkbox
-                                        checked={field.value.some(
-                                          (el) => el.id === item.id_zelty
-                                        )}
-                                        onCheckedChange={(checked) => {
-                                          return (
-                                            checked &&
-                                            field.onChange([
-                                              {
-                                                id: item.id_zelty,
-                                                name: item.name,
-                                                qte: 1,
-                                                price: Number(item.price),
-                                              },
-                                            ])
-                                          );
-                                        }}
-                                      />
-                                    </FormControl>
-                                    <FormLabel className="text-base capitalize font-normal">
-                                      {item.name}
-                                    </FormLabel>
-                                    <div className="absolute bottom-0 left-[50%] translate-x-[-50%]">
-                                      <FormMessage />
-                                    </div>
-                                  </FormItem>
-                                );
-                              }}
-                            />
-                          </FormItem>
-                          {item.price > 0 && (
-                            <div>{XAF.format(item.price)}</div>
-                          )}
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-                {typePates.length > 0 && (
-                  <div>
-                    <div className="productDetailTitle">
-                      {typePates[0].name}
-                    </div>
-                    <div className="productDetailInput">
-                      {typePates[0].enfants.map((item, id) => (
-                        <div
-                          key={id}
-                          className="flex max-w-md w-full justify-between gap-3 py-2 flex-wrap"
-                        >
-                          <FormItem>
-                            <FormField
-                              control={form.control}
-                              name="typePates"
-                              render={({ field }) => {
-                                return (
-                                  <FormItem
-                                    key={id}
-                                    className="flex flex-row items-start space-x-3 space-y-0"
-                                  >
-                                    <FormControl>
-                                      <Checkbox
-                                        checked={field.value.some(
-                                          (el) => el.id === item.id_zelty
-                                        )}
-                                        onCheckedChange={(checked) => {
-                                          return (
-                                            checked &&
-                                            field.onChange([
-                                              {
-                                                id: item.id_zelty,
-                                                name: item.name,
-                                                qte: 1,
-                                                price: Number(item.price),
-                                              },
-                                            ])
-                                          );
-                                        }}
-                                      />
-                                    </FormControl>
-                                    <FormLabel className="text-base capitalize font-normal">
-                                      {item.name}
-                                    </FormLabel>
-                                    <div className="absolute bottom-0 left-[50%] translate-x-[-50%]">
-                                      <FormMessage />
-                                    </div>
-                                  </FormItem>
-                                );
-                              }}
-                            />
-                          </FormItem>
-                          {item.price > 0 && (
-                            <div>{XAF.format(item.price)}</div>
-                          )}
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-                {sauces.length > 0 && (
-                  <div>
-                    <div className="productDetailTitle">{sauces[0].name}</div>
-                    <div className="productDetailInput">
-                      {sauces[0].enfants.map((item, id) => (
-                        <div
-                          key={id}
-                          className="flex max-w-md w-full justify-between gap-3 py-2 flex-wrap"
-                        >
-                          <FormItem>
-                            <FormField
-                              control={form.control}
-                              name="sauces"
-                              render={({ field }) => {
-                                return (
-                                  <FormItem
-                                    key={id}
-                                    className="flex flex-row items-start space-x-3 space-y-0"
-                                  >
-                                    <FormControl>
-                                      <Checkbox
-                                        checked={field.value.some(
-                                          (el) => el.id === item.id_zelty
-                                        )}
-                                        onCheckedChange={(checked) => {
-                                          return checked
-                                            ? field.onChange([
-                                                {
-                                                  id: item.id_zelty,
-                                                  name: item.name,
-                                                  qte: 1,
-                                                  price: Number(item.price),
-                                                },
-                                              ])
-                                            : field.onChange([]);
-                                        }}
-                                      />
-                                    </FormControl>
-                                    <FormLabel className="text-base capitalize font-normal">
-                                      {item.name}
-                                    </FormLabel>
-                                    <div className="absolute bottom-0 left-[50%] translate-x-[-50%]">
-                                      <FormMessage />
-                                    </div>
-                                  </FormItem>
-                                );
-                              }}
-                            />
-                          </FormItem>
-                          {item.price > 0 && (
-                            <div>{XAF.format(item.price)}</div>
-                          )}
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-                {cuissonViande.length > 0 && (
-                  <div>
-                    <div className="productDetailTitle">
-                      {cuissonViande[0].name}
-                    </div>
-                    <div className="productDetailInput">
-                      {cuissonViande[0].enfants.map((item, id) => (
-                        <div
-                          key={id}
-                          className="flex max-w-md w-full justify-between gap-3 py-2 flex-wrap"
-                        >
-                          <FormItem>
-                            <FormField
-                              control={form.control}
-                              name="cuissonViande"
-                              render={({ field }) => {
-                                return (
-                                  <FormItem
-                                    key={id}
-                                    className="flex flex-row items-start space-x-3 space-y-0"
-                                  >
-                                    <FormControl>
-                                      <Checkbox
-                                        checked={field.value.some(
-                                          (el) => el.id === item.id_zelty
-                                        )}
-                                        onCheckedChange={(checked) => {
-                                          return (
-                                            checked &&
-                                            field.onChange([
-                                              {
-                                                id: item.id_zelty,
-                                                name: item.name,
-                                                qte: 1,
-                                                price: Number(item.price),
-                                              },
-                                            ])
-                                          );
-                                        }}
-                                      />
-                                    </FormControl>
-                                    <FormLabel className="text-base capitalize font-normal">
-                                      {item.name}
-                                    </FormLabel>
-                                    <div className="absolute bottom-0 left-[50%] translate-x-[-50%]">
-                                      <FormMessage />
-                                    </div>
-                                  </FormItem>
-                                );
-                              }}
-                            />
-                          </FormItem>
-                          {item.price > 0 && (
-                            <div>{XAF.format(item.price)}</div>
-                          )}
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-                {supplements.length > 0 &&
-                  supplements.map((option, id) => (
-                    <div key={id}>
-                      <div className="productDetailTitle">{option.name}</div>
-                      <div className="productDetailInput">
-                        {option.enfants.map((item) => (
-                          <div
-                            key={item.name}
-                            className="flex max-w-md w-full justify-between gap-3 py-2 flex-wrap"
-                          >
-                            <FormItem>
-                              <FormField
-                                control={form.control}
-                                name="otherOptions"
-                                render={({ field }) => {
-                                  const optionIndex = field.value.findIndex(
-                                    (val) => val.name === option.name
-                                  );
-                                  const detailIndex =
-                                    optionIndex !== -1
-                                      ? field.value[
-                                          optionIndex
-                                        ].details.findIndex(
-                                          (dt) => dt.name === item.name
-                                        )
-                                      : -1;
-                                  const currentQuantity =
-                                    field.value.findIndex(
-                                      (op) => op.name === option.name
-                                    ) >= 0
-                                      ? field.value[
-                                          field.value.findIndex(
-                                            (op) => op.name === option.name
-                                          )
-                                        ].details.findIndex(
-                                          (dt) => dt.name === item.name
-                                        ) >= 0
-                                        ? field.value[optionIndex].details[
-                                            detailIndex
-                                          ].qte
-                                        : 0
-                                      : 0;
-                                  return (
-                                    <FormItem
-                                      key={item.name}
-                                      className="flex flex-row items-start space-x-3 space-y-0"
-                                    >
-                                      <FormControl>
-                                        <div className="flex flex-row gap-0 items-center">
-                                          <Button
-                                            variant={"outline"}
-                                            size={"icon"}
-                                            className="h-4 w-4 rounded-none"
-                                            onClick={(e) => {
-                                              detailIndex >= 0 &&
-                                                field.onChange(
-                                                  field.value
-                                                    .map((op) =>
-                                                      op.name === option.name
-                                                        ? currentQuantity > 1
-                                                          ? {
-                                                              name: op.name,
-                                                              details:
-                                                                op.details.map(
-                                                                  (dt) =>
-                                                                    dt.name ===
-                                                                    item.name
-                                                                      ? {
-                                                                          id: dt.id,
-                                                                          name: dt.name,
-                                                                          price:
-                                                                            dt.price,
-                                                                          qte:
-                                                                            dt.qte -
-                                                                            1,
-                                                                        }
-                                                                      : dt
-                                                                ),
-                                                            }
-                                                          : currentQuantity ===
-                                                            1
-                                                          ? {
-                                                              name: op.name,
-                                                              details:
-                                                                op.details.filter(
-                                                                  (dt) =>
-                                                                    dt.name !==
-                                                                    item.name
-                                                                ),
-                                                            }
-                                                          : op
-                                                        : op
-                                                    )
-                                                    .filter(
-                                                      (op) =>
-                                                        op.details.length > 0
-                                                    )
-                                                );
-                                              e.preventDefault();
-                                            }}
-                                          >
-                                            <Minus size={16} />
-                                          </Button>
-                                          <span className="w-5">
-                                            {currentQuantity}
-                                          </span>
-                                          <Button
-                                            variant={"outline"}
-                                            size={"icon"}
-                                            className="h-4 w-4 rounded-none"
-                                            onClick={(e) => {
-                                              detailIndex >= 0
-                                                ? field.onChange(
-                                                    field.value.map((op) =>
-                                                      op.name === option.name
-                                                        ? {
-                                                            name: op.name,
-                                                            details:
-                                                              op.details.map(
-                                                                (dt) =>
-                                                                  dt.name ===
-                                                                  item.name
-                                                                    ? dt.qte < 3
-                                                                      ? {
-                                                                          id: dt.name,
-                                                                          name: dt.name,
-                                                                          price:
-                                                                            dt.price,
-                                                                          qte:
-                                                                            dt.qte +
-                                                                            1,
-                                                                        }
-                                                                      : dt
-                                                                    : dt
-                                                              ),
-                                                          }
-                                                        : op
-                                                    )
-                                                  )
-                                                : detailIndex < 0 &&
-                                                  optionIndex >= 0
-                                                ? field.onChange(
-                                                    field.value.map((op) =>
-                                                      op.name === option.name
-                                                        ? {
-                                                            name: op.name,
-                                                            details: [
-                                                              ...op.details,
-                                                              {
-                                                                id: item.id_zelty,
-                                                                name: item.name,
-                                                                price:
-                                                                  item.price,
-                                                                qte: 1,
-                                                              },
-                                                            ],
-                                                          }
-                                                        : op
-                                                    )
-                                                  )
-                                                : field.onChange([
-                                                    ...field.value,
-                                                    {
-                                                      name: option.name,
-                                                      details: [
-                                                        {
-                                                          id: item.id_zelty,
-                                                          name: item.name,
-                                                          price: item.price,
-                                                          qte: 1,
-                                                        },
-                                                      ],
-                                                    },
-                                                  ]);
-                                              e.preventDefault();
-                                            }}
-                                          >
-                                            <Plus size={16} />
-                                          </Button>
-                                        </div>
+                                          }}
+                                        />
                                       </FormControl>
                                       <FormLabel className="text-base capitalize font-normal">
                                         {item.name}
@@ -1026,26 +463,668 @@ function EditProductDialog({
                                 }}
                               />
                             </FormItem>
-
-                            <div>{XAF.format(item.price)}</div>
+                            {item.price > 0 && (
+                              <div>{XAF.format(item.price)}</div>
+                            )}
                           </div>
                         ))}
                       </div>
                     </div>
-                  ))}
+                  )}
+                  {flavors.length > 0 && (
+                    <div>
+                      <div className="productDetailTitle">
+                        {flavors[0].name}
+                        <p className="text-sm font-normal normal-case">
+                          Vous pouvez en sélectionner 2 au plus
+                        </p>
+                      </div>
+                      <div className="productDetailInput">
+                        {flavors[0].enfants.map((item, id) => (
+                          <div
+                            key={id}
+                            className="flex max-w-md w-full justify-between gap-3 py-2 flex-wrap odd:bg-gray-200 px-2"
+                          >
+                            <FormItem>
+                              <FormField
+                                control={form.control}
+                                name="flavors"
+                                render={({ field }) => {
+                                  return (
+                                    <FormItem
+                                      key={id}
+                                      className="flex flex-row items-start space-x-3 space-y-0"
+                                    >
+                                      <FormControl>
+                                        <Checkbox
+                                          className="border-gray-400"
+                                          checked={field.value.some(
+                                            (el) => el.id === item.id_zelty
+                                          )}
+                                          onCheckedChange={(checked) => {
+                                            return checked
+                                              ? field.value.length <= 1
+                                                ? field.onChange([
+                                                    ...field.value,
+                                                    {
+                                                      id: item.id_zelty,
+                                                      name: item.name,
+                                                      qte: 1,
+                                                      price: Number(item.price),
+                                                    },
+                                                  ])
+                                                : null
+                                              : field.value.length > 1 &&
+                                                  field.onChange([
+                                                    ...field.value.filter(
+                                                      (detail) =>
+                                                        detail.id !==
+                                                        item.id_zelty
+                                                    ),
+                                                  ]);
+                                          }}
+                                        />
+                                      </FormControl>
+                                      <FormLabel className="text-base capitalize font-normal">
+                                        {item.name}
+                                      </FormLabel>
+                                      <div className="absolute bottom-0 left-[50%] translate-x-[-50%]">
+                                        <FormMessage />
+                                      </div>
+                                    </FormItem>
+                                  );
+                                }}
+                              />
+                            </FormItem>
+                            {item.price > 0 && (
+                              <div>{XAF.format(item.price)}</div>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  {suppSauce.length > 0 && (
+                    <div>
+                      <div className="productDetailTitle">
+                        {suppSauce[0].name}
+                      </div>
+                      <div className="productDetailInput">
+                        {suppSauce[0].enfants.map((item, id) => (
+                          <div
+                            key={id}
+                            className="flex max-w-md w-full justify-between gap-3 py-2 flex-wrap odd:bg-gray-200 px-2"
+                          >
+                            <FormItem>
+                              <FormField
+                                control={form.control}
+                                name="suppSauce"
+                                render={({ field }) => {
+                                  return (
+                                    <FormItem
+                                      key={id}
+                                      className="flex flex-row items-start space-x-3 space-y-0"
+                                    >
+                                      <FormControl>
+                                        <Checkbox
+                                          className="border-gray-400"
+                                          checked={field.value.some(
+                                            (el) => el.id === item.id_zelty
+                                          )}
+                                          onCheckedChange={(checked) => {
+                                            return checked
+                                              ? field.onChange([
+                                                  {
+                                                    id: item.id_zelty,
+                                                    name: item.name,
+                                                    qte: 1,
+                                                    price: Number(item.price),
+                                                  },
+                                                ])
+                                              : field.onChange([]);
+                                          }}
+                                        />
+                                      </FormControl>
+                                      <FormLabel className="text-base capitalize font-normal">
+                                        {item.name}
+                                      </FormLabel>
+                                      <div className="absolute bottom-0 left-[50%] translate-x-[-50%]">
+                                        <FormMessage />
+                                      </div>
+                                    </FormItem>
+                                  );
+                                }}
+                              />
+                            </FormItem>
+                            {item.price > 0 && (
+                              <div>{XAF.format(item.price)}</div>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  {cuissonPates.length > 0 && (
+                    <div>
+                      <div className="productDetailTitle">
+                        {cuissonPates[0].name}
+                      </div>
+                      <div className="productDetailInput">
+                        {cuissonPates[0].enfants.map((item, id) => (
+                          <div
+                            key={id}
+                            className="flex max-w-md w-full justify-between gap-3 py-2 flex-wrap odd:bg-gray-200 px-2"
+                          >
+                            <FormItem>
+                              <FormField
+                                control={form.control}
+                                name="cuissonPates"
+                                render={({ field }) => {
+                                  return (
+                                    <FormItem
+                                      key={id}
+                                      className="flex flex-row items-start space-x-3 space-y-0"
+                                    >
+                                      <FormControl>
+                                        <Checkbox
+                                          className="border-gray-400"
+                                          checked={field.value.some(
+                                            (el) => el.id === item.id_zelty
+                                          )}
+                                          onCheckedChange={(checked) => {
+                                            return (
+                                              checked &&
+                                              field.onChange([
+                                                {
+                                                  id: item.id_zelty,
+                                                  name: item.name,
+                                                  qte: 1,
+                                                  price: Number(item.price),
+                                                },
+                                              ])
+                                            );
+                                          }}
+                                        />
+                                      </FormControl>
+                                      <FormLabel className="text-base capitalize font-normal">
+                                        {item.name}
+                                      </FormLabel>
+                                      <div className="absolute bottom-0 left-[50%] translate-x-[-50%]">
+                                        <FormMessage />
+                                      </div>
+                                    </FormItem>
+                                  );
+                                }}
+                              />
+                            </FormItem>
+                            {item.price > 0 && (
+                              <div>{XAF.format(item.price)}</div>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  {typePates.length > 0 && (
+                    <div>
+                      <div className="productDetailTitle">
+                        {typePates[0].name}
+                      </div>
+                      <div className="productDetailInput">
+                        {typePates[0].enfants.map((item, id) => (
+                          <div
+                            key={id}
+                            className="flex max-w-md w-full justify-between gap-3 py-2 flex-wrap odd:bg-gray-200 px-2"
+                          >
+                            <FormItem>
+                              <FormField
+                                control={form.control}
+                                name="typePates"
+                                render={({ field }) => {
+                                  return (
+                                    <FormItem
+                                      key={id}
+                                      className="flex flex-row items-start space-x-3 space-y-0"
+                                    >
+                                      <FormControl>
+                                        <Checkbox
+                                          className="border-gray-400"
+                                          checked={field.value.some(
+                                            (el) => el.id === item.id_zelty
+                                          )}
+                                          onCheckedChange={(checked) => {
+                                            return (
+                                              checked &&
+                                              field.onChange([
+                                                {
+                                                  id: item.id_zelty,
+                                                  name: item.name,
+                                                  qte: 1,
+                                                  price: Number(item.price),
+                                                },
+                                              ])
+                                            );
+                                          }}
+                                        />
+                                      </FormControl>
+                                      <FormLabel className="text-base capitalize font-normal">
+                                        {item.name}
+                                      </FormLabel>
+                                      <div className="absolute bottom-0 left-[50%] translate-x-[-50%]">
+                                        <FormMessage />
+                                      </div>
+                                    </FormItem>
+                                  );
+                                }}
+                              />
+                            </FormItem>
+                            {item.price > 0 && (
+                              <div>{XAF.format(item.price)}</div>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  {sauces.length > 0 && (
+                    <div>
+                      <div className="productDetailTitle">{sauces[0].name}</div>
+                      <div className="productDetailInput">
+                        {sauces[0].enfants.map((item, id) => (
+                          <div
+                            key={id}
+                            className="flex max-w-md w-full justify-between gap-3 py-2 flex-wrap odd:bg-gray-200 px-2"
+                          >
+                            <FormItem>
+                              <FormField
+                                control={form.control}
+                                name="sauces"
+                                render={({ field }) => {
+                                  return (
+                                    <FormItem
+                                      key={id}
+                                      className="flex flex-row items-start space-x-3 space-y-0"
+                                    >
+                                      <FormControl>
+                                        <Checkbox
+                                          className="border-gray-400"
+                                          checked={field.value.some(
+                                            (el) => el.id === item.id_zelty
+                                          )}
+                                          onCheckedChange={(checked) => {
+                                            return checked
+                                              ? field.onChange([
+                                                  {
+                                                    id: item.id_zelty,
+                                                    name: item.name,
+                                                    qte: 1,
+                                                    price: Number(item.price),
+                                                  },
+                                                ])
+                                              : field.onChange([]);
+                                          }}
+                                        />
+                                      </FormControl>
+                                      <FormLabel className="text-base capitalize font-normal">
+                                        {item.name}
+                                      </FormLabel>
+                                      <div className="absolute bottom-0 left-[50%] translate-x-[-50%]">
+                                        <FormMessage />
+                                      </div>
+                                    </FormItem>
+                                  );
+                                }}
+                              />
+                            </FormItem>
+                            {item.price > 0 && (
+                              <div>{XAF.format(item.price)}</div>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  {cuissonViande.length > 0 && (
+                    <div>
+                      <div className="productDetailTitle">
+                        {cuissonViande[0].name}
+                      </div>
+                      <div className="productDetailInput">
+                        {cuissonViande[0].enfants.map((item, id) => (
+                          <div
+                            key={id}
+                            className="flex max-w-md w-full justify-between gap-3 py-2 flex-wrap odd:bg-gray-200 px-2"
+                          >
+                            <FormItem>
+                              <FormField
+                                control={form.control}
+                                name="cuissonViande"
+                                render={({ field }) => {
+                                  return (
+                                    <FormItem
+                                      key={id}
+                                      className="flex flex-row items-start space-x-3 space-y-0"
+                                    >
+                                      <FormControl>
+                                        <Checkbox
+                                          className="border-gray-400"
+                                          checked={field.value.some(
+                                            (el) => el.id === item.id_zelty
+                                          )}
+                                          onCheckedChange={(checked) => {
+                                            return (
+                                              checked &&
+                                              field.onChange([
+                                                {
+                                                  id: item.id_zelty,
+                                                  name: item.name,
+                                                  qte: 1,
+                                                  price: Number(item.price),
+                                                },
+                                              ])
+                                            );
+                                          }}
+                                        />
+                                      </FormControl>
+                                      <FormLabel className="text-base capitalize font-normal">
+                                        {item.name}
+                                      </FormLabel>
+                                      <div className="absolute bottom-0 left-[50%] translate-x-[-50%]">
+                                        <FormMessage />
+                                      </div>
+                                    </FormItem>
+                                  );
+                                }}
+                              />
+                            </FormItem>
+                            {item.price > 0 && (
+                              <div>{XAF.format(item.price)}</div>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  {supplements.length > 0 &&
+                    supplements.map((option, id) => (
+                      <div key={id} className="relative">
+                        <div className="productDetailTitle sticky top-0 backdrop-blur-lg">
+                          {option.name}
+                        </div>
+                        <div className="productDetailInput">
+                          {option.enfants.map((item) => (
+                            <div
+                              key={item.name}
+                              className="flex max-w-md w-full justify-between gap-3 py-2 flex-wrap odd:bg-gray-200 px-2"
+                            >
+                              <FormItem>
+                                <FormField
+                                  control={form.control}
+                                  name="otherOptions"
+                                  render={({ field }) => {
+                                    const optionIndex = field.value.findIndex(
+                                      (val) => val.name === option.name
+                                    );
+                                    const detailIndex =
+                                      optionIndex !== -1
+                                        ? field.value[
+                                            optionIndex
+                                          ].details.findIndex(
+                                            (dt) => dt.name === item.name
+                                          )
+                                        : -1;
+                                    const currentQuantity =
+                                      field.value.findIndex(
+                                        (op) => op.name === option.name
+                                      ) >= 0
+                                        ? field.value[
+                                            field.value.findIndex(
+                                              (op) => op.name === option.name
+                                            )
+                                          ].details.findIndex(
+                                            (dt) => dt.name === item.name
+                                          ) >= 0
+                                          ? field.value[optionIndex].details[
+                                              detailIndex
+                                            ].qte
+                                          : 0
+                                        : 0;
+                                    return (
+                                      <FormItem
+                                        key={item.name}
+                                        className="flex flex-row items-start space-x-3 space-y-0"
+                                      >
+                                        <FormControl>
+                                          <div className="flex flex-row gap-0 items-center">
+                                            <Button
+                                              variant={"outline"}
+                                              size={"icon"}
+                                              className="h-4 w-4 rounded-sm p-2"
+                                              onClick={(e) => {
+                                                detailIndex >= 0 &&
+                                                  field.onChange(
+                                                    field.value
+                                                      .map((op) =>
+                                                        op.name === option.name
+                                                          ? currentQuantity > 1
+                                                            ? {
+                                                                name: op.name,
+                                                                details:
+                                                                  op.details.map(
+                                                                    (dt) =>
+                                                                      dt.name ===
+                                                                      item.name
+                                                                        ? {
+                                                                            id: dt.id,
+                                                                            name: dt.name,
+                                                                            price:
+                                                                              dt.price,
+                                                                            qte:
+                                                                              dt.qte -
+                                                                              1,
+                                                                          }
+                                                                        : dt
+                                                                  ),
+                                                              }
+                                                            : currentQuantity ===
+                                                              1
+                                                            ? {
+                                                                name: op.name,
+                                                                details:
+                                                                  op.details.filter(
+                                                                    (dt) =>
+                                                                      dt.name !==
+                                                                      item.name
+                                                                  ),
+                                                              }
+                                                            : op
+                                                          : op
+                                                      )
+                                                      .filter(
+                                                        (op) =>
+                                                          op.details.length > 0
+                                                      )
+                                                  );
+                                                e.preventDefault();
+                                              }}
+                                            >
+                                              <Minus
+                                                size={16}
+                                                className="text-primary"
+                                              />
+                                            </Button>
+                                            <span className="w-5">
+                                              {currentQuantity}
+                                            </span>
+                                            <Button
+                                              variant={"outline"}
+                                              size={"icon"}
+                                              className="h-4 w-4 rounded-sm p-2"
+                                              onClick={(e) => {
+                                                detailIndex >= 0
+                                                  ? field.onChange(
+                                                      field.value.map((op) =>
+                                                        op.name === option.name
+                                                          ? {
+                                                              name: op.name,
+                                                              details:
+                                                                op.details.map(
+                                                                  (dt) =>
+                                                                    dt.name ===
+                                                                    item.name
+                                                                      ? dt.qte <
+                                                                        3
+                                                                        ? {
+                                                                            id: dt.name,
+                                                                            name: dt.name,
+                                                                            price:
+                                                                              dt.price,
+                                                                            qte:
+                                                                              dt.qte +
+                                                                              1,
+                                                                          }
+                                                                        : dt
+                                                                      : dt
+                                                                ),
+                                                            }
+                                                          : op
+                                                      )
+                                                    )
+                                                  : detailIndex < 0 &&
+                                                    optionIndex >= 0
+                                                  ? field.onChange(
+                                                      field.value.map((op) =>
+                                                        op.name === option.name
+                                                          ? {
+                                                              name: op.name,
+                                                              details: [
+                                                                ...op.details,
+                                                                {
+                                                                  id: item.id_zelty,
+                                                                  name: item.name,
+                                                                  price:
+                                                                    item.price,
+                                                                  qte: 1,
+                                                                },
+                                                              ],
+                                                            }
+                                                          : op
+                                                      )
+                                                    )
+                                                  : field.onChange([
+                                                      ...field.value,
+                                                      {
+                                                        name: option.name,
+                                                        details: [
+                                                          {
+                                                            id: item.id_zelty,
+                                                            name: item.name,
+                                                            price: item.price,
+                                                            qte: 1,
+                                                          },
+                                                        ],
+                                                      },
+                                                    ]);
+                                                e.preventDefault();
+                                              }}
+                                            >
+                                              <Plus
+                                                size={16}
+                                                className="text-primary"
+                                              />
+                                            </Button>
+                                          </div>
+                                        </FormControl>
+                                        <FormLabel className="text-base capitalize font-normal">
+                                          {item.name}
+                                        </FormLabel>
+                                        <div className="absolute bottom-0 left-[50%] translate-x-[-50%]">
+                                          <FormMessage />
+                                        </div>
+                                      </FormItem>
+                                    );
+                                  }}
+                                />
+                              </FormItem>
 
-                <div className="productDetailInput">
-                  <div className="flex max-w-md w-full justify-center items-center gap-3 py-2 flex-wrap">
-                    <div className="flex flex-col text-left">
-                      <Label className="uppercase">prix total</Label>
-                      <span className="font-bold text-xl">{currentPrice}</span>
+                              <div>{XAF.format(item.price)}</div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    ))}
+                </div>
+                <div className="flex flex-col justify-center items-center gap-2">
+                  <div className="productDetailInput">
+                    <p className="text-sm text-red-500 mt-1">
+                      La quantité choisie s’appliquera aux mêmes options
+                      sélectionnées.
+                    </p>
+                    <div className="flex max-w-md w-full justify-center items-center gap-5 divide-x py-2 flex-wrap">
+                      <div className="flex items-center justify-center pr-5">
+                        <FormField
+                          control={form.control}
+                          name="quantity"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel className="font-bold">
+                                Quantité
+                              </FormLabel>
+                              <div className="flex items-center gap-2">
+                                <Button
+                                  type="button"
+                                  onClick={() =>
+                                    field.onChange(Number(field.value || 0) - 1)
+                                  }
+                                  variant="outline"
+                                  size="icon"
+                                  className="h-5 w-5 rounded"
+                                >
+                                  <LuMinus className="cursor-pointer text-primary" />
+                                </Button>
+
+                                <FormControl>
+                                  <Input
+                                    type="number"
+                                    {...field}
+                                    value={field.value ?? 0}
+                                    onChange={(e) =>
+                                      field.onChange(Number(e.target.value))
+                                    }
+                                    className="w-10 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none [appearance:textfield]"
+                                  />
+                                </FormControl>
+
+                                <Button
+                                  type="button"
+                                  onClick={() =>
+                                    field.onChange(Number(field.value || 0) + 1)
+                                  }
+                                  size="icon"
+                                  className="h-5 w-5 rounded"
+                                >
+                                  <LuPlus className="cursor-pointer" />
+                                </Button>
+                              </div>
+                              <div className="absolute bottom-0 left-[50%] translate-x-[-50%]">
+                                <FormMessage />
+                              </div>
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+
+                      <div className="flex flex-col text-center">
+                        <Label className="uppercase">prix total</Label>
+                        <span className="font-bold text-xl">
+                          {currentPrice}
+                        </span>
+                      </div>
                     </div>
                   </div>
-                </div>
-                <div className="w-full flex justify-center flex-wrap gap-4">
-                  <Button className="mt-6" type="submit">
-                    Ajouter au panier
-                  </Button>
+                  <div className="w-full flex justify-center flex-wrap gap-4">
+                    <Button type="submit">Ajouter au panier</Button>
+                  </div>
                 </div>
               </form>
             </Form>
