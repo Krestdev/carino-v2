@@ -60,6 +60,12 @@ const CategoryDetail = ({ id }: { id: number }) => {
       product.cat.some((x) => x.id == id || x.id_parent == id)
     );
 
+    const filteredCategories = categories.filter((cat) =>
+      filteredProducts.some((product) =>
+        product.cat.some((c) => c.id === cat.id)
+      )
+    );
+
     function handleFilter(filterId: number) {
       if (filterId === -1) {
         setFilteredItems(filteredProducts);
@@ -88,7 +94,10 @@ const CategoryDetail = ({ id }: { id: number }) => {
             <ChevronRight />
             <p>{category?.name}</p>
           </div>
-          <Category categories={categories} handleFilter={handleFilter} />
+          <Category
+            categories={filteredCategories}
+            handleFilter={handleFilter}
+          />
           <Dishes products={filteredItems} />
         </div>
       </>
