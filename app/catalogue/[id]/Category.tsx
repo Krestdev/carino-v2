@@ -11,10 +11,19 @@ import Link from "next/link";
 import React, { useState } from "react";
 
 const CategoryDetail = ({ id }: { id: number }) => {
+  const [filteredItems, setFilteredItems] = useState<ProductsData[]>([]);
   const product = new ProductQuery();
   const productData = useQuery({
     queryKey: ["productFetchAll"],
-    queryFn: () => product.getAllProducts(),
+    queryFn: () =>
+      product.getAllProducts().then((res) => {
+        setFilteredItems(
+          res.data.filter((product) =>
+            product.cat.some((x) => x.id == id || x.id_parent == id)
+          )
+        );
+        return res;
+      }),
   });
   const categoryData = useQuery({
     queryKey: ["categoryFetchAll"],
@@ -36,15 +45,15 @@ const CategoryDetail = ({ id }: { id: number }) => {
     const filteredProducts = productData.data.data.filter((product) =>
       product.cat.some((x) => x.id == id || x.id_parent == id)
     );
-    const [filteredItems, setfilteredItems] = useState(filteredProducts);
+
     function handleFilter(filterId: number) {
       if (filterId === -1) {
-        setfilteredItems(filteredProducts);
+        setFilteredItems(filteredProducts);
       } else {
         const filtered = filteredProducts.filter((product) =>
           product.cat.some((x) => x.id === filterId)
         );
-        setfilteredItems(filtered);
+        setFilteredItems(filtered);
       }
     }
     return (
