@@ -44,15 +44,15 @@ const HistoryTable = ({ title, data }: Props) => {
     <div className="flex flex-col gap-5 w-full">
       <h3 className="text-xl font-bold">{title}</h3>
       <Table className="max-w-[1440px] w-full mx-auto border border-gray-300">
-        <TableHeader>
-          <TableRow className="divide-x divide-gray-300">
-            <TableHead className="font-bold">{"References"}</TableHead>
-            <TableHead className="font-bold">{"Statuts"}</TableHead>
-            <TableHead className="font-bold">{"Etats de paiement"}</TableHead>
-            <TableHead className="font-bold">{"Commande"}</TableHead>
-            <TableHead className="font-bold">{"Prix"}</TableHead>
-            <TableHead className="font-bold">{"Date"}</TableHead>
-            <TableHead className="font-bold">{"Actions"}</TableHead>
+        <TableHeader className="bg-primary text-white">
+          <TableRow className="divide-x divide-gray-300 hover:bg-primary/90">
+            <TableHead className="font-bold text-white">{"References"}</TableHead>
+            <TableHead className="font-bold text-white">{"Statuts"}</TableHead>
+            <TableHead className="font-bold text-white">{"Etats de paiement"}</TableHead>
+            <TableHead className="font-bold text-white">{"Commande"}</TableHead>
+            <TableHead className="font-bold text-white">{"Prix"}</TableHead>
+            <TableHead className="font-bold text-white">{"Date"}</TableHead>
+            <TableHead className="font-bold text-white">{"Actions"}</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody className="divide-y divide-gray-200">
@@ -64,8 +64,8 @@ const HistoryTable = ({ title, data }: Props) => {
             </TableRow>
           ) : (
             data.reverse().map((order, id) => (
-              <TableRow key={id} className="divide-x divide-gray-200">
-                <TableCell className="font-medium text-center">
+              <TableRow key={id} className={`divide-x divide-gray-200 ${id % 2 === 0 ? "bg-gray-100" : ""}`}>
+                <TableCell className={`font-medium text-center`}>
                   {order.zelty_order_id}
                 </TableCell>
                 <TableCell>

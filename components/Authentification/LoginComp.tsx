@@ -2,7 +2,6 @@
 
 import useStore from "@/context/store";
 import UserQuery from "@/queries/userQueries";
-import { User } from "@/types/types";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
 import Link from "next/link";
@@ -69,6 +68,7 @@ const LoginComp = () => {
     userLoginData.isPending,
     userLoginData.data,
     login,
+    userLoginData.isError
   ]);
 
   if (token) {

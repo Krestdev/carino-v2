@@ -285,11 +285,11 @@ function AddDialog({
               src={image || "/images/imagePlaceholder.svg"}
               alt={name}
               className="w-full h-full object-cover rounded-t-[12px] absolute -z-20"
-              loading="lazy" /* width={600} height={400} */
+              loading="lazy" 
             />
             <span className="px-4 text-white font-sans">{name}</span>
           </DialogTitle>
-          <DialogDescription className="text-black text-[18px] text-center">
+          <DialogDescription className="text-black text-[16px] text-center">
             {description}
           </DialogDescription>
         </DialogHeader>

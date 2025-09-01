@@ -11,7 +11,6 @@ import Link from "next/link";
 import React, { useState } from "react";
 
 const CategoryDetail = ({ id }: { id: number }) => {
-  const [filteredItems, setfilteredItems] = useState<ProductsData[]>([]);
   const product = new ProductQuery();
   const productData = useQuery({
     queryKey: ["productFetchAll"],
@@ -21,6 +20,8 @@ const CategoryDetail = ({ id }: { id: number }) => {
     queryKey: ["categoryFetchAll"],
     queryFn: () => product.getCategories(),
   });
+
+  const [filteredItems, setfilteredItems] = useState<ProductsData[]>([]);
 
   if (productData.isLoading && categoryData.isLoading) {
     return <div>Loading...</div>;
@@ -32,7 +33,15 @@ const CategoryDetail = ({ id }: { id: number }) => {
   }
   if (productData.isSuccess && categoryData.isSuccess) {
     const category = categoryData.data.data.find((x) => x.id == id);
-    const categories = categoryData.data.data.filter((x) => x.id_parent == id);
+    // const categories = categoryData.data.data.filter((x) => x.id_parent == id);
+    const categories = categoryData.data.data
+      .filter((x) => x.id_parent == id)
+      .filter((cat) =>
+        productData.data.data.some((product) =>
+          product.cat.some((c) => c.id === cat.id)
+        )
+      );
+
 
     const filteredProducts = productData.data.data.filter((product) =>
       product.cat.some((x) => x.id == id || x.id_parent == id)
