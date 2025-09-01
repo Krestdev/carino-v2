@@ -17,7 +17,7 @@ const DishGrid = ({ dishes, categories }: Props) => {
       setfilteredItems(dishes);
     } else {
       const filteredProducts = dishes.filter((product) =>
-        product.cat.some((x) => x.id === filterId)
+        product.cat.some((x) => x.id === filterId || x.id_parent === filterId)
       );
       setfilteredItems(filteredProducts);
     }

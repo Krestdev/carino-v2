@@ -14,8 +14,30 @@ const CategoryDetail = ({ id }: { id: number }) => {
   const product = new ProductQuery();
   const productData = useQuery({
     queryKey: ["productFetchAll"],
-    queryFn: () => product.getAllProducts(),
+    queryFn: () =>
+      product.getAllProducts().then((res) => {
+        setFilteredItems(
+          res.data.filter((product) =>
+            product.cat.some((x) => x.id == id || x.id_parent == id)
+          )
+        );
+        return res;
+      }),
   });
+
+  /*     const productData = useQuery({
+    queryKey: ["productFetchAll"],
+    queryFn: async () => {
+      const products = await product.getAllProducts();
+      setFilteredItems(
+        products.data.filter((product) =>
+          product.cat.some((x) => x.id == id || x.id_parent == id)
+        )
+      );
+      return products;
+    },
+  }); */
+
   const categoryData = useQuery({
     queryKey: ["categoryFetchAll"],
     queryFn: () => product.getCategories(),
@@ -47,14 +69,20 @@ const CategoryDetail = ({ id }: { id: number }) => {
       product.cat.some((x) => x.id == id || x.id_parent == id)
     );
 
+    const filteredCategories = categories.filter((cat) =>
+      filteredProducts.some((product) =>
+        product.cat.some((c) => c.id === cat.id)
+      )
+    );
+
     function handleFilter(filterId: number) {
       if (filterId === -1) {
-        setfilteredItems(filteredProducts);
+        setFilteredItems(filteredProducts);
       } else {
         const filtered = filteredProducts.filter((product) =>
           product.cat.some((x) => x.id === filterId)
         );
-        setfilteredItems(filtered);
+        setFilteredItems(filtered);
       }
     }
     return (
@@ -75,7 +103,10 @@ const CategoryDetail = ({ id }: { id: number }) => {
             <ChevronRight />
             <p>{category?.name}</p>
           </div>
-          <Category categories={categories} handleFilter={handleFilter} />
+          <Category
+            categories={filteredCategories}
+            handleFilter={handleFilter}
+          />
           <Dishes products={filteredItems} />
         </div>
       </>
