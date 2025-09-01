@@ -285,7 +285,7 @@ function AddDialog({
               src={image || "/images/imagePlaceholder.svg"}
               alt={name}
               className="w-full h-full object-cover rounded-t-[12px] absolute -z-20"
-              loading="lazy" 
+              loading="lazy"
             />
             <span className="px-4 text-white font-sans">{name}</span>
           </DialogTitle>
@@ -986,13 +986,16 @@ function AddDialog({
                           <div className="flex items-center gap-2">
                             <Button
                               type="button"
-                              onClick={() => field.onChange(Number(field.value || 0) - 1)}
+                              onClick={() =>
+                                field.onChange(Math.max(1, Number(field.value || 1) - 1))
+                              }
                               variant="outline"
                               size="icon"
                               className="h-5 w-5 rounded"
                             >
                               <LuMinus className="cursor-pointer text-primary" />
                             </Button>
+
 
                             <FormControl>
                               <Input
