@@ -43,7 +43,7 @@ const CategoryDetail = ({ id }: { id: number }) => {
     queryFn: () => product.getCategories(),
   });
 
-  const [filteredItems, setfilteredItems] = useState<ProductsData[]>([]);
+  const [filteredItems, setFilteredItems] = useState<ProductsData[]>([]);
 
   if (productData.isLoading && categoryData.isLoading) {
     return <div>Loading...</div>;

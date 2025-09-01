@@ -290,7 +290,6 @@ function AddDialog({
             <span className="px-4 text-white font-sans">{name}</span>
           </DialogTitle>
           <DialogDescription className="text-black text-[18px] text-center line-clamp-3">
-          <DialogDescription className="text-black text-[16px] text-center">
             {description}
           </DialogDescription>
         </DialogHeader>
