@@ -124,7 +124,7 @@ function Footer() {
       </div>
       <div className="container mx-auto flex flex-col px-7 md:items-center xl:flex-row text-sm mt-12 gap-3">
         <div className="flex flex-col md:items-center justify-center gap-2 w-full">
-          <p className="text-slate-400 md:text-center">@ 2024 le Carino.</p>
+          <p className="text-slate-400 md:text-center">© 2025 le Carino.</p>
           <p className="text-[#A3A0B9] md:text-center">
             Designé et implementé par
             <Link target="_blank" className="text-[#F4F4F7]" href={"https://www.krestdev.com/"}>
