@@ -12,16 +12,16 @@ export interface OrderTypeProps {
   setFees: React.Dispatch<React.SetStateAction<number>>;
   setPostOrderStatus: React.Dispatch<React.SetStateAction<boolean>>;
 }
-export interface User {
-  id: number;
-  name: string;
-  phone: string;
-  email: string;
-  created_at: string;
-  updated_at: string;
-  loyalty: number;
-  isFirstOrder: boolean;
-}
+// export interface User {
+//   id: number;
+//   name: string;
+//   phone: string;
+//   email: string;
+//   created_at: string;
+//   updated_at: string;
+//   loyalty: number;
+//   isFirstOrder: boolean;
+// }
 
 export interface cartItem {
   nom: string;
@@ -421,7 +421,7 @@ export interface OrdersData {
   id: number;
   zelty_order_id?: number;
   reference: string;
-  items: [product:string, price:number][];
+  items: [product: string, price: number][];
   user_id: number;
   prix_total: number;
   lieu_livraison: string;
@@ -456,6 +456,7 @@ export interface UserLoginData {
 
 export interface User {
   id: number;
+  id_zelty?: number;
   uuid: string;
   remote_id: number;
   nice_name: string;

@@ -2,7 +2,14 @@
 
 import React, { useState } from "react";
 import z from "zod/v3";
-import { Dialog, DialogClose, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "../ui/dialog";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "../ui/dialog";
 import { AlertCircle, CalendarIcon, Loader } from "lucide-react";
 import Link from "next/link";
 import { Button } from "../ui/button";
@@ -77,8 +84,8 @@ const formSchema = z
 const ReservationForm = () => {
   const { user } = useStore();
   const [open, setOpen] = React.useState(false);
-  const [successModal, setSuccessModal] = useState(false)
-  const [confirm, setConfirm] = useState(false)
+  const [successModal, setSuccessModal] = useState(false);
+  const [confirm, setConfirm] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -98,8 +105,14 @@ const ReservationForm = () => {
   const reservations = new ReservationQuery();
   const reservationData = useMutation({
     mutationKey: ["reservations"],
-    mutationFn: (data: z.infer<typeof formSchema>) => reservations.createReservation({ ...data, userId: user?.id, places: Number(data.places) }),
-  })
+    mutationFn: (data: z.infer<typeof formSchema>) =>
+      reservations.createReservation({
+        ...data,
+        userId: user?.id_zelty,
+        booking_for: data.date.toISOString(),
+        places: Number(data.places),
+      }),
+  });
 
   function onSubmit(values: z.infer<typeof formSchema>) {
     console.log(values);
@@ -142,7 +155,9 @@ const ReservationForm = () => {
         <Dialog open={successModal} onOpenChange={setSuccessModal}>
           <DialogContent>
             <DialogHeader>
-              <DialogTitle className="font-sans font-semibold tracking-tighter">{"Réservation enregistrée"}</DialogTitle>
+              <DialogTitle className="font-sans font-semibold tracking-tighter">
+                {"Réservation enregistrée"}
+              </DialogTitle>
               <DialogDescription>{`Votre réservation a été enregistrée avec succès, vous serez très prochainement contacté par nos services pour confirmer votre demande`}</DialogDescription>
             </DialogHeader>
             <DialogClose asChild>
@@ -294,7 +309,11 @@ const ReservationForm = () => {
                     <FormItem className="w-full">
                       <FormLabel>{"Numéro de téléphone"}</FormLabel>
                       <FormControl>
-                        <Input type="text" {...field} placeholder="ex. 678890890" />
+                        <Input
+                          type="text"
+                          {...field}
+                          placeholder="ex. 678890890"
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -353,10 +372,13 @@ const ReservationForm = () => {
               )}
             />
             <Button
-              type='button'
+              type="button"
               disabled={reservationData.isPending}
               // disabled={isPending}
-              onClick={(e) => { e.preventDefault(); setConfirm(true) }}
+              onClick={(e) => {
+                e.preventDefault();
+                setConfirm(true);
+              }}
             >
               {reservationData.isPending && (
                 <Loader className="mr-2 h-4 w-4 animate-spin" />
@@ -367,37 +389,79 @@ const ReservationForm = () => {
           <Dialog open={confirm} onOpenChange={setConfirm}>
             <DialogContent>
               <DialogHeader className="bg-primary text-white p-2">
-                <DialogTitle className="font-sans font-semibold tracking-tighter">{"Confirmer la réservation"}</DialogTitle>
-                <DialogDescription className="text-white">{"Vérifiez les informations liées à votre réservation"}</DialogDescription>
+                <DialogTitle className="font-sans font-semibold tracking-tighter">
+                  {"Confirmer la réservation"}
+                </DialogTitle>
+                <DialogDescription className="text-white">
+                  {"Vérifiez les informations liées à votre réservation"}
+                </DialogDescription>
               </DialogHeader>
               <div className="px-7 pb-7 grid gap-4">
                 <div className="grid gap-2">
-                  <span className="text-sm text-gray-400">{"Nom de la réservation"}</span>
+                  <span className="text-sm text-gray-400">
+                    {"Nom de la réservation"}
+                  </span>
                   <p>{!!form.getValues("name") && form.getValues("name")}</p>
                 </div>
                 <div className="grid gap-2">
-                  <span className="text-sm text-gray-400">{"Votre adresse mail"}</span>
+                  <span className="text-sm text-gray-400">
+                    {"Votre adresse mail"}
+                  </span>
                   <p>{!!form.getValues("email") && form.getValues("email")}</p>
                 </div>
                 <div className="grid gap-2">
-                  <span className="text-sm text-gray-400">{"Date de la réservation"}</span>
-                  <p>{!!form.getValues("date") && format(new Date(form.getValues("date")), "PPP", { locale: fr })} {form.getValues("time")}</p>
+                  <span className="text-sm text-gray-400">
+                    {"Date de la réservation"}
+                  </span>
+                  <p>
+                    {!!form.getValues("date") &&
+                      format(new Date(form.getValues("date")), "PPP", {
+                        locale: fr,
+                      })}{" "}
+                    {form.getValues("time")}
+                  </p>
                 </div>
                 <div className="grid gap-2">
                   <span className="text-sm text-gray-400">{"Menu"}</span>
-                  <p>{!!form.getValues("menu") && form.getValues("menu")} pour {form.getValues("places")} personnes</p>
+                  <p>
+                    {!!form.getValues("menu") && form.getValues("menu")} pour{" "}
+                    {form.getValues("places")} personnes
+                  </p>
                 </div>
                 <div className="grid gap-2">
                   <span className="text-sm text-gray-400">{"Téléphone"}</span>
                   <p>{!!form.getValues("phone") && form.getValues("phone")}</p>
                 </div>
                 <div className="grid gap-2">
-                  <span className="text-sm text-gray-400">{"Commentaires"}</span>
-                  <p>{!!form.getValues("description") && form.getValues("description")}</p>
+                  <span className="text-sm text-gray-400">
+                    {"Commentaires"}
+                  </span>
+                  <p>
+                    {!!form.getValues("description") &&
+                      form.getValues("description")}
+                  </p>
                 </div>
                 <div className="inline-flex gap-2">
-                  <Button type="submit" onClick={(e) => { e.preventDefault(); form.handleSubmit(onSubmit)(); setConfirm(false) }}>{"Confirmer"}</Button>
-                  <Button className="w-fit text-black border-black" variant={"outline"} onClick={(e) => { e.preventDefault(); setConfirm(false) }}>{"Annuler"}</Button>
+                  <Button
+                    type="submit"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      form.handleSubmit(onSubmit)();
+                      setConfirm(false);
+                    }}
+                  >
+                    {"Confirmer"}
+                  </Button>
+                  <Button
+                    className="w-fit text-black border-black"
+                    variant={"outline"}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setConfirm(false);
+                    }}
+                  >
+                    {"Annuler"}
+                  </Button>
                 </div>
               </div>
             </DialogContent>
@@ -409,8 +473,12 @@ const ReservationForm = () => {
           <h2 className="text-4xl font-bold text-primary">{"Nous trouver"}</h2>
           <div className="flex flex-col">
             <p className="font-bold">{config.siteName}</p>
-            <Link href={`mailto:${config.contact.email}`} className="font-bold">{config.contact.email}</Link>
-            <Link href={`tel:${config.contact.phone}`} className="font-bold">{config.contact.phone}</Link>
+            <Link href={`mailto:${config.contact.email}`} className="font-bold">
+              {config.contact.email}
+            </Link>
+            <Link href={`tel:${config.contact.phone}`} className="font-bold">
+              {config.contact.phone}
+            </Link>
           </div>
         </div>
         <iframe
