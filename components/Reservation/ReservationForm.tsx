@@ -89,7 +89,7 @@ const formSchema = z
         message: "Le numéro ne doit comporter que des chiffres",
       }),
 
-    description: z.string(),
+    comment: z.string(),
   })
   .refine(
     (data) => {
@@ -117,7 +117,7 @@ const ReservationForm = () => {
       name: user?.name,
       email: user?.email,
       phone: user?.phone.substring(4),
-      description: "",
+      comment: "",
       // note: "",
       menu: "",
       places: "",
@@ -138,6 +138,7 @@ const ReservationForm = () => {
       }),
     onSuccess: () => {
       setSuccessModal(true);
+      form.reset();
     },
   });
 
@@ -334,11 +335,11 @@ const ReservationForm = () => {
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          <SelectItem value="terrasse">
-                            {"Espace Fumeur"}
+                          <SelectItem value="terrasse exterieure">
+                            {"Térrasse Exterieur"}
                           </SelectItem>
-                          <SelectItem value="intérieure">
-                            {"Espace Non-Fumeur"}
+                          <SelectItem value="terrasse intérieure">
+                            {"Térrasse Interieure"}
                           </SelectItem>
                         </SelectContent>
                       </Select>
@@ -402,7 +403,7 @@ const ReservationForm = () => {
             </div>
             <FormField
               control={form.control}
-              name="description"
+              name="comment"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>{"Commentaires"}</FormLabel>
@@ -481,8 +482,8 @@ const ReservationForm = () => {
                     {"Commentaires"}
                   </span>
                   <p>
-                    {!!form.getValues("description") &&
-                      form.getValues("description")}
+                    {!!form.getValues("comment") &&
+                      form.getValues("comment")}
                   </p>
                 </div>
                 <div className="inline-flex gap-2">
