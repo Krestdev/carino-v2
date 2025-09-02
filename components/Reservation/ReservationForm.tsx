@@ -42,6 +42,7 @@ import { useMutation } from "@tanstack/react-query";
 import { fr } from "date-fns/locale";
 import { format } from "date-fns";
 import { config } from "@/data/config";
+import { toast } from "../ui/use-toast";
 
 const formSchema = z
   .object({
@@ -49,37 +50,60 @@ const formSchema = z
       .string({ required_error: "Veuillez entrer votre nom" })
       .min(4, "Trop court"),
     email: z.string().email({ message: "Adresse mail invalide" }),
-    date: z.date({ required_error: "Veuillez choisir une date" }),
-    time: z.string({ required_error: "Selectionnez une heure" }),
+
+    date: z.date({ required_error: "Veuillez choisir une date" }).refine(
+      (date) => {
+        // Aujourd'hui à minuit
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        // Demain à minuit
+        const tomorrow = new Date(today);
+        tomorrow.setDate(today.getDate() + 1);
+
+        // Vérifie que la date choisie >= demain
+        return date >= tomorrow;
+      },
+      {
+        message: "La réservation doit être faite à partir de demain",
+      }
+    ),
+
+    time: z.string({ required_error: "Sélectionnez une heure" }),
+
     menu: z.string({
       required_error: "Veuillez choisir un menu pour continuer",
     }),
+
     places: z
       .string({ required_error: "Veuillez choisir le nombre de places" })
-      .refine((value) => /^\d*$/.test(value)),
+      .refine((value) => /^\d*$/.test(value), {
+        message: "Le nombre de places doit être un nombre",
+      }),
 
     salle: z.string(),
+
     phone: z
       .string({ required_error: "Veuillez entrer votre numéro de téléphone" })
       .refine((value) => /^\d*$/.test(value), {
         message: "Le numéro ne doit comporter que des chiffres",
       }),
+
     description: z.string(),
   })
   .refine(
     (data) => {
       const [hours] = data.time.split(":");
 
-      if (Number(hours) < 12 || Number(hours) > 21) {
-        return false;
-      }
-      return true;
+      // Réservations seulement entre 12h et 22h inclus
+      return Number(hours) >= 12 && Number(hours) <= 21;
     },
     {
       message: "Les réservations sont disponibles entre Midi et 22h",
       path: ["time"],
     }
   );
+
 
 const ReservationForm = () => {
   const { user } = useStore();
@@ -112,12 +136,32 @@ const ReservationForm = () => {
         booking_for: data.date.toISOString(),
         places: Number(data.places),
       }),
+    onSuccess: () => {
+      setSuccessModal(true);
+    },
   });
+
+  const isValidDate = (date: Date) => {
+    const today = new Date();
+    return date > today;
+  }
 
   function onSubmit(values: z.infer<typeof formSchema>) {
     console.log(values);
     if (user) {
-      reservationData.mutate(values);
+      if (isValidDate(values.date)) {
+
+        reservationData.mutate(values);
+      } else {
+
+        console.log("Veuillez choisir une date future");
+
+        toast({
+          title: "Date invalide",
+          description: "Veuillez choisir une date future",
+          variant: "destructive",
+        });
+      }
     } else {
       setOpen(true);
     }
@@ -144,7 +188,7 @@ const ReservationForm = () => {
             </p>
             <div className="flex flex-wrap gap-2 items-center">
               <Link href="/connexion">
-                <Button variant={"outline"}>{"se connecter"}</Button>
+                <Button variant={"outline"} className="text-black">{"se connecter"}</Button>
               </Link>
               <DialogClose asChild>
                 <Button variant={"destructive"}>{"Fermer"}</Button>
