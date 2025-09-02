@@ -14,7 +14,7 @@ interface OrderInvoiceProps {
     phoneNumber: string;
     deliveryAddress: string;
     location: string;
-    products: [product: string, price: number][];
+    products: string[];
     deliveryFee: string;
     itemsAmount: string;
     totalAmount: string;
@@ -25,6 +25,7 @@ interface OrderInvoiceProps {
 }
 
 const OrderInvoice = ({ order }: OrderInvoiceProps) => (
+
   <Document>
     <Page size="A4" style={styles.page}>
       <View style={styles.header}>
@@ -69,14 +70,20 @@ const OrderInvoice = ({ order }: OrderInvoiceProps) => (
             </View>
           </View>
           <View style={styles.section}>
-            {order.products.map((product: [string, number], index: number) => (
-              <View key={index} style={styles.subSection}>
-                <Text style={styles.subSectionLabel}>{`• ${product[0]}`}</Text>
-                <Text
-                  style={styles.subSectionValue}
-                >{`${product[1]} prix FCFA`}</Text>
-              </View>
-            ))}
+            {order.products.map((product, index: number) => {
+              // Séparer le nom du prix en utilisant le séparateur " -> "
+              const [productName, pricePart] = product.split(' -> ');
+
+              // Extraire le prix (enlever "FCFA" si présent et convertir en nombre)
+              const price = parseInt(pricePart.replace(' FCFA', '')) || 0;
+
+              return (
+                <View key={index} style={styles.subSection}>
+                  <Text style={styles.subSectionLabel}>{`• ${productName}`}</Text>
+                  <Text style={styles.subSectionValue}>{`${price} FCFA`}</Text>
+                </View>
+              );
+            })}
           </View>
           <View style={styles.section}>
             <View style={styles.subSection}>

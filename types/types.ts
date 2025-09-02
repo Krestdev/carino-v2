@@ -421,7 +421,7 @@ export interface OrdersData {
   id: number;
   zelty_order_id?: number;
   reference: string;
-  items: [product: string, price: number][];
+  items: string[];
   user_id: number;
   prix_total: number;
   lieu_livraison: string;

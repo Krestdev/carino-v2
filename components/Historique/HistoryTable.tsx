@@ -22,14 +22,6 @@ const HistoryTable = ({ title, data }: Props) => {
   const [selectedOrder, setSelectedOrder] = useState<OrdersData | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
 
-  // const jsonArray = (array: string) => {
-  //   if (typeof array === "string") {
-  //     return JSON.parse(array.replace(/\n/g, ""));
-  //   } else {
-  //     return array;
-  //   }
-  // };
-
   const handleViewOrder = (order: OrdersData) => {
     setSelectedOrder(order);
     setDialogOpen(true);
@@ -39,7 +31,7 @@ const HistoryTable = ({ title, data }: Props) => {
     setDialogOpen(false);
     setSelectedOrder(null);
   };
-  
+
   return (
     <div className="flex flex-col gap-5 w-full">
       <h3 className="text-xl font-bold">{title}</h3>
@@ -88,8 +80,22 @@ const HistoryTable = ({ title, data }: Props) => {
                 <TableCell>{order.is_paid ? "Payé" : "Non payé"}</TableCell>
                 <TableCell className="truncate max-w-[200px]">
                   {(() => {
-                    const items = order.items;
-                    const preview = items.slice(0, 3);
+                    // Parse items to ensure it's an array
+                    const parseItems = (items: unknown): string[] => {
+                      if (Array.isArray(items)) return items;
+                      if (typeof items === "string") {
+                        try {
+                          const parsed = JSON.parse(items);
+                          return Array.isArray(parsed) ? parsed : [items];
+                        } catch {
+                          return [items];
+                        }
+                      }
+                      return [];
+                    };
+
+                    const items = parseItems(order.items);
+                    const preview = items.slice(0, 3).join(", ");
                     return items.length > 3 ? `${preview} ...` : preview;
                   })()}
                 </TableCell>

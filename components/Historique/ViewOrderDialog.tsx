@@ -12,6 +12,7 @@ import { PDFViewer } from "@react-pdf/renderer";
 import { FileText, X } from "lucide-react";
 import { useState } from "react";
 import OrderInvoice from "./OrderInvoice";
+import Loading from "@/app/loading";
 
 interface ViewOrderDialogProps {
   open: boolean;
@@ -23,6 +24,28 @@ const ViewOrderDialog = ({ open, onClose, order }: ViewOrderDialogProps) => {
   const [showPdf, setShowPdf] = useState(false);
 
   if (!order) return null;
+
+  if (order.items === null || order.items === undefined) return <Loading />;
+
+  // Parse items to ensure it's always an array
+  const parseItems = (items: unknown): string[] => {
+    if (Array.isArray(items)) {
+      return items;
+    } else if (typeof items === "string") {
+      try {
+        // Try to parse as JSON first
+        const parsed = JSON.parse(items);
+        return Array.isArray(parsed) ? parsed : [items];
+      } catch {
+        // If it's not valid JSON, treat as a single string item
+        return [items];
+      }
+    } else {
+      return [];
+    }
+  };
+
+  const parsedItems = parseItems(order.items);
 
   const jsonArray = (array: string) => {
     if (typeof array === "string") {
@@ -38,9 +61,9 @@ const ViewOrderDialog = ({ open, onClose, order }: ViewOrderDialogProps) => {
     id: order.id,
     customerName: metadata.customer.name ? metadata.customer.name : "-",
     phoneNumber: metadata.customer.phone ? metadata.customer.phone : "-",
-    deliveryAddress:  metadata.address && metadata.address.name ? metadata.address.name : "-",
-    location:  metadata.address && metadata.address.street ? metadata.address.street : "-",
-    products: order.items,
+    deliveryAddress: metadata.address && metadata.address.name ? metadata.address.name : "-",
+    location: metadata.address && metadata.address.street ? metadata.address.street : "-",
+    products: parsedItems,
     deliveryFee: "2 000",
     itemsAmount: (Number(order.prix_total) - 2000).toString(),
     totalAmount: order.prix_total.toString(),
@@ -48,9 +71,6 @@ const ViewOrderDialog = ({ open, onClose, order }: ViewOrderDialogProps) => {
     is_delivred: order.is_delivred,
     created_at: order.created_at,
   };
-
-  console.log(orderData.products);
-  
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
@@ -64,9 +84,7 @@ const ViewOrderDialog = ({ open, onClose, order }: ViewOrderDialogProps) => {
               {`Statut payement : ${order.is_paid ? "Payé" : "Non payé"}`}
             </DialogDescription>
             <DialogDescription>
-              {`Statut livraison : ${
-                order.is_delivred ? "Livré" : "Non livré"
-              }`}
+              {`Statut livraison : ${order.is_delivred ? "Livré" : "Non livré"}`}
             </DialogDescription>
           </div>
           <Button
@@ -125,16 +143,20 @@ const ViewOrderDialog = ({ open, onClose, order }: ViewOrderDialogProps) => {
                     </div>
                   </div>
                   <div className="flex flex-col gap-1 w-full border-b border-[#848484] pb-2">
-                    {orderData.products && orderData.products.map(
-                      (product: [string, number], index: number) => {
-                        return (
-                          <div key={index} className="flex justify-between">
-                            <h4 className="font-normal w-[220px]">{`• ${product[0]}`}</h4>
-                            <h4>{`${product[1]} FCFA`}</h4>
-                          </div>
-                        );
-                      }
-                    )}
+                    {parsedItems.map((product, index: number) => {
+                      // Séparer le nom du prix en utilisant le séparateur " -> "
+                      const [productName, pricePart] = product.split(' -> ');
+
+                      // Extraire le prix numérique
+                      const price = pricePart ? pricePart.replace(' FCFA', '') : '0';
+
+                      return (
+                        <div key={index} className="flex justify-between">
+                          <h4 className="font-normal w-[220px]">{`• ${productName}`}</h4>
+                          <h4>{`${price} FCFA`}</h4>
+                        </div>
+                      );
+                    })}
                   </div>
                   <div className="flex flex-col gap-1 w-full border-b border-[#848484] pb-2">
                     <div className="flex justify-between">
