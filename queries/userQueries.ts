@@ -1,10 +1,5 @@
 import api from "@/providers/axios";
-import {
-  cartItem,
-  UserLogin,
-  UserLoginData,
-  UserOrdersResponse,
-} from "@/types/types";
+import { Order, UserLogin, UserOrdersResponse } from "@/types/types";
 
 type UserRegister = {
   email: string;
@@ -17,14 +12,6 @@ type UserRegister = {
 type UserLoginIn = {
   email: string;
   password: string;
-};
-
-type Order = {
-  phone: string;
-  total_amount: number;
-  user: number;
-  Address: string;
-  commande: cartItem[];
 };
 
 export default class UserQuery {
@@ -41,9 +28,10 @@ export default class UserQuery {
     return api.post(`${this.route}/logout`).then((res) => res.data);
   };
   register = async (data: UserRegister) => {
-    return api.post(`${this.route}/register`).then((res) => res.data);
+    return api.post(`${this.route}/register`, data).then((res) => res.data);
   };
-  orders = async (data: Order) => {
+  PlaceOrder = async (data: Order) => {
+    console.log(data);
     return api.post(`${this.route}/orders`, data).then((res) => res.data);
   };
   allUsersOrders = async (id: number): Promise<UserOrdersResponse> => {

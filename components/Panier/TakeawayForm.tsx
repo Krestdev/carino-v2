@@ -2,6 +2,7 @@ import axiosConfig from "@/api";
 import useStore from "@/context/store";
 import { cn, isDeliveryOpen } from "@/lib/utils";
 import {
+  Order,
   orderMutation,
   OrderTypeProps,
   PostTakeAwayOrderProps,
@@ -34,6 +35,7 @@ import {
 } from "../ui/select";
 import { toast } from "../ui/use-toast";
 import { ApplyPromotion, sendPackPromotion } from "../universal/promotions";
+import UserQuery from "@/queries/userQueries";
 
 const formSchema = z
   .object({
@@ -138,23 +140,29 @@ const TakeawayForm = ({
     },
   });
 
+  const userQuery = new UserQuery();
+
   const postOrder = useMutation({
-    mutationFn: ({
-      phone,
-      total_amount,
-      user,
-      commande,
-      due_date,
-    }: PostTakeAwayOrderProps) => {
-      return axiosClient.post<orderMutation>("/auth/orders", {
-        phone,
-        total_amount,
-        user,
-        commande,
-        due_date,
-      });
-    },
+    mutationFn: async (data: Order) => userQuery.PlaceOrder(data),
   });
+
+  // const postOrder = useMutation({
+  //   mutationFn: ({
+  //     phone,
+  //     total_amount,
+  //     user,
+  //     commande,
+  //     due_date,
+  //   }: PostTakeAwayOrderProps) => {
+  //     return axiosClient.post<orderMutation>("/auth/orders", {
+  //       phone,
+  //       total_amount,
+  //       user,
+  //       commande,
+  //       due_date,
+  //     });
+  //   },
+  // });
 
   function onSubmit(values: z.infer<typeof formSchema>) {
     const dueDate = new Date(values.takeDate);
@@ -172,7 +180,7 @@ const TakeawayForm = ({
           total_amount: totalPrice() + fees,
           user: user.id,
           commande: sendPackPromotion(ApplyPromotion(cart)),
-          due_date: dueDate,
+          due_date: dueDate.toISOString(),
         });
         //receipt here !
         setReceiptData({
@@ -221,9 +229,9 @@ const TakeawayForm = ({
     postOrder.isError,
     postOrder.isSuccess,
     postOrder.isPending,
-    postOrder.data?.data.data.ref,
+    postOrder.data?.data.ref,
     setTransaction,
-    setPostOrderStatus
+    setPostOrderStatus,
   ]);
 
   function isDisable() {
