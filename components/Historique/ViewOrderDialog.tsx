@@ -129,7 +129,7 @@ const ViewOrderDialog = ({ open, onClose, order }: ViewOrderDialogProps) => {
                       (product: [string, number], index: number) => {
                         return (
                           <div key={index} className="flex justify-between">
-                            <h4 className="font-normal w-[220px]">{`• ${product}`}</h4>
+                            <h4 className="font-normal w-[220px]">{`• ${product[0]}`}</h4>
                             <h4>{`${product[1]} FCFA`}</h4>
                           </div>
                         );

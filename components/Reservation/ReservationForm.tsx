@@ -98,7 +98,7 @@ const ReservationForm = () => {
   const reservations = new ReservationQuery();
   const reservationData = useMutation({
     mutationKey: ["reservations"],
-    mutationFn: (data: z.infer<typeof formSchema>) => reservations.createReservation({ ...data, places: Number(data.places) }),
+    mutationFn: (data: z.infer<typeof formSchema>) => reservations.createReservation({ ...data, userId: user?.id, places: Number(data.places) }),
   })
 
   function onSubmit(values: z.infer<typeof formSchema>) {
