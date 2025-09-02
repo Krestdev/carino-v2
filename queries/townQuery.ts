@@ -4,6 +4,6 @@ import { AddressResponse } from "@/types/types";
 export default class TownQuery {
   route = "villes";
   getTowns = async (): Promise<AddressResponse> => {
-    return api.get("/").then((res) => res.data);
+    return api.get(`${this.route}/`).then((res) => res.data);
   };
 }

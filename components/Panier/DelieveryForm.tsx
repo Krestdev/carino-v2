@@ -4,6 +4,7 @@ import { cn, isDeliveryOpen } from "@/lib/utils";
 import {
   CitiesResponse,
   City,
+  Order,
   orderMutation,
   OrderTypeProps,
   PostOrderProps,
@@ -42,6 +43,8 @@ import {
 } from "../ui/select";
 import { toast } from "../ui/use-toast";
 import { ApplyPromotion, sendPackPromotion } from "../universal/promotions";
+import TownQuery from "@/queries/townQuery";
+import UserQuery from "@/queries/userQueries";
 
 const formSchema = z.object({
   city: z.string().min(3, { message: "Selectionnez une ville" }),
@@ -62,7 +65,6 @@ const DelieveryForm = ({
   setPostOrderStatus,
 }: OrderTypeProps) => {
   const router = useRouter();
-  const axiosClient = axiosConfig();
   const {
     cart,
     totalPrice,
@@ -83,12 +85,10 @@ const DelieveryForm = ({
     }
   }, [cart]); //check if there's something in the cart to disable or not the button
 
+  const townQuery = new TownQuery();
   const { data, isSuccess } = useQuery({
     queryKey: ["cities"],
-    queryFn: async (): Promise<CitiesResponse> => {
-      const res = await axiosClient.get<CitiesResponse>("/villes");
-      return res.data;
-    },
+    queryFn: () => townQuery.getTowns(),
   });
 
   useEffect(() => {
@@ -111,23 +111,10 @@ const DelieveryForm = ({
     },
   });
 
+  const userQuery = new UserQuery();
+
   const postOrder = useMutation({
-    mutationFn: async ({
-      phone,
-      total_amount,
-      user,
-      Address,
-      commande,
-    }: PostOrderProps): Promise<orderMutation> => {
-      const res = await axiosClient.post<orderMutation>("/auth/orders", {
-        phone,
-        total_amount,
-        user,
-        Address,
-        commande,
-      });
-      return res.data;
-    },
+    mutationFn: async (data: Order) => userQuery.PlaceOrder(data),
   });
 
   function onSubmit(values: z.infer<typeof formSchema>) {
@@ -137,12 +124,13 @@ const DelieveryForm = ({
           phone: values.phoneNumber,
           total_amount: totalPrice() + fees,
           user: user.id,
-          Address: {
-            name: values.district,
-            street: values.locality.concat(" - ", values.deliveryNumber),
-            zip_code: "237",
-            city: "yaounde",
-          },
+          Address: values.city,
+          // Address: {
+          //   name: values.district,
+          //   street: values.locality.concat(" - ", values.deliveryNumber),
+          //   zip_code: "237",
+          //   city: "yaounde",
+          // },
           commande: sendPackPromotion(ApplyPromotion(cart)),
         });
         setReceiptData({

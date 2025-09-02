@@ -434,6 +434,15 @@ export interface OrdersData {
   updated_at: Date;
 }
 
+export type Order = {
+  phone: string;
+  total_amount: number;
+  user: number;
+  Address?: string;
+  commande: cartItem[];
+  due_date?: string;
+};
+
 // ##############
 // Login
 // ##############
