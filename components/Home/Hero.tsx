@@ -2,10 +2,13 @@ import { config } from "@/data/config";
 import React from "react";
 import { Button } from "../ui/button";
 import PromoMessage from "../universal/PromoMessage";
+import { useRouter } from "next/navigation";
 
 const Hero = () => {
   const message =
     "Pour 2 pizzas🍕🍕 achetées, 1 pizza🍕 offerte ! Profitez-en du 10 juillet au 05 Septembre 2025 exclusivement sur notre site.";
+
+  const router = useRouter();
   return (
     <div
       style={{
@@ -30,10 +33,13 @@ const Hero = () => {
               {config.description}
             </p>
             <div className="flex flex-row gap-2">
-              <Button className="bg-[#29235C]">{"Commander"}</Button>
+              <Button
+                onClick={() => router.push("/produits")}
+                className="bg-[#29235C]">{"Commander"}</Button>
               <Button
                 className="bg-[#FFC336] text-primary "
                 variant={"outline"}
+                onClick={() => router.push("/reservation")}
               >
                 {"Réserver une Table"}
               </Button>
