@@ -15,7 +15,7 @@ jobs:
       # Cache dependencies to speed up subsequent installs
       - name: Cache Node Modules
         id: cache-deps
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: |
             node_modules
@@ -35,7 +35,7 @@ jobs:
 
       # Upload node_modules for reuse
       - name: Upload node_modules
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: node_modules
           path: node_modules
@@ -47,7 +47,7 @@ jobs:
       - uses: actions/checkout@v4
       # Download cached node_modules from lint step
       - name: Download node_modules
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: node_modules
           path: node_modules
@@ -58,7 +58,7 @@ jobs:
 
       # Upload build for deployment step
       - name: Upload Build
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: app-build
           path: .next
