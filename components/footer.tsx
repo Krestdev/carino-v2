@@ -49,18 +49,18 @@ function Footer() {
     {
       mainTitle: "aide & ressources",
       content: [
-        {
-          title: "politique & confidentialité",
-          link: "/privacy",
-        },
+        // {
+        //   title: "politique & confidentialité",
+        //   link: "/privacy",
+        // },
         {
           title: "termes et conditions",
-          link: "/termes-conditions",
+          link: "/terms",
         },
-        {
-          title: "aide",
-          link: "/aide",
-        },
+        // {
+        //   title: "aide",
+        //   link: "/aide",
+        // },
       ],
     },
   ];
