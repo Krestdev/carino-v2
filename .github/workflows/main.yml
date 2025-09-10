@@ -105,7 +105,7 @@ jobs:
 
             cd $DEPLOY_DIR
 
-            # cp ~/deployments/carino/shared/.env.prod .env.prod
+            cp ~/deployed-apps/carino/shared/.env.prod .env.prod
             export DOCKER_BUILDKIT=0
 
             # Remove any containers that might conflict

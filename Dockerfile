@@ -13,10 +13,6 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
-# Set environment variable for build
-ARG API_BASE_URL
-ENV API_BASE_URL=${API_BASE_URL}
-
 RUN npm run build
 
 # -------- Runtime Stage --------
@@ -37,9 +33,6 @@ COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
 USER nextjs
-
-ARG API_BASE_URL
-ENV API_BASE_URL=${API_BASE_URL}
 
 EXPOSE 3000
 
