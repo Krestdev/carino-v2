@@ -1,6 +1,5 @@
 "use client";
 
-import axiosConfig from "@/api";
 import useStore from "@/context/store";
 import { UserRegistration } from "@/types/types";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -22,6 +21,8 @@ import {
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
 import Link from "next/link";
+import UserQuery from "@/queries/userQueries";
+import { useAppContext } from "@/providers/appContext";
 
 const formSchema = z
   .object({
@@ -45,7 +46,8 @@ const formSchema = z
   });
 
 const SignupComp = () => {
-  const axiosClient = axiosConfig();
+  const { baseURL } = useAppContext();
+  const userQuery = new UserQuery(baseURL);
   // const [displayError, setDisplayError] = useState(false);
   const { token } = useStore();
   const { mutate, isError, isSuccess, error, isPending } = useMutation({
@@ -56,7 +58,7 @@ const SignupComp = () => {
       confirm_password,
       phone,
     }: UserRegistration) => {
-      return axiosClient.post("/auth/register", {
+      return userQuery.register({
         email,
         password,
         name,

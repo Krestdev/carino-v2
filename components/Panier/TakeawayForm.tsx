@@ -1,4 +1,3 @@
-import axiosConfig from "@/api";
 import useStore from "@/context/store";
 import { cn, isDeliveryOpen } from "@/lib/utils";
 import {

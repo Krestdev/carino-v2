@@ -1,7 +1,6 @@
 /* eslint-disable react/no-unescaped-entities */
 "use client";
 
-import axiosConfig from "@/api";
 import {
   Dialog,
   DialogContent,
@@ -12,9 +11,11 @@ import {
 import { toast } from "@/components/ui/use-toast";
 import useStore from "@/context/store";
 import { config } from "@/data/config";
-import { checkTransactionStatus, ReceiptProps } from "@/types/types";
+import { useAppContext } from "@/providers/appContext";
+import ProductQuery from "@/queries/productQuery";
+import UserQuery from "@/queries/userQueries";
+import { ReceiptProps } from "@/types/types";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import axios from "axios";
 import { useEffect, useState } from "react";
 import { CgSpinner } from "react-icons/cg";
 import { FaRegCheckCircle } from "react-icons/fa";
@@ -26,22 +27,23 @@ function Transaction() {
   const [paymentStatus, setPaymentStatus] = useState<
     "pending" | "success" | "failed"
   >("pending");
-  const axiosClient = axiosConfig();
+  const { baseURL } = useAppContext();
+  const userQuery = new UserQuery(baseURL);
   const { data, isSuccess } = useQuery({
     queryKey: ["transaction", transactionRef],
     queryFn: async () => {
-      return axiosClient.get<checkTransactionStatus>(
-        `auth/${transactionRef}/check/status/transaction`
-      );
+      return userQuery.status(transactionRef!);
     },
     enabled: !!transactionRef,
     refetchInterval: 10000,
     retry: true,
   });
 
+  const producQuery = new ProductQuery(baseURL);
+
   const sendReceipt = useMutation({
     mutationFn: (props: ReceiptProps) => {
-      return axios.post("/api/ticket", props);
+      return producQuery.postTicket(props);
     },
   });
 

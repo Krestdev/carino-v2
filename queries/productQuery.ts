@@ -4,6 +4,7 @@ import {
   CategoryData,
   CategoryResponse,
   ProductsResponse,
+  ReceiptProps,
 } from "@/types/types";
 import { AxiosInstance } from "axios";
 
@@ -29,5 +30,8 @@ export default class ProductQuery {
   };
   getCategories = (): Promise<CategoryResponse> => {
     return this.api.get(`/${this.cRoute}`).then((res) => res.data);
+  };
+  postTicket = (data: ReceiptProps) => {
+    return this.api.post("/api/ticket", data);
   };
 }
