@@ -1,0 +1,20 @@
+# Docker
+Dockerfile
+.dockerignore
+
+# Node
+node_modules/
+.next/
+!.next/static
+!.next/standalone
+
+# build
+out/
+build/
+
+#git
+.git
+.github
+.env*
+
+README.md
