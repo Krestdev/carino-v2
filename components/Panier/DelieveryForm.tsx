@@ -1,14 +1,9 @@
-import axiosConfig from "@/api";
 import useStore from "@/context/store";
 import { cn, isDeliveryOpen } from "@/lib/utils";
-import {
-  CitiesResponse,
-  City,
-  Order,
-  orderMutation,
-  OrderTypeProps,
-  PostOrderProps,
-} from "@/types/types";
+import { useAppContext } from "@/providers/appContext";
+import TownQuery from "@/queries/townQuery";
+import UserQuery from "@/queries/userQueries";
+import { City, Order, OrderTypeProps } from "@/types/types";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { Check, ChevronsUpDown } from "lucide-react";
@@ -43,8 +38,6 @@ import {
 } from "../ui/select";
 import { toast } from "../ui/use-toast";
 import { ApplyPromotion, sendPackPromotion } from "../universal/promotions";
-import TownQuery from "@/queries/townQuery";
-import UserQuery from "@/queries/userQueries";
 
 const formSchema = z.object({
   city: z.string().min(3, { message: "Selectionnez une ville" }),
@@ -85,7 +78,9 @@ const DelieveryForm = ({
     }
   }, [cart]); 
 
-  const townQuery = new TownQuery();
+  const { baseURL } = useAppContext();
+
+  const townQuery = new TownQuery(baseURL);
   const { data, isSuccess } = useQuery({
     queryKey: ["cities"],
     queryFn: () => townQuery.getTowns(),
@@ -111,7 +106,7 @@ const DelieveryForm = ({
     },
   });
 
-  const userQuery = new UserQuery();
+  const userQuery = new UserQuery(baseURL);
 
   const postOrder = useMutation({
     mutationFn: async (data: Order) => userQuery.PlaceOrder(data),

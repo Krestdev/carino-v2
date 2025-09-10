@@ -3,6 +3,7 @@
 import Category from "@/components/produits/categories";
 import Dishes from "@/components/produits/dishes";
 import Head from "@/components/universal/Head";
+import { useAppContext } from "@/providers/appContext";
 import ProductQuery from "@/queries/productQuery";
 import { ProductsData } from "@/types/types";
 import { useQuery } from "@tanstack/react-query";
@@ -11,7 +12,8 @@ import Link from "next/link";
 import React, { useState } from "react";
 
 const CategoryDetail = ({ id }: { id: number }) => {
-  const product = new ProductQuery();
+  const { baseURL } = useAppContext();
+  const product = new ProductQuery(baseURL);
   const productData = useQuery({
     queryKey: ["productFetchAll"],
     queryFn: () =>
@@ -63,7 +65,6 @@ const CategoryDetail = ({ id }: { id: number }) => {
           product.cat.some((c) => c.id === cat.id)
         )
       );
-
 
     const filteredProducts = productData.data.data.filter((product) =>
       product.cat.some((x) => x.id == id || x.id_parent == id)

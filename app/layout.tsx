@@ -7,6 +7,7 @@ import Header from "../components/header";
 import QueryProvider from "@/providers/queryProvider";
 import { Toaster } from "@/components/ui/sonner";
 import Transaction from "@/components/universal/Transaction";
+import { AppProvider } from "@/providers/appContext";
 
 // Police principale
 const ptSans = PT_Sans({
@@ -33,18 +34,19 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const baseURL = process.env.API_BASE_URL ?? "https://www.le-carino.com/api/";
   return (
     <html lang="fr">
       <body className={`${ptSans.variable} ${oleo.variable} antialiased`}>
-        <QueryProvider>
-          <Header />
-          <main>
-            {children}
-          </main>
-          <Transaction />
-          <Footer />
-          <Toaster />
-        </QueryProvider>
+        <AppProvider baseURL={baseURL ?? ""}>
+          <QueryProvider>
+            <Header />
+            <main>{children}</main>
+            <Transaction />
+            <Footer />
+            <Toaster />
+          </QueryProvider>
+        </AppProvider>
       </body>
     </html>
   );

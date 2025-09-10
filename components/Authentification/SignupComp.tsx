@@ -1,16 +1,18 @@
 "use client";
 
-import axiosConfig from "@/api";
 import useStore from "@/context/store";
+import { useAppContext } from "@/providers/appContext";
+import UserQuery from "@/queries/userQueries";
 import { UserRegistration } from "@/types/types";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
-import React, { useEffect } from "react";
+import Link from "next/link";
+import { redirect } from "next/navigation";
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import z from "zod";
-import { toast } from "../ui/use-toast";
-import { redirect } from "next/navigation";
 import { Alert, AlertDescription } from "../ui/alert";
+import { Button } from "../ui/button";
 import {
   Form,
   FormControl,
@@ -20,8 +22,7 @@ import {
   FormMessage,
 } from "../ui/form";
 import { Input } from "../ui/input";
-import { Button } from "../ui/button";
-import Link from "next/link";
+import { toast } from "../ui/use-toast";
 
 const formSchema = z
   .object({
@@ -45,7 +46,8 @@ const formSchema = z
   });
 
 const SignupComp = () => {
-  const axiosClient = axiosConfig();
+  const { baseURL } = useAppContext();
+  const userQuery = new UserQuery(baseURL);
   // const [displayError, setDisplayError] = useState(false);
   const { token } = useStore();
   const { mutate, isError, isSuccess, error, isPending } = useMutation({
@@ -56,7 +58,7 @@ const SignupComp = () => {
       confirm_password,
       phone,
     }: UserRegistration) => {
-      return axiosClient.post("/auth/register", {
+      return userQuery.register({
         email,
         password,
         name,

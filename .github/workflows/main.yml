@@ -1,0 +1,133 @@
+name: Deploy Le carino Pizzeria
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  lint:
+    name: Lint Code
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # Cache dependencies to speed up subsequent installs
+      - name: Cache Node Modules
+        id: cache-deps
+        uses: actions/cache@v4
+        with:
+          path: |
+            node_modules
+            ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      # Install only if cache missed
+      - name: Install Dependencies
+        if: steps.cache-deps.outputs.cache-hit != 'true'
+        run: npm ci
+
+      # Run linting
+      - name: Run Linter
+        run: npm run lint
+
+      # Upload node_modules for reuse
+      # - name: Upload node_modules
+      #   uses: actions/upload-artifact@v4
+      #   with:
+      #     name: node_modules
+      #     path: node_modules
+  build:
+    name: Build API
+    runs-on: ubuntu-latest
+    needs: lint
+    steps:
+      - uses: actions/checkout@v4
+      # Download cached node_modules from lint step
+      # - name: Download node_modules
+      #   uses: actions/download-artifact@v4
+      #   with:
+      #     name: node_modules
+      #     path: node_modules
+
+      - name: Install Dependencies
+        run: npm ci
+
+      # Build app without reinstalling
+      - name: Build Project
+        run: npm run build
+
+      # Upload build for deployment step
+      # - name: Upload Build
+      #   uses: actions/upload-artifact@v4
+      #   with:
+      #     name: app-build
+      #     path: .next
+
+  deploy:
+    name: Deploy to VPS
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Setup SSH
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.KREST_SERVER1_PRIVATE_KEY }}
+
+      - name: Add VPS to known_hosts
+        run: |
+          ssh-keyscan -H ${{ secrets.KREST_SERVER1_HOST }} >> ~/.ssh/known_hosts
+
+      - name: Set env vars
+        run: |
+          ssh-keyscan -H ${{ secrets.KREST_SERVER1_HOST }} >> ~/.ssh/known_hosts
+          echo "DEPLOY_DIR=~/deployed-apps/carino/ui" >> $GITHUB_ENV
+
+      - name: Deploy to VPS
+        run: |
+          ssh ${{ secrets.KREST_SERVER1_USER }}@${{ secrets.KREST_SERVER1_HOST }} 'bash -s' << EOF
+            set -euo pipefail
+
+            DEPLOY_DIR=~/deployed-apps/carino/ui
+
+            if [ ! -d $DEPLOY_DIR ]; then
+              mkdir -p $DEPLOY_DIR
+              git clone https://github.com/${{ github.repository }} $DEPLOY_DIR
+            else
+              cd $DEPLOY_DIR
+              git pull origin main
+            fi
+
+            cd $DEPLOY_DIR
+
+            cp ~/deployed-apps/carino/shared/.env.prod .env.prod
+            export DOCKER_BUILDKIT=0
+
+            # Remove any containers that might conflict
+            docker rm -f carino-client 2>/dev/null || true
+            docker rmi current-carino:latest 2>/dev/null || true
+
+            # Build and run the new image
+            docker compose up -d --force-recreate client --build
+
+            # Health check loop
+            for i in {1..10}; do
+              if curl --fail http://localhost:3000/; then
+                echo "✅ Health check passed"
+                break
+              fi
+              echo "⏳ Waiting for app to be ready... ($i/10)"
+              sleep 6
+            done
+
+            echo "🎯 Deployment complete"
+            exit 0
+          EOF
+
+      - name: Confirm remote session is done
+        run: echo "🧠 SSH session completed cleanly"

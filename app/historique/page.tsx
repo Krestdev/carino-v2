@@ -9,11 +9,13 @@ import { ArrowLeft } from "lucide-react";
 import { redirect, useRouter } from "next/navigation";
 import { useEffect, useState, useTransition } from "react";
 import Loading from "../loading";
+import { useAppContext } from "@/providers/appContext";
 
 const Page = () => {
+  const { baseURL } = useAppContext();
   const { user, token } = useStore();
   const router = useRouter();
-  const userLogIn = new UserQuery();
+  const userLogIn = new UserQuery(baseURL);
 
   const userData = useQuery({
     queryKey: ["userInfo", user?.id],
