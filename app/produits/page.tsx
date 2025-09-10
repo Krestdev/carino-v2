@@ -4,8 +4,14 @@ import DishGrid from "@/components/produits/dishGrid";
 import Head from "@/components/universal/Head";
 import ProductQuery from "@/queries/productQuery";
 import { useQuery } from "@tanstack/react-query";
+import { useEffect, useState, useTransition } from "react";
+import Loading from "../loading";
 
 const Page = () => {
+
+  const [isPending, startTransition] = useTransition();
+  const [showContent, setShowContent] = useState(false);
+
   const product = new ProductQuery();
   const productData = useQuery({
     queryKey: ["productFetchAll"],
@@ -16,14 +22,24 @@ const Page = () => {
     queryFn: () => product.getCategories(),
   });
 
-  if (productData.isLoading && categoryData.isLoading) {
-    return <div>Loading...</div>;
-  }
+  useEffect(() => {
+    if (productData.isSuccess && categoryData.isSuccess) {
+      startTransition(() => {
+        setShowContent(true);
+      });
+    }
+  }, [productData.isSuccess, categoryData.isSuccess]);
+
   if (productData.isError && categoryData.isError) {
     return (
       <div>{productData.error?.message && categoryData.error?.message}</div>
     );
   }
+
+  if (isPending || !showContent) {
+    return <Loading />;
+  }
+  
   if (productData.isSuccess && categoryData.isSuccess) {
     return (
       <>

@@ -1,31 +1,44 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { useState, useTransition } from "react";
 
-const letters = "LE CARINO".split("");
+const letters = "LE  CARINO  PIZZERIA".split("");
 
 const Loading = () => {
+  // Je vais gerer le loading pendant la transition totale de la page
+  const [isPending, startTransition] = useTransition();
+  const [showLoading, setShowLoading] = useState(true);
+
+  if (isPending) {
+    startTransition(() => {
+      setShowLoading(false);
+    });
+  }
+
   return (
-    <div className="flex justify-center items-center h-screen bg-white">
-      <div className="flex space-x-1 text-4xl font-bold text-primary">
-        {letters.map((letter, index) => (
-          <motion.span
-            key={index}
-            initial={{ y: 0 }}
-            animate={{ y: [0, -10, 0] }}
-            transition={{
-              duration: 0.6,
-              repeat: Infinity,
-              delay: index * 0.1,
-            }}
-            className="font-mono"
-          >
-            {letter}
-          </motion.span>
-        ))}
+    showLoading && (
+      <div className="flex justify-center items-center h-screen bg-white">
+        <div className="flex space-x-1 text-4xl font-bold text-primary">
+          {letters.map((letter, index) => (
+            <motion.span
+              key={index}
+              initial={{ y: 0 }}
+              animate={{ y: [0, -10, 0] }}
+              transition={{
+                duration: 0.6,
+                repeat: Infinity,
+                delay: index * 0.1,
+              }}
+              className="font-mono"
+            >
+              {letter}
+            </motion.span>
+          ))}
+        </div>
       </div>
-    </div>
-  );
+    )
+  )
 };
 
 export default Loading;

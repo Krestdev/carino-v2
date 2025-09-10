@@ -9,8 +9,12 @@ import ProductQuery from "@/queries/productQuery";
 import { Categories, ProductsData } from "@/types/types";
 import { useQuery } from "@tanstack/react-query";
 import Loading from "./loading";
+import { useTransition, useState, useEffect } from "react";
 
 export default function Home() {
+  const [isPending, startTransition] = useTransition();
+  const [showContent, setShowContent] = useState(false);
+
   const product = new ProductQuery();
   const productData = useQuery({
     queryKey: ["productFetchAll"],
@@ -21,16 +25,33 @@ export default function Home() {
     queryFn: () => product.getCategories(),
   });
 
+  // Une fois les données prêtes, on déclenche la transition
+  useEffect(() => {
+    if (productData.isSuccess && categoryData.isSuccess) {
+      startTransition(() => {
+        setShowContent(true);
+      });
+    }
+  }, [productData.isSuccess, categoryData.isSuccess]);
+
   if (productData.isLoading && categoryData.isLoading) {
     return <Loading />;
   }
+
   if (productData.isError && categoryData.isError) {
     return (
-      <div>{productData.error?.message && categoryData.error?.message}</div>
+      <div>
+        {productData.error?.message && categoryData.error?.message}
+      </div>
     );
   }
 
+  if (isPending || !showContent) {
+    return <Loading />;
+  }
+
   if (productData.isSuccess && categoryData.isSuccess) {
+    // === Ton rendu principal une fois la transition finie ===
     const dailyMenu: ProductsData[] = productData.data.data.filter((product) =>
       product.cat.some(
         (element) =>
@@ -45,7 +66,7 @@ export default function Home() {
     return (
       <div>
         <Hero />
-        <div className="md:pt-6">
+        <div className="md:pt-6 container mx-auto ">
           <ProductCarousel products={dailyMenu} category={dailyCategory} />
         </div>
         <CatProdMob products={dailyMenu} category={dailyCategory} />

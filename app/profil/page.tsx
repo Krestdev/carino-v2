@@ -7,37 +7,67 @@ import useStore from "@/context/store";
 import UserQuery from "@/queries/userQueries";
 import { useQuery } from "@tanstack/react-query";
 import { ArrowLeft } from "lucide-react";
-import { redirect } from "next/navigation";
+import { useRouter } from "next/navigation";
+import Loading from "@/app/loading";
+import { AnimatePresence } from "framer-motion";
+import { useEffect, useState, useTransition } from "react";
 
 const Page = () => {
   const { user, token } = useStore();
+  const router = useRouter();
   const userLogIn = new UserQuery();
+
   const userData = useQuery({
     queryKey: ["userInfo", user?.id],
     queryFn: () => userLogIn.allUsersOrders(user ? user.id : -1),
     enabled: !!user,
   });
 
-  if (!token) {
-    redirect("/");
+  const [isHydrated, setIsHydrated] = useState(false);
+  const [isPending, startTransition] = useTransition();
+  const [showContent, setShowContent] = useState(false);
+
+  useEffect(() => {
+    setIsHydrated(true);
+  }, []);
+
+  useEffect(() => {
+    if (userData.isSuccess) {
+      startTransition(() => {
+        setShowContent(true);
+      });
+    }
+  }, [userData.isSuccess]);
+
+  if (!isHydrated || isPending || !showContent) {
+    return <Loading />;
   }
 
-  return userData.isSuccess ? (
-    <div className="pt-24 pb-10">
-      <div className="max-w-[1440px] w-full mx-auto flex flex-col gap-5">
-        <Button onClick={() => redirect("/")} className="w-fit">
-          <ArrowLeft />
-          {"Retour a l'accueil"}
-        </Button>
-        <ProfilComp orders={userData.data} />
-        <HistoryTable
-          title={"Dernieres Commandes"}
-          data={userData.data.data.slice(-5)}
-        />
-      </div>
+  if (!token) {
+    router.push("/");
+    return null;
+  }
+
+  return (
+    <div className="container mx-auto pt-24 pb-10">
+      <AnimatePresence mode="wait">
+        {userData.isSuccess && (
+          <div
+            className="max-w-[1440px] w-full mx-auto flex flex-col gap-5"
+          >
+            <Button onClick={() => router.push("/")} className="w-fit">
+              <ArrowLeft />
+              {"Retour à l'accueil"}
+            </Button>
+            <ProfilComp orders={userData.data} />
+            <HistoryTable
+              title={"Dernières Commandes"}
+              data={userData.data.data.slice(-5)}
+            />
+          </div>
+        )}
+      </AnimatePresence>
     </div>
-  ) : (
-    userData.isLoading && null
   );
 };
 
