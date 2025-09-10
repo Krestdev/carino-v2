@@ -59,10 +59,10 @@ const ViewOrderDialog = ({ open, onClose, order }: ViewOrderDialogProps) => {
 
   const orderData = {
     id: order.id,
-    customerName: metadata.customer.name ? metadata.customer.name : "-",
-    phoneNumber: metadata.customer.phone ? metadata.customer.phone : "-",
-    deliveryAddress: metadata.address && metadata.address.name ? metadata.address.name : "-",
-    location: metadata.address && metadata.address.street ? metadata.address.street : "-",
+    customerName: metadata && metadata.customer && metadata.customer.name ? metadata.customer.name : "-",
+    phoneNumber: metadata && metadata.customer && metadata.customer.phone ? metadata.customer.phone : "-",
+    deliveryAddress: metadata && metadata.address && metadata.address.name ? metadata.address.name : "-",
+    location: metadata && metadata.address && metadata.address.street ? metadata.address.street : "-",
     products: parsedItems,
     deliveryFee: "2 000",
     itemsAmount: (Number(order.prix_total) - 2000).toString(),

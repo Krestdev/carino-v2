@@ -80,9 +80,8 @@ const formSchema = z
           );
         },
         {
-          message: `Uniquement entre ${
-            process.env.NEXT_PUBLIC_OPENTIME || "11:00"
-          } et ${process.env.NEXT_PUBLIC_CLOSETIME || "22:00"}`,
+          message: `Uniquement entre ${process.env.NEXT_PUBLIC_OPENTIME || "11:00"
+            } et ${process.env.NEXT_PUBLIC_CLOSETIME || "22:00"}`,
         }
       ),
   })
@@ -172,7 +171,6 @@ const TakeawayForm = ({
       0,
       0
     );
-    // console.log(values);
     if (user !== null) {
       if (isDeliveryOpen()) {
         postOrder.mutate({
@@ -220,7 +218,7 @@ const TakeawayForm = ({
       setPostOrderStatus(false);
     }
     if (postOrder.isSuccess) {
-      setTransaction(postOrder.data.data.data.ref);
+      setTransaction(postOrder.data.data.ref);
     }
     if (postOrder.isError) {
       //console.log(postOrder.error);
@@ -235,10 +233,12 @@ const TakeawayForm = ({
   ]);
 
   function isDisable() {
+    
     if (
-      cart.length === 0 ||
-      totalPrice() + fees <
-        Number(process.env.NEXT_PUBLIC_MINIMUM_AMOUNT || 4999) ||
+      cart.length === 0 
+      ||
+      // totalPrice() + fees <
+      // Number(process.env.NEXT_PUBLIC_MINIMUM_AMOUNT || 4999) ||
       postOrder.isPending ||
       !!transactionRef
     ) {

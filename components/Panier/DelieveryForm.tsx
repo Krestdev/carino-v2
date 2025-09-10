@@ -83,7 +83,7 @@ const DelieveryForm = ({
     } else {
       setCartIsEmpty(true);
     }
-  }, [cart]); //check if there's something in the cart to disable or not the button
+  }, [cart]); 
 
   const townQuery = new TownQuery();
   const { data, isSuccess } = useQuery({
@@ -125,12 +125,6 @@ const DelieveryForm = ({
           total_amount: totalPrice() + fees,
           user: user.id,
           Address: values.city,
-          // Address: {
-          //   name: values.district,
-          //   street: values.locality.concat(" - ", values.deliveryNumber),
-          //   zip_code: "237",
-          //   city: "yaounde",
-          // },
           commande: sendPackPromotion(ApplyPromotion(cart)),
         });
         setReceiptData({
@@ -145,6 +139,7 @@ const DelieveryForm = ({
             city: "yaounde",
           },
           client_mail: user.email,
+
         });
       } else {
         toast({

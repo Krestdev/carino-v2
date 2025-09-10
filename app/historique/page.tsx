@@ -17,7 +17,7 @@ const Page = () => {
 
   const userData = useQuery({
     queryKey: ["userInfo", user?.id],
-    queryFn: () => userLogIn.allUsersOrders(user ? user.id : -1),
+    queryFn: () => userLogIn.allUsersOrders(194),
     enabled: !!user,
   });
 

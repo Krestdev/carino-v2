@@ -52,8 +52,7 @@ export default function Home() {
 
   if (productData.isSuccess && categoryData.isSuccess) {
     // === Ton rendu principal une fois la transition finie ===
-    const dailyMenu: ProductsData[] = productData.data.data.filter((product) =>
-      product.cat.some(
+    const dailyMenu: ProductsData[] = productData.data.data.filter((product) =>product.cat.some(
         (element) =>
           element.name.toLocaleLowerCase().includes("suggestion") ||
           element.name.toLocaleLowerCase() === "suggestions du chef"

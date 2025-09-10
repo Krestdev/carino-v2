@@ -108,14 +108,13 @@ const ProductCarousel = ({ products, category, isLeft = true }: Props) => {
     return () => container.removeEventListener("scroll", handleScroll);
   }, [currentPage, visibleCount, startAutoScroll]);
 
-  const totalPages = Math.ceil(products.length / visibleCount);
+  const totalPages = Math.ceil(products.filter(x => x.price > 500).length / visibleCount);
 
   return (
     <div className="hidden md:flex max-w-[1440px] w-full mx-auto flex-col">
       <div
-        className={`w-full flex flex-col ${
-          isLeft ? "md:flex-row" : "md:flex-row-reverse"
-        } gap-4`}
+        className={`w-full flex flex-col ${isLeft ? "md:flex-row" : "md:flex-row-reverse"
+          } gap-4`}
       >
         {/* Bloc catégorie FIXE */}
         <div className="relative basis-[250px] lg:basis-[351px] shrink-0 aspect-square">
@@ -156,7 +155,7 @@ const ProductCarousel = ({ products, category, isLeft = true }: Props) => {
                         [scrollbar-width:none]
                     "
         >
-          {products.map((product) => (
+          {products.filter(x =>  x.price > 500).map((product) => (
             <div
               key={product.id}
               className="
@@ -183,9 +182,8 @@ const ProductCarousel = ({ products, category, isLeft = true }: Props) => {
           <button
             key={i}
             onClick={() => scrollToPage(i)}
-            className={`w-3 h-3 rounded-full transition-colors ${
-              i === currentPage ? "bg-black" : "bg-gray-400"
-            }`}
+            className={`w-3 h-3 rounded-full transition-colors ${i === currentPage ? "bg-black" : "bg-gray-400"
+              }`}
           />
         ))}
         <Button variant={"ghost"} className="w-8 h-8" onClick={goToNextPage}>

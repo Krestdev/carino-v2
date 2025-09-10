@@ -28,20 +28,6 @@ const Panier = ({ items }: Props) => {
   const [postOrderStatus, setPostOrderStatus] = useState<boolean>(false);
   const [fees, setFees] = useState<number>(0);
 
-  // function informationMessage() {
-  //   if (cart.length === 0) {
-  //     return "Votre panier est vide";
-  //   }
-  //   if (totalPrice() + fees < Number(process.env.NEXT_PUBLIC_MINIMUM_AMOUNT || 4999)) {
-  //     return `Le montant minimum de commande est de ${XAF.format(Number(process.env.NEXT_PUBLIC_MINIMUM_AMOUNT || 4999))}`;
-  //   }
-  //   if (postOrderStatus ||
-  //     !!transactionRef) {
-  //     return "Veuillez patienter une transaction est en cours";
-  //   }
-  //   return null;
-  // }
-
   return cart.length > 0 ? (
     <div className="grid grid-cols-1 md:grid-cols-2 justify-center gap-7 py-20">
       <div className="max-w-[1440px] w-full mx-auto flex flex-col items-end gap-10">
@@ -88,13 +74,12 @@ const Panier = ({ items }: Props) => {
             {items.map((item, index) => (
               <div
                 key={index}
-                className={`flex flex-row gap-6 items-center justify-between w-full px-7 py-5 rounded-[20px] ${
-                  index % 2 === 0 && item.price !== 0
+                className={`flex flex-row gap-6 items-center justify-between w-full px-7 py-5 rounded-[20px] ${index % 2 === 0 && item.price !== 0
                     ? "bg-[#848484]/10"
                     : item.price === 0
-                    ? "bg-green-500/10"
-                    : "border border-[#848484]"
-                }`}
+                      ? "bg-green-500/10"
+                      : "border border-[#848484]"
+                  }`}
               >
                 <div className="flex flex-row items-center justify-between w-full">
                   <div className="flex flex-row items-center gap-6">
@@ -104,11 +89,10 @@ const Panier = ({ items }: Props) => {
                       className="w-20 h-20 rounded-[12px] object-cover"
                     />
                     <div className="flex flex-col gap-0">
-                      <p className="text-[18px] font-bold">{`${item.nom }(x${item.qte})`}</p>
+                      <p className="text-[18px] font-bold">{`${item.nom}(x${item.qte})`}</p>
                       <p
-                        className={`text-[18px] font-bold ${
-                          item.price === 0 ? "font-mono" : ""
-                        }`}
+                        className={`text-[18px] font-bold ${item.price === 0 ? "font-mono" : ""
+                          }`}
                       >
                         {item.price === 0 ? "Gratuit" : XAF.format(item.price)}
                       </p>

@@ -49,7 +49,7 @@ const Page = () => {
           <Breadcumb />
           <DishGrid
             categories={categoryData.data.data}
-            dishes={productData.data.data}
+            dishes={productData.data.data.filter(x => x.price > 500)}
           />
         </div>
       </>
