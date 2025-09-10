@@ -32,6 +32,7 @@ import { useQuery } from "@tanstack/react-query";
 import ProductQuery from "@/queries/productQuery";
 import { LuMinus, LuPlus } from "react-icons/lu";
 import { Input } from "@/components/ui/input";
+import { useAppContext } from "@/providers/appContext";
 
 const FormSchema = z.object({
   quantity: z.number().positive({ message: "Doit être supérieur à 0" }),
@@ -142,9 +143,10 @@ function EditProductDialog({
   children,
 }: EditProps) {
   const { editCart } = useStore();
+  const { baseURL } = useAppContext();
 
   const [open, setOpen] = useState(false);
-  const products = new ProductQuery();
+  const products = new ProductQuery(baseURL);
   const productData = useQuery({
     queryKey: ["produit", nom],
     queryFn: () => products.getProductByName(nom),

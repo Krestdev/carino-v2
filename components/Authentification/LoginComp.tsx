@@ -20,6 +20,7 @@ import {
 } from "../ui/form";
 import { Input } from "../ui/input";
 import { toast } from "../ui/use-toast";
+import { useAppContext } from "@/providers/appContext";
 
 const formSchema = z.object({
   email: z.string().email({ message: "Adresse mail invalide" }),
@@ -37,8 +38,10 @@ const LoginComp = () => {
     },
   });
 
+  const { baseURL } = useAppContext();
+
   const { login, token } = useStore();
-  const userLogIn = new UserQuery();
+  const userLogIn = new UserQuery(baseURL);
   const userLoginData = useMutation({
     mutationFn: (values: { email: string; password: string }) =>
       userLogIn.login(values),
@@ -68,7 +71,7 @@ const LoginComp = () => {
     userLoginData.isPending,
     userLoginData.data,
     login,
-    userLoginData.isError
+    userLoginData.isError,
   ]);
 
   if (token) {

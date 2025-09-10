@@ -11,11 +11,13 @@ import { useRouter } from "next/navigation";
 import Loading from "@/app/loading";
 import { AnimatePresence } from "framer-motion";
 import { useEffect, useState, useTransition } from "react";
+import { useAppContext } from "@/providers/appContext";
 
 const Page = () => {
+  const { baseURL } = useAppContext();
   const { user, token } = useStore();
   const router = useRouter();
-  const userLogIn = new UserQuery();
+  const userLogIn = new UserQuery(baseURL);
 
   const userData = useQuery({
     queryKey: ["userInfo", user?.id],
@@ -52,9 +54,7 @@ const Page = () => {
     <div className="container mx-auto pt-24 pb-10">
       <AnimatePresence mode="wait">
         {userData.isSuccess && (
-          <div
-            className="max-w-[1440px] w-full mx-auto flex flex-col gap-5"
-          >
+          <div className="max-w-[1440px] w-full mx-auto flex flex-col gap-5">
             <Button onClick={() => router.push("/")} className="w-fit">
               <ArrowLeft />
               {"Retour à l'accueil"}

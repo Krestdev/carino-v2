@@ -1,27 +1,34 @@
+import AxiosConfig from "@/providers/axios";
 import api from "@/providers/axios";
+import { AxiosInstance } from "axios";
 
 export default class PromotionQuery {
   route = "promotion";
+  api: AxiosInstance;
+
+  constructor(baseURL: string) {
+    this.api = new AxiosConfig(baseURL).api;
+  }
 
   codeverify = async () => {
-    return api.post(`${this.route}/codeverify`);
+    return this.api.post(`${this.route}/codeverify`);
   };
   useCount = async () => {
-    return api.post(`${this.route}/usecount`);
+    return this.api.post(`${this.route}/usecount`);
   };
   userList = async () => {
-    return api.post(`${this.route}/userlist`);
+    return this.api.post(`${this.route}/userlist`);
   };
   lsit = async () => {
-    return api.get(`${this.route}/list`);
+    return this.api.get(`${this.route}/list`);
   };
   create = async () => {
-    return api.post(`${this.route}/create`);
+    return this.api.post(`${this.route}/create`);
   };
   update = async () => {
-    return api.post(`${this.route}/update`);
+    return this.api.post(`${this.route}/update`);
   };
   delete = async () => {
-    return api.post(`${this.route}/delete`);
+    return this.api.post(`${this.route}/delete`);
   };
 }

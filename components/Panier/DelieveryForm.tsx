@@ -45,6 +45,7 @@ import { toast } from "../ui/use-toast";
 import { ApplyPromotion, sendPackPromotion } from "../universal/promotions";
 import TownQuery from "@/queries/townQuery";
 import UserQuery from "@/queries/userQueries";
+import { useAppContext } from "@/providers/appContext";
 
 const formSchema = z.object({
   city: z.string().min(3, { message: "Selectionnez une ville" }),
@@ -85,7 +86,9 @@ const DelieveryForm = ({
     }
   }, [cart]); //check if there's something in the cart to disable or not the button
 
-  const townQuery = new TownQuery();
+  const { baseURL } = useAppContext();
+
+  const townQuery = new TownQuery(baseURL);
   const { data, isSuccess } = useQuery({
     queryKey: ["cities"],
     queryFn: () => townQuery.getTowns(),
@@ -111,7 +114,7 @@ const DelieveryForm = ({
     },
   });
 
-  const userQuery = new UserQuery();
+  const userQuery = new UserQuery(baseURL);
 
   const postOrder = useMutation({
     mutationFn: async (data: Order) => userQuery.PlaceOrder(data),

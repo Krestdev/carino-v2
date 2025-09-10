@@ -6,13 +6,14 @@ import ProductQuery from "@/queries/productQuery";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState, useTransition } from "react";
 import Loading from "../loading";
+import { useAppContext } from "@/providers/appContext";
 
 const Page = () => {
-
   const [isPending, startTransition] = useTransition();
   const [showContent, setShowContent] = useState(false);
+  const { baseURL } = useAppContext();
 
-  const product = new ProductQuery();
+  const product = new ProductQuery(baseURL);
   const productData = useQuery({
     queryKey: ["productFetchAll"],
     queryFn: () => product.getAllProducts(),

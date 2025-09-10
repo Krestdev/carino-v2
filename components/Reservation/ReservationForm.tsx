@@ -43,6 +43,7 @@ import { fr } from "date-fns/locale";
 import { format } from "date-fns";
 import { config } from "@/data/config";
 import { toast } from "../ui/use-toast";
+import { useAppContext } from "@/providers/appContext";
 
 const formSchema = z
   .object({
@@ -104,12 +105,13 @@ const formSchema = z
     }
   );
 
-
 const ReservationForm = () => {
   const { user } = useStore();
   const [open, setOpen] = React.useState(false);
   const [successModal, setSuccessModal] = useState(false);
   const [confirm, setConfirm] = useState(false);
+
+  const { baseURL } = useAppContext();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -126,7 +128,7 @@ const ReservationForm = () => {
     },
   });
 
-  const reservations = new ReservationQuery();
+  const reservations = new ReservationQuery(baseURL);
   const reservationData = useMutation({
     mutationKey: ["reservations"],
     mutationFn: (data: z.infer<typeof formSchema>) =>
@@ -145,16 +147,14 @@ const ReservationForm = () => {
   const isValidDate = (date: Date) => {
     const today = new Date();
     return date > today;
-  }
+  };
 
   function onSubmit(values: z.infer<typeof formSchema>) {
     console.log(values);
     if (user) {
       if (isValidDate(values.date)) {
-
         reservationData.mutate(values);
       } else {
-
         console.log("Veuillez choisir une date future");
 
         toast({
@@ -189,7 +189,9 @@ const ReservationForm = () => {
             </p>
             <div className="flex flex-wrap gap-2 items-center">
               <Link href="/connexion">
-                <Button variant={"outline"} className="text-black">{"se connecter"}</Button>
+                <Button variant={"outline"} className="text-black">
+                  {"se connecter"}
+                </Button>
               </Link>
               <DialogClose asChild>
                 <Button variant={"destructive"}>{"Fermer"}</Button>
@@ -482,8 +484,7 @@ const ReservationForm = () => {
                     {"Commentaires"}
                   </span>
                   <p>
-                    {!!form.getValues("comment") &&
-                      form.getValues("comment")}
+                    {!!form.getValues("comment") && form.getValues("comment")}
                   </p>
                 </div>
                 <div className="inline-flex gap-2">

@@ -36,6 +36,7 @@ import {
 import { toast } from "../ui/use-toast";
 import { ApplyPromotion, sendPackPromotion } from "../universal/promotions";
 import UserQuery from "@/queries/userQueries";
+import { useAppContext } from "@/providers/appContext";
 
 const formSchema = z
   .object({
@@ -116,7 +117,7 @@ const TakeawayForm = ({
   setPostOrderStatus,
 }: OrderTypeProps) => {
   const router = useRouter();
-  const axiosClient = axiosConfig();
+  // const axiosClient = axiosConfig();
   const {
     cart,
     totalPrice,
@@ -125,6 +126,8 @@ const TakeawayForm = ({
     transactionRef,
     setReceiptData,
   } = useStore();
+
+  const { baseURL } = useAppContext();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -140,7 +143,7 @@ const TakeawayForm = ({
     },
   });
 
-  const userQuery = new UserQuery();
+  const userQuery = new UserQuery(baseURL);
 
   const postOrder = useMutation({
     mutationFn: async (data: Order) => userQuery.PlaceOrder(data),

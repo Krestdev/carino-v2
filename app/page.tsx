@@ -10,12 +10,14 @@ import { Categories, ProductsData } from "@/types/types";
 import { useQuery } from "@tanstack/react-query";
 import Loading from "./loading";
 import { useTransition, useState, useEffect } from "react";
+import { useAppContext } from "@/providers/appContext";
 
 export default function Home() {
   const [isPending, startTransition] = useTransition();
   const [showContent, setShowContent] = useState(false);
+  const { baseURL } = useAppContext();
 
-  const product = new ProductQuery();
+  const product = new ProductQuery(baseURL);
   const productData = useQuery({
     queryKey: ["productFetchAll"],
     queryFn: () => product.getAllProducts(),
@@ -40,9 +42,7 @@ export default function Home() {
 
   if (productData.isError && categoryData.isError) {
     return (
-      <div>
-        {productData.error?.message && categoryData.error?.message}
-      </div>
+      <div>{productData.error?.message && categoryData.error?.message}</div>
     );
   }
 
