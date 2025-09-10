@@ -50,7 +50,7 @@ function Transaction() {
   useEffect(() => {
     if (transactionRef) {
       if (isSuccess) {
-        if (data.data.data[0].status.toLocaleLowerCase().includes("success")) {
+        if (data.data[0].status.toLocaleLowerCase().includes("success")) {
           //Sending the receipt ticket through email here !
           receiptData && sendReceipt.mutate(receiptData);
           toast({
@@ -69,7 +69,7 @@ function Transaction() {
           emptyCart();
           setTimeout(() => setTransaction(null), 9000);
         } else if (
-          data.data.data[0].status.toLocaleLowerCase().includes("fail")
+          data.data[0].status.toLocaleLowerCase().includes("fail")
         ) {
           toast({
             title: "Transaction échouée",
@@ -95,8 +95,8 @@ function Transaction() {
   }, [
     isSuccess,
     transactionRef,
-    data?.data.data[0].status,
-    data?.data.data,
+    data?.data[0].status,
+    data?.data,
     emptyCart,
     receiptData,
     sendReceipt,

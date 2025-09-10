@@ -29,12 +29,14 @@ const Page = () => {
   }
 
   return (
-    <div className=''>
+    <div>
       <Head image={'/tempo/pub1.webp'} title='Panier' />
-      <div className='max-w-[1440px] w-full mx-auto'>
-        <Button onClick={() => router.push('/produits')} className='m-8'><ArrowLeft />{"Continuer mes achats"}</Button>
+      <div className='container mx-auto'>
+        <div className='max-w-[1440px] w-full mx-auto'>
+          <Button onClick={() => router.push('/produits')} className='m-8'><ArrowLeft />{"Continuer mes achats"}</Button>
+        </div>
+        <Panier items={cartItems} />
       </div>
-      <Panier items={cartItems} />
     </div>
   )
 }
