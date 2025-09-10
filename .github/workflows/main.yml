@@ -34,11 +34,11 @@ jobs:
         run: npm run lint
 
       # Upload node_modules for reuse
-      - name: Upload node_modules
-        uses: actions/upload-artifact@v4
-        with:
-          name: node_modules
-          path: node_modules
+      # - name: Upload node_modules
+      #   uses: actions/upload-artifact@v4
+      #   with:
+      #     name: node_modules
+      #     path: node_modules
   build:
     name: Build API
     runs-on: ubuntu-latest
@@ -46,22 +46,25 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       # Download cached node_modules from lint step
-      - name: Download node_modules
-        uses: actions/download-artifact@v4
-        with:
-          name: node_modules
-          path: node_modules
+      # - name: Download node_modules
+      #   uses: actions/download-artifact@v4
+      #   with:
+      #     name: node_modules
+      #     path: node_modules
+
+      - name: Install Dependencies
+        run: npm ci
 
       # Build app without reinstalling
       - name: Build Project
         run: npm run build
 
       # Upload build for deployment step
-      - name: Upload Build
-        uses: actions/upload-artifact@v4
-        with:
-          name: app-build
-          path: .next
+      # - name: Upload Build
+      #   uses: actions/upload-artifact@v4
+      #   with:
+      #     name: app-build
+      #     path: .next
 
   deploy:
     name: Deploy to VPS
