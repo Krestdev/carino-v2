@@ -1,11 +1,8 @@
 import useStore from "@/context/store";
 import { cn, isDeliveryOpen } from "@/lib/utils";
-import {
-  Order,
-  orderMutation,
-  OrderTypeProps,
-  PostTakeAwayOrderProps,
-} from "@/types/types";
+import { useAppContext } from "@/providers/appContext";
+import UserQuery from "@/queries/userQueries";
+import { Order, OrderTypeProps } from "@/types/types";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
 import { CalendarIcon } from "lucide-react";
@@ -34,8 +31,6 @@ import {
 } from "../ui/select";
 import { toast } from "../ui/use-toast";
 import { ApplyPromotion, sendPackPromotion } from "../universal/promotions";
-import UserQuery from "@/queries/userQueries";
-import { useAppContext } from "@/providers/appContext";
 
 const formSchema = z
   .object({

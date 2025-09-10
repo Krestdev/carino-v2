@@ -1,15 +1,18 @@
 "use client";
 
 import useStore from "@/context/store";
+import { useAppContext } from "@/providers/appContext";
+import UserQuery from "@/queries/userQueries";
 import { UserRegistration } from "@/types/types";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
-import React, { useEffect } from "react";
+import Link from "next/link";
+import { redirect } from "next/navigation";
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import z from "zod";
-import { toast } from "../ui/use-toast";
-import { redirect } from "next/navigation";
 import { Alert, AlertDescription } from "../ui/alert";
+import { Button } from "../ui/button";
 import {
   Form,
   FormControl,
@@ -19,10 +22,7 @@ import {
   FormMessage,
 } from "../ui/form";
 import { Input } from "../ui/input";
-import { Button } from "../ui/button";
-import Link from "next/link";
-import UserQuery from "@/queries/userQueries";
-import { useAppContext } from "@/providers/appContext";
+import { toast } from "../ui/use-toast";
 
 const formSchema = z
   .object({

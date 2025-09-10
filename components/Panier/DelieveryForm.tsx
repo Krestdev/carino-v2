@@ -1,13 +1,9 @@
 import useStore from "@/context/store";
 import { cn, isDeliveryOpen } from "@/lib/utils";
-import {
-  CitiesResponse,
-  City,
-  Order,
-  orderMutation,
-  OrderTypeProps,
-  PostOrderProps,
-} from "@/types/types";
+import { useAppContext } from "@/providers/appContext";
+import TownQuery from "@/queries/townQuery";
+import UserQuery from "@/queries/userQueries";
+import { City, Order, OrderTypeProps } from "@/types/types";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { Check, ChevronsUpDown } from "lucide-react";
@@ -42,9 +38,6 @@ import {
 } from "../ui/select";
 import { toast } from "../ui/use-toast";
 import { ApplyPromotion, sendPackPromotion } from "../universal/promotions";
-import TownQuery from "@/queries/townQuery";
-import UserQuery from "@/queries/userQueries";
-import { useAppContext } from "@/providers/appContext";
 
 const formSchema = z.object({
   city: z.string().min(3, { message: "Selectionnez une ville" }),
