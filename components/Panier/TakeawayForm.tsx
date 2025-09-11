@@ -161,9 +161,6 @@ const TakeawayForm = ({
   // });
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-
-    console.log(values);
-    
     const dueDate = new Date(values.takeDate);
     dueDate.setHours(
       Number(values.time.split(":")[0]),
@@ -172,7 +169,10 @@ const TakeawayForm = ({
       0
     );
     if (user !== null) {
+
+      
       if (isDeliveryOpen()) {
+        console.log("on est la:", isDeliveryOpen());
         postOrder.mutate({
           phone: values.phoneNumber,
           total_amount: totalPrice() + fees,
