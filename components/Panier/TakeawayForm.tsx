@@ -161,6 +161,9 @@ const TakeawayForm = ({
   // });
 
   function onSubmit(values: z.infer<typeof formSchema>) {
+
+    console.log(values);
+    
     const dueDate = new Date(values.takeDate);
     dueDate.setHours(
       Number(values.time.split(":")[0]),
@@ -188,8 +191,7 @@ const TakeawayForm = ({
       } else {
         toast({
           title: "Livraison  fermée.",
-          description:
-            "La livraison est disponible uniquement entre 10h30 et 20h30.",
+          description: "La livraison est disponible uniquement entre 10h30 et 20h30.",
           variant: "info",
         });
       }
@@ -218,7 +220,7 @@ const TakeawayForm = ({
       setTransaction(postOrder.data.data.ref);
     }
     if (postOrder.isError) {
-      //console.log(postOrder.error);
+      setTransaction(null);
     }
   }, [
     postOrder.isError,
