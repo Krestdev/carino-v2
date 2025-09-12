@@ -3,7 +3,7 @@ import React from 'react'
 
 const page = () => {
   return (
-    <div className='container mx-auto flex flex-col items-center justify-center pt-[157px] pb-[87px]'>
+    <div className='px-7 flex flex-col items-center justify-center pt-[157px] pb-[87px]'>
       <SignupComp />
     </div>
   )

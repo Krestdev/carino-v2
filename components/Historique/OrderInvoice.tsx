@@ -22,6 +22,7 @@ interface OrderInvoiceProps {
     is_paid: boolean;
     is_delivred: boolean;
     created_at: Date;
+    reference: string
   };
 }
 
@@ -43,7 +44,7 @@ const OrderInvoice = ({ order }: OrderInvoiceProps) => (
           <View style={styles.section}>
             <View style={styles.subSection}>
               <Text style={styles.subSectionLabel}>{"ID de transaction:"}</Text>
-              <Text style={styles.subSectionValue}>{order.zelty_order_id}</Text>
+              <Text style={styles.subSectionValue}>{order.reference}</Text>
             </View>
             <View style={styles.subSection}>
               <Text style={styles.subSectionLabel}>{"Numéro de tel:"}</Text>

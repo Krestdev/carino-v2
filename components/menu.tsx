@@ -13,13 +13,11 @@ import {
 import React from 'react';
 import {
     Drawer,
-    DrawerClose,
     DrawerContent,
     DrawerHeader,
     DrawerTrigger,
 } from "@/components/ui/drawer";
 import Link from 'next/link';
-import { Button } from './ui/button';
 import { usePathname } from 'next/navigation';
 import useStore from '@/context/store';
 

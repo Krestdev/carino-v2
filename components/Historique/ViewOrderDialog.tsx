@@ -14,7 +14,6 @@ import { useState } from "react";
 import OrderInvoice from "./OrderInvoice";
 import Loading from "@/app/loading";
 import { XAF } from "@/lib/functions";
-import TownQuery from "@/queries/townQuery";
 
 interface ViewOrderDialogProps {
   open: boolean;
@@ -32,23 +31,37 @@ const ViewOrderDialog = ({ open, onClose, order, towns }: ViewOrderDialogProps) 
 
   // Parse items to ensure it's always an array
   const parseItems = (items: unknown): string[] => {
-    if (Array.isArray(items)) {
-      return items;
-    } else if (typeof items === "string") {
-      try {
-        // Try to parse as JSON first
-        const parsed = JSON.parse(items);
-        return Array.isArray(parsed) ? parsed : [items];
-      } catch {
-        // If it's not valid JSON, treat as a single string item
-        return [items];
-      }
-    } else {
-      return [];
-    }
-  };
+  if (Array.isArray(items)) {
+    return items.map((item) =>
+      typeof item === "string" ? item.replace(/"/g, "").trim() : String(item)
+    );
+  }
+
+  if (typeof items === "string") {
+    // Prend tout ce qui est avant le premier "]"
+    const beforeBracket = items.includes("]")
+      ? items.split("]")[0]
+      : items;
+
+    // Retire les crochets
+    const cleaned = beforeBracket.replace(/\[|\]/g, "").trim();
+
+    return cleaned
+      .split(",")
+      .map((item) => item.replace(/"/g, "").trim()) // 🔥 enlève tous les guillemets
+      .filter((item) => item.length > 0);
+  }
+
+  return [];
+};
+
+
+
 
   const parsedItems = parseItems(order.items);
+
+  console.log(parsedItems);
+
 
   const jsonArray = (array: string) => {
     if (typeof array === "string") {
@@ -75,10 +88,11 @@ const ViewOrderDialog = ({ open, onClose, order, towns }: ViewOrderDialogProps) 
     is_paid: order.is_paid,
     is_delivred: order.is_delivred,
     created_at: order.created_at,
+    reference: order.reference,
   };
 
   console.log(metadata);
-  
+
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
@@ -133,15 +147,15 @@ const ViewOrderDialog = ({ open, onClose, order, towns }: ViewOrderDialogProps) 
                     </p>
                   </div>
                   <div className="flex flex-col gap-1 w-full border-b border-[#848484] pb-2">
-                    <div className="flex justify-between">
+                    <div className="flex items-center justify-between">
                       <h4 className="font-normal">{"ID de transaction:"}</h4>
-                      <h4>{"#" + orderData.id}</h4>
+                      <h4 className="text-[10.5px]">{`${order.reference}`}</h4>
                     </div>
-                    <div className="flex justify-between">
+                    <div className="flex items-center justify-between">
                       <h4 className="font-normal">{"Numéro de tel:"}</h4>
                       <h4>{orderData.phoneNumber}</h4>
                     </div>
-                    <div className="flex justify-between">
+                    <div className="flex items-center justify-between">
                       <h4 className="font-normal">{"Adresse de livraison:"}</h4>
                       <h4>{orderData.deliveryAddress}</h4>
                     </div>
@@ -152,6 +166,8 @@ const ViewOrderDialog = ({ open, onClose, order, towns }: ViewOrderDialogProps) 
                   </div>
                   <div className="flex flex-col gap-1 w-full border-b border-[#848484] pb-2">
                     {parsedItems.map((product, index: number) => {
+
+
                       // Séparer le nom du prix en utilisant le séparateur " -> "
                       const [productName, pricePart] = product.split(' -> ');
 

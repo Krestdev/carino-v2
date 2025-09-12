@@ -169,7 +169,7 @@ const ReservationForm = () => {
   }
 
   return (
-    <div className="flex flex-col md:flex-row justify-center items-center md:items-end max-w-[1040px] w-full md:mx-auto mb-10">
+    <div className="flex flex-col gap-3 md:gap-0 md:flex-row justify-center items-center md:items-end max-w-[1040px] w-full md:mx-auto mb-10">
       <div className="flex flex-col items-center gap-10 w-full px-7 md:px-0 md:w-auto">
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogContent className="p-5 flex flex-col gap-5">
@@ -514,8 +514,8 @@ const ReservationForm = () => {
           </Dialog>
         </Form>
       </div>
-      <div className="max-w-[300px] w-full flex flex-col gap-4">
-        <div className="flex flex-col gap-2">
+      <div className="max-w-[350px] w-full flex flex-col gap-4">
+        <div className="flex flex-col gap-1">
           <h2 className="text-4xl font-bold text-primary">{"Nous trouver"}</h2>
           <div className="flex flex-col">
             <p className="font-bold">{config.siteName}</p>

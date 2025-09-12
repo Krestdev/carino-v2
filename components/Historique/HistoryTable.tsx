@@ -33,13 +33,13 @@ const HistoryTable = ({ title, data, towns }: Props) => {
     setSelectedOrder(null);
   };
 
-  const jsonArray = (array: string) => {
-    if (typeof array === "string") {
-      return JSON.parse(array.replace(/\n/g, ""));
-    } else {
-      return array;
-    }
-  };
+  // const jsonArray = (array: string) => {
+  //   if (typeof array === "string") {
+  //     return JSON.parse(array.replace(/\n/g, ""));
+  //   } else {
+  //     return array;
+  //   }
+  // };
 
   return (
     <div className="flex flex-col gap-5 w-full">
@@ -101,21 +101,41 @@ const HistoryTable = ({ title, data, towns }: Props) => {
                     {(() => {
                       // Parse items to ensure it's an array
                       const parseItems = (items: unknown): string[] => {
-                        if (Array.isArray(items)) return items;
-                        if (typeof items === "string") {
-                          try {
-                            const parsed = JSON.parse(items);
-                            return Array.isArray(parsed) ? parsed : [items];
-                          } catch {
-                            return [items];
-                          }
+                        if (Array.isArray(items)) {
+                          return items.map((item) =>
+                            typeof item === "string" ? item.replace(/"/g, "").trim() : String(item)
+                          );
                         }
+
+                        if (typeof items === "string") {
+                          // Prend tout ce qui est avant le premier "]"
+                          const beforeBracket = items.includes("]")
+                            ? items.split("]")[0]
+                            : items;
+
+                          // Retire les crochets
+                          const cleaned = beforeBracket.replace(/\[|\]/g, "").trim();
+
+                          return cleaned
+                            .split(",")
+                            .map((item) => item.replace(/"/g, "").trim())
+                            .filter((item) => item.length > 0);
+                        }
+
                         return [];
                       };
 
-                      const items = parseItems(order.items);
-                      const preview = items.slice(0, 3).join(", ");
-                      return items.length > 3 ? `${preview} ...` : preview;
+                      const removeParenthesesContent = (items: string[]): string[] => {
+                        return items
+                          .map(item => item.replace(/\([^)]*\)/g, "").trim()) // supprime tout contenu entre parenthèses
+                          .filter(item => item.length > 0); // supprime les chaînes vides
+                      };
+
+                      const items = removeParenthesesContent(parseItems(order.items));
+                      console.log(removeParenthesesContent(parseItems(order.items)), parseItems(order.items));
+
+                      const preview = items.join(`\n `);
+                      return preview
                     })()}
                   </TableCell>
 

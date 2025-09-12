@@ -17,21 +17,23 @@ import { XAF } from "@/lib/functions";
 import useStore from "@/context/store";
 import EditProductDialog from "@/app/panier/editProductDialog";
 import { ShoppingBasket } from "lucide-react";
+import Link from "next/link";
 
 interface Props {
   items: cartItem[];
 }
 
 const Panier = ({ items }: Props) => {
-  const { totalPrice, cart, removeFromCart, emptyCart } = useStore();
+  const { totalPrice, cart, removeFromCart, emptyCart, token } = useStore();
   const [deliveryMode, setDeliveryMode] = useState<string>("");
   const [postOrderStatus, setPostOrderStatus] = useState<boolean>(false);
   const [fees, setFees] = useState<number>(0);
 
   return cart.length > 0 ? (
-    <div className="px-7 md:px-0 container mx-auto grid grid-cols-1 md:grid-cols-2 justify-center gap-7 py-20">
+    <div className="px-7 grid grid-cols-1 md:grid-cols-2 justify-center gap-7 py-20">
       <div className="max-w-[1440px] w-full mx-auto flex flex-col items-end gap-10">
         <div className="flex flex-col max-w-[495px] w-full gap-6">
+        {token === null && <p className="text-red-500 w-full">🚨🚨 Veuillez vous <Link href="/connexion" className="italic text-blue-500 underline">connecter</Link> pour passer une commande.</p>}
           <h3>{"Paiement"}</h3>
           <div className="flex flex-col gap-2">
             <label className="text-sm font-medium">{"Mode de livraison"}</label>
