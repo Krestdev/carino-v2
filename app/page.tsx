@@ -63,7 +63,7 @@ export default function Home() {
     );
 
     return (
-      <div>
+      <div className="overflow-clip">
         <Hero />
         <div className="md:pt-6 container mx-auto ">
           <ProductCarousel products={dailyMenu} category={dailyCategory} />

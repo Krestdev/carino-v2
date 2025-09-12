@@ -5,14 +5,16 @@ import Link from "next/link";
 import { LuCircleUser } from "react-icons/lu";
 import { Button } from "./ui/button";
 import PopAccount from "./Authentification/PopAccount";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import useStore from "@/context/store";
+import MenuComp from "./menu";
 
 const Header = () => {
 
-  const {token} = useStore();
+  const router = useRouter();
+  const { token } = useStore();
   const isLogin = token !== null;
-  
+
   const pathname = usePathname();
 
   const isActiveTab = (tab: string) => {
@@ -21,7 +23,7 @@ const Header = () => {
 
   return (
     <div className="sticky top-0 z-50 mx-3">
-      <div className="absolute bg-white/60 backdrop-blur-lg top-[10px] left-1/2 transform -translate-x-1/2 max-w-[1100px] w-full h-[60px] md:h-[70px] rounded-full flex justify-between px-[10px] z-50">
+      <div className="absolute bg-white/60 backdrop-blur-lg top-[10px] left-1/2 transform -translate-x-1/2 max-w-[1100px] w-full h-[60px] md:h-[70px] rounded-full flex items-center justify-between px-[10px] z-50">
         <div className="flex flex-row items-center gap-8">
           <Link href="/">
             <img
@@ -83,10 +85,12 @@ const Header = () => {
           </div>
         )}
         <div className="md:hidden flex gap-2">
-          <Button variant={"outline"}>
-            <Menu />
-          </Button>
-          <Button>
+          <MenuComp>
+            <Button variant={"outline"}>
+              <Menu className="text-primary" />
+            </Button>
+          </MenuComp>
+          <Button onClick={() => router.push("/panier")}>
             <ShoppingCart />
           </Button>
         </div>

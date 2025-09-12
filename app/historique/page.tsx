@@ -56,7 +56,7 @@ const Page = () => {
   }
 
   return userData.isSuccess ? (
-    <div className="pt-24 pb-10 container mx-auto ">
+    <div className="px-7 md:px-0 pt-24 pb-10 container mx-auto ">
       <div className="max-w-[1440px] w-full mx-auto flex flex-col gap-5">
         <Button onClick={() => redirect("/")} className="w-fit">
           <ArrowLeft />

@@ -18,8 +18,8 @@ const Loading = () => {
 
   return (
     showLoading && (
-      <div className="flex justify-center items-center h-screen bg-white">
-        <div className="flex space-x-1 text-4xl font-bold text-primary">
+      <div className="px-7 md:px-0 container mx-auto flex justify-center items-center h-screen bg-white">
+        <div className="flex space-x-1 text-2xl md:text-4xl font-bold text-primary">
           {letters.map((letter, index) => (
             <motion.span
               key={index}

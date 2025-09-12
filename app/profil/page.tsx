@@ -58,7 +58,7 @@ const Page = () => {
   }
 
   return (
-    <div className="container mx-auto pt-24 pb-10">
+    <div className="px-7 md:px-0 container mx-auto pt-24 pb-10">
       <AnimatePresence mode="wait">
         {userData.isSuccess && (
           <div className="max-w-[1440px] w-full mx-auto flex flex-col gap-5">

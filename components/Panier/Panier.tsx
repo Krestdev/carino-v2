@@ -29,7 +29,7 @@ const Panier = ({ items }: Props) => {
   const [fees, setFees] = useState<number>(0);
 
   return cart.length > 0 ? (
-    <div className="grid grid-cols-1 md:grid-cols-2 justify-center gap-7 py-20">
+    <div className="px-7 md:px-0 container mx-auto grid grid-cols-1 md:grid-cols-2 justify-center gap-7 py-20">
       <div className="max-w-[1440px] w-full mx-auto flex flex-col items-end gap-10">
         <div className="flex flex-col max-w-[495px] w-full gap-6">
           <h3>{"Paiement"}</h3>

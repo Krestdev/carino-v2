@@ -169,8 +169,8 @@ const ReservationForm = () => {
   }
 
   return (
-    <div className="flex justify-center items-end max-w-[1040px] w-full mx-auto mb-10">
-      <div className="flex flex-col items-center gap-10">
+    <div className="flex flex-col md:flex-row justify-center items-center md:items-end max-w-[1040px] w-full md:mx-auto mb-10">
+      <div className="flex flex-col items-center gap-10 w-full px-7 md:px-0 md:w-auto">
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogContent className="p-5 flex flex-col gap-5">
             <DialogHeader className="uppercase tracking-widest pb-3 border-b">
@@ -215,7 +215,7 @@ const ReservationForm = () => {
         <Form {...form}>
           <form
             onSubmit={form.handleSubmit(onSubmit)}
-            className="w-fit flex flex-col gap-5 px-7"
+            className="w-full md:w-fit flex flex-col gap-5 md:px-7"
           >
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="w-full flex flex-col gap-7">
