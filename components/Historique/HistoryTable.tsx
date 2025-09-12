@@ -65,9 +65,6 @@ const HistoryTable = ({ title, data, towns }: Props) => {
             </TableRow>
           ) : (
             data.reverse().map((order, id) => {
-              const metadata = jsonArray(order.metadata!);
-              // console.log(metadata.address);
-
               return (
                 <TableRow key={id} className={`divide-x divide-gray-200 ${id % 2 === 0 ? "bg-gray-100" : ""}`}>
                   <TableCell className={`font-medium text-center`}>
