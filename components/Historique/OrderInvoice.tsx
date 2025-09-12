@@ -1,3 +1,4 @@
+import { XAF } from "@/lib/functions";
 import {
   Document,
   Page,
@@ -15,9 +16,9 @@ interface OrderInvoiceProps {
     deliveryAddress: string;
     location: string;
     products: string[];
-    deliveryFee: string;
+    deliveryFee: number;
     itemsAmount: string;
-    totalAmount: string;
+    totalAmount: number;
     is_paid: boolean;
     is_delivred: boolean;
     created_at: Date;
@@ -80,7 +81,7 @@ const OrderInvoice = ({ order }: OrderInvoiceProps) => (
               return (
                 <View key={index} style={styles.subSection}>
                   <Text style={styles.subSectionLabel}>{`• ${productName}`}</Text>
-                  <Text style={styles.subSectionValue}>{`${price} FCFA`}</Text>
+                  <Text style={styles.subSectionValue}>{`${XAF.format(price)}`}</Text>
                 </View>
               );
             })}
@@ -88,17 +89,17 @@ const OrderInvoice = ({ order }: OrderInvoiceProps) => (
           <View style={styles.section}>
             <View style={styles.subSection}>
               <Text style={styles.subSectionLabel}>{"Commande:"}</Text>
-              <Text style={styles.subSectionValue}>{order.itemsAmount}</Text>
+              <Text style={styles.subSectionValue}>{Number(order.itemsAmount)}</Text>
             </View>
             <View style={styles.subSection}>
               <Text style={styles.subSectionLabel}>
                 {"Frais de livraison:"}
               </Text>
-              <Text style={styles.subSectionValue}>{order.deliveryFee}</Text>
+              <Text style={styles.subSectionValue}>{Number(order.deliveryFee)}</Text>
             </View>
             <View style={styles.subSection}>
               <Text style={styles.subSectionLabel}>{"Total:"}</Text>
-              <Text style={styles.subSectionValue}>{order.totalAmount}</Text>
+              <Text style={styles.subSectionValue}>{Number(order.totalAmount)}</Text>
             </View>
           </View>
         </View>

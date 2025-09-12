@@ -170,9 +170,7 @@ const TakeawayForm = ({
     );
     if (user !== null) {
 
-      
       if (isDeliveryOpen()) {
-        console.log("on est la:", isDeliveryOpen());
         postOrder.mutate({
           phone: values.phoneNumber,
           total_amount: totalPrice() + fees,
@@ -232,9 +230,9 @@ const TakeawayForm = ({
   ]);
 
   function isDisable() {
-    
+
     if (
-      cart.length === 0 
+      cart.length === 0
       ||
       // totalPrice() + fees <
       // Number(process.env.NEXT_PUBLIC_MINIMUM_AMOUNT || 4999) ||
@@ -387,12 +385,15 @@ const TakeawayForm = ({
               )}
             />
           </div>
-          <div className="flex gap-2 items-center">
-            <Button disabled={isDisable()} className="h-[54px]" type="submit">
-              {"Proceder au paiement"}
-            </Button>
-            <img src="/images/momo.webp" alt="" className="w-[54px] h-[54px]" />
-            <img src="/images/om.webp" alt="" className="w-[54px] h-[54px]" />
+          <div className="flex flex-col gap-2 items-end">
+            <div className="flex gap-2 items-center">
+              <Button disabled={isDisable()} className="h-[54px]" type="submit">
+                {"Proceder au paiement"}
+              </Button>
+              <img src="/images/momo.webp" alt="" className="w-[54px] h-[54px]" />
+              <img src="/images/om.webp" alt="" className="w-[54px] h-[54px]" />
+            </div>
+            {totalPrice() < 5000 && <p className="text-[14px] text-red-500">{"Le montant minimum pour soumettre une commande est de 5000 Fcfa"}</p>}
           </div>
         </form>
       </Form>

@@ -10,17 +10,24 @@ import { redirect, useRouter } from "next/navigation";
 import { useEffect, useState, useTransition } from "react";
 import Loading from "../loading";
 import { useAppContext } from "@/providers/appContext";
+import TownQuery from "@/queries/townQuery";
 
 const Page = () => {
   const { baseURL } = useAppContext();
   const { user, token } = useStore();
   const router = useRouter();
   const userLogIn = new UserQuery(baseURL);
+  const lieu = new TownQuery(baseURL);
 
   const userData = useQuery({
     queryKey: ["userInfo", user?.id],
     queryFn: () => userLogIn.allUsersOrders(user ? user.id : -1),
     enabled: !!user,
+  });
+
+  const townData = useQuery({
+    queryKey: ["towns"],
+    queryFn: () => lieu.getTowns(),
   });
 
   const [isHydrated, setIsHydrated] = useState(false);
@@ -58,6 +65,7 @@ const Page = () => {
         <HistoryTable
           title={"Historique des commandes"}
           data={userData.data?.data}
+          towns={townData.data?.data}
         />
       </div>
     </div>

@@ -6,7 +6,7 @@ import {
   ProductsResponse,
   ReceiptProps,
 } from "@/types/types";
-import { AxiosInstance } from "axios";
+import axios, { AxiosInstance } from "axios";
 
 export default class ProductQuery {
   route = "products";
@@ -16,6 +16,8 @@ export default class ProductQuery {
   constructor(baseURL: string) {
     this.api = new AxiosConfig(baseURL).api;
   }
+
+  secondBaseURL = process.env.NEXT_PUBLIC_API;
 
   getProductByName = async (product: string): Promise<ProductsResponse> => {
     return this.api.get(`/products/${product}`).then((res) => res.data);
@@ -32,6 +34,6 @@ export default class ProductQuery {
     return this.api.get(`/${this.cRoute}`).then((res) => res.data);
   };
   postTicket = (data: ReceiptProps) => {
-    return this.api.post("/api/ticket", data);
+    return axios.post(`api/ticket`, data);
   };
 }

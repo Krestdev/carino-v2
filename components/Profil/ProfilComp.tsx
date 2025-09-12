@@ -32,7 +32,7 @@ const ProfilComp = ({ orders }: { orders: UserOrdersResponse }) => {
           <div>
             <p className="text-[12px] font-semibold">{"Dernieres commandes"}</p>
             <p className="text-[12px]">
-              {lastOrder.created_at.toString().slice(0, 10)}
+              {lastOrder ? lastOrder.created_at.toString().slice(0, 10) : "Aucune commande"}
             </p>
           </div>
         </div>

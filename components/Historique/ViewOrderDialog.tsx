@@ -7,20 +7,23 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { OrdersData } from "@/types/types";
+import { AddtressData, OrdersData } from "@/types/types";
 import { PDFViewer } from "@react-pdf/renderer";
 import { FileText, X } from "lucide-react";
 import { useState } from "react";
 import OrderInvoice from "./OrderInvoice";
 import Loading from "@/app/loading";
+import { XAF } from "@/lib/functions";
+import TownQuery from "@/queries/townQuery";
 
 interface ViewOrderDialogProps {
   open: boolean;
   onClose: () => void;
   order: OrdersData | null;
+  towns: AddtressData[] | undefined;
 }
 
-const ViewOrderDialog = ({ open, onClose, order }: ViewOrderDialogProps) => {
+const ViewOrderDialog = ({ open, onClose, order, towns }: ViewOrderDialogProps) => {
   const [showPdf, setShowPdf] = useState(false);
 
   if (!order) return null;
@@ -56,21 +59,26 @@ const ViewOrderDialog = ({ open, onClose, order }: ViewOrderDialogProps) => {
   };
 
   const metadata = jsonArray(order.metadata!);
+  const livraison = metadata && metadata.address && metadata.address.name ? metadata.address.name : "-";
+  const frais = towns?.find((town) => town.quartier === livraison)?.prix ?? 0;
 
   const orderData = {
     id: order.id,
     customerName: metadata && metadata.customer && metadata.customer.name ? metadata.customer.name : "-",
     phoneNumber: metadata && metadata.customer && metadata.customer.phone ? metadata.customer.phone : "-",
-    deliveryAddress: metadata && metadata.address && metadata.address.name ? metadata.address.name : "-",
+    deliveryAddress: livraison,
     location: metadata && metadata.address && metadata.address.street ? metadata.address.street : "-",
     products: parsedItems,
-    deliveryFee: "2 000",
-    itemsAmount: (Number(order.prix_total) - 2000).toString(),
-    totalAmount: order.prix_total.toString(),
+    deliveryFee: metadata && metadata.mode && metadata.mode === "takeaway" ? 0 : Number(frais),
+    itemsAmount: (Number(order.prix_total) - (metadata && metadata.mode && metadata.mode === "takeaway" ? 0 : Number(frais))).toString(),
+    totalAmount: order.prix_total,
     is_paid: order.is_paid,
     is_delivred: order.is_delivred,
     created_at: order.created_at,
   };
+
+  console.log(metadata);
+  
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
@@ -161,15 +169,15 @@ const ViewOrderDialog = ({ open, onClose, order }: ViewOrderDialogProps) => {
                   <div className="flex flex-col gap-1 w-full border-b border-[#848484] pb-2">
                     <div className="flex justify-between">
                       <h4 className="font-normal">{"Commande"}</h4>
-                      <h4>{orderData.itemsAmount} FCFA</h4>
+                      <h4>{XAF.format(Number(orderData.itemsAmount))}</h4>
                     </div>
                     <div className="flex justify-between">
                       <h4 className="font-normal">{"Frais de livraison:"}</h4>
-                      <h4>{orderData.deliveryFee} FCFA</h4>
+                      <h4>{XAF.format(Number(orderData.deliveryFee))}</h4>
                     </div>
                     <div className="flex justify-between">
                       <h4 className="font-semibold">{"Total:"}</h4>
-                      <h4>{orderData.totalAmount} FCFA</h4>
+                      <h4>{XAF.format(Number(orderData.totalAmount))}</h4>
                     </div>
                   </div>
                 </div>
@@ -192,7 +200,7 @@ const ViewOrderDialog = ({ open, onClose, order }: ViewOrderDialogProps) => {
         </div>
 
         <DialogFooter className="px-4 py-2">
-          <Button variant="secondary" onClick={onClose}>
+          <Button variant="secondary" onClick={onClose} className="text-white">
             Fermer
           </Button>
         </DialogFooter>

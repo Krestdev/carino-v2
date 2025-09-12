@@ -135,7 +135,7 @@ const LoginComp = () => {
           </div>
           <span>
             {"Mot de passe oublié?"}{" "}
-            <Link href={"/recuperation-mot-de-passe"}>{"Réinitialiser"}</Link>
+            <Link className="bg-black text-white px-2 py-1 rounded-[8px]" href={"/recuperation-mot-de-passe"}>{"Réinitialiser"}</Link>
           </span>
         </form>
       </Form>

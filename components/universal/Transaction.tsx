@@ -19,8 +19,7 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { CgSpinner } from "react-icons/cg";
 import { FaRegCheckCircle } from "react-icons/fa";
-/* import DownloadReceipt from "@/components/downloadReceipt";
- */
+
 function Transaction() {
   const { transactionRef, setTransaction, emptyCart, receiptData } = useStore();
   const [open, setOpen] = useState(false);
@@ -29,78 +28,93 @@ function Transaction() {
   >("pending");
   const { baseURL } = useAppContext();
   const userQuery = new UserQuery(baseURL);
-  const { data, isSuccess } = useQuery({
-    queryKey: ["transaction", transactionRef],
-    queryFn: async () => {
-      return userQuery.status(transactionRef!);
-    },
-    enabled: !!transactionRef,
-    refetchInterval: 10000,
-    retry: true,
-  });
 
   const producQuery = new ProductQuery(baseURL);
 
   const sendReceipt = useMutation({
-    mutationFn: (props: ReceiptProps) => {
-      return producQuery.postTicket(props);
+    mutationFn: (props: ReceiptProps) => producQuery.postTicket(props),
+  });
+
+  const { data, isSuccess } = useQuery({
+    queryKey: ["transaction", transactionRef],
+    queryFn: async () => {
+      return userQuery.status(transactionRef!).then((res) => {
+        if (res.data[0].status === "FAILED") {
+          setPaymentStatus("failed");
+        }
+        return res;
+      });
     },
+    enabled: !!transactionRef,
+    refetchInterval: paymentStatus === "pending" ? 10000 : false, 
+    retry: true,
   });
 
   useEffect(() => {
-    if (transactionRef) {
-      if (isSuccess) {
-        if (data.data[0].status.toLocaleLowerCase().includes("success")) {
-          //Sending the receipt ticket through email here !
-          receiptData && sendReceipt.mutate(receiptData);
-          toast({
-            title: "Transaction réussie",
-            variant: "success",
-            description: (
-              <p>
-                Votre paiement a été validé avec succès, restez près de votre
-                téléphone pour la livraison. Le Carino vous remercie pour votre
-                confiance
-              </p>
-            ),
-          });
-          setPaymentStatus("success");
-          setOpen(true);
-          emptyCart();
-          setTimeout(() => setTransaction(null), 9000);
-        } else if (
-          data.data[0].status.toLocaleLowerCase().includes("fail")
-        ) {
-          toast({
-            title: "Transaction échouée",
-            variant: "destructive",
-            description: (
-              <p>
-                Aie ! Votre paiement a échoué. N'hésitez pas à contacter notre
-                support si nécessaire.
-              </p>
-            ),
-          });
-          setPaymentStatus("failed");
-          setOpen(true);
-          setTimeout(() => setTransaction(null), 9000);
-        } else {
-          setPaymentStatus("pending");
-          setOpen(true);
-        }
-      }
-    } else {
-      // setOpen(false);
+    if (!transactionRef) {
+      setOpen(false);
+      return;
+    }
+
+    if (!isSuccess) return;
+
+    const status = data?.data[0]?.status?.toLowerCase();
+    if (!status) return;
+
+    // ✅ Empêcher plusieurs exécutions
+    if (status.includes("success") && paymentStatus !== "success") {
+      setPaymentStatus("success");
+      setOpen(true);
+
+      if (receiptData) sendReceipt.mutate(receiptData);
+
+      toast({
+        title: "Transaction réussie",
+        variant: "success",
+        description: (
+          <p>
+            Votre paiement a été validé avec succès, restez près de votre
+            téléphone pour la livraison. Le Carino vous remercie pour votre
+            confiance
+          </p>
+        ),
+      });
+
+      emptyCart();
+      setTimeout(() => setTransaction(null), 9000);
+    }
+
+    if (status.includes("fail") && paymentStatus !== "failed") {
+      setPaymentStatus("failed");
+      setOpen(true);
+
+      toast({
+        title: "Transaction échouée",
+        variant: "destructive",
+        description: (
+          <p>
+            Aie ! Votre paiement a échoué. N'hésitez pas à contacter notre
+            support si nécessaire.
+          </p>
+        ),
+      });
+
+      setTimeout(() => setTransaction(null), 9000);
+    }
+
+    if (!status.includes("success") && !status.includes("fail")) {
+      setPaymentStatus("pending");
+      setOpen(true);
     }
   }, [
     isSuccess,
-    transactionRef,
-    data?.data[0].status,
     data?.data,
+    transactionRef,
     emptyCart,
     receiptData,
     sendReceipt,
     setTransaction,
+    paymentStatus,
   ]);
 
   return (
@@ -127,6 +141,7 @@ function Transaction() {
               "Un ordre de retrait a été émis. Validez le paiement pour finaliser votre commande."}
           </DialogDescription>
         </DialogHeader>
+
         {paymentStatus === "success" ? (
           <div className="px-7 py-10 flex flex-col gap-5 items-center justify-center">
             <div className="flex flex-col gap-3 text-center items-center justify-center">

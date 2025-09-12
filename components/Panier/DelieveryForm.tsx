@@ -76,7 +76,7 @@ const DelieveryForm = ({
     } else {
       setCartIsEmpty(true);
     }
-  }, [cart]); 
+  }, [cart]);
 
   const { baseURL } = useAppContext();
 
@@ -181,7 +181,7 @@ const DelieveryForm = ({
     if (
       cartIsEmpty ||
       totalPrice() + fees <
-        Number(process.env.NEXT_PUBLIC_MINIMUM_AMOUNT || 4999) ||
+      Number(process.env.NEXT_PUBLIC_MINIMUM_AMOUNT || 4999) ||
       postOrder.isPending ||
       !!transactionRef
     ) {
@@ -221,8 +221,8 @@ const DelieveryForm = ({
                         >
                           {field.value
                             ? addresses.find(
-                                (item) => item.quartier === field.value
-                              )?.quartier
+                              (item) => item.quartier === field.value
+                            )?.quartier
                             : "Choisissez un quartier"}
                           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                         </Button>
@@ -349,12 +349,15 @@ const DelieveryForm = ({
               )}
             />
           </div>
-          <div className="flex gap-2 items-center">
-            <Button disabled={isDisable()} className="h-[54px]" type="submit">
-              {"Proceder au paiement"}
-            </Button>
-            <img src="/images/momo.webp" alt="" className="w-[54px] h-[54px]" />
-            <img src="/images/om.webp" alt="" className="w-[54px] h-[54px]" />
+          <div className="flex flex-col gap-2 items-end">
+            <div className="flex gap-2 items-center">
+              <Button disabled={isDisable()} className="h-[54px]" type="submit">
+                {"Proceder au paiement"}
+              </Button>
+              <img src="/images/momo.webp" alt="" className="w-[54px] h-[54px]" />
+              <img src="/images/om.webp" alt="" className="w-[54px] h-[54px]" />
+            </div>
+            {totalPrice() < 5000 && <p className="text-[14px] text-red-500">{"Le montant minimum pour soumettre une commande est de 5000 Fcfa"}</p>}
           </div>
         </form>
       </Form>

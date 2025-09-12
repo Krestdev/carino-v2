@@ -63,6 +63,7 @@ const Panier = ({ items }: Props) => {
             setPostOrderStatus={setPostOrderStatus}
           />
         )}
+        
       </div>
       <div className="flex flex-col gap-6 items-start justify-start max-w-[600px] w-full">
         <h3>{"Ma commande"}</h3>

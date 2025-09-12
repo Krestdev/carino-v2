@@ -12,12 +12,19 @@ import Loading from "@/app/loading";
 import { AnimatePresence } from "framer-motion";
 import { useEffect, useState, useTransition } from "react";
 import { useAppContext } from "@/providers/appContext";
+import TownQuery from "@/queries/townQuery";
 
 const Page = () => {
   const { baseURL } = useAppContext();
   const { user, token } = useStore();
   const router = useRouter();
   const userLogIn = new UserQuery(baseURL);
+  const lieu = new TownQuery(baseURL);
+
+  const townData = useQuery({
+    queryKey: ["towns"],
+    queryFn: () => lieu.getTowns(),
+  });
 
   const userData = useQuery({
     queryKey: ["userInfo", user?.id],
@@ -63,6 +70,7 @@ const Page = () => {
             <HistoryTable
               title={"Dernières Commandes"}
               data={userData.data.data.slice(-5)}
+              towns={townData.data?.data}
             />
           </div>
         )}

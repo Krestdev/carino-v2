@@ -341,7 +341,7 @@ const ReservationForm = () => {
                             {"Térrasse Exterieur"}
                           </SelectItem>
                           <SelectItem value="terrasse intérieure">
-                            {"Térrasse Interieure"}
+                            {"Térrasse Interieure(Non Fumeur)"}
                           </SelectItem>
                         </SelectContent>
                       </Select>
