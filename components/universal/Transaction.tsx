@@ -24,7 +24,7 @@ function Transaction() {
   const { transactionRef, setTransaction, emptyCart, receiptData } = useStore();
   const [open, setOpen] = useState(false);
   const [paymentStatus, setPaymentStatus] = useState<
-    "pending" | "success" | "failed" | "error"
+    "pending" | "success" | "failed" | "error" | "hide"
   >("pending");
   const { baseURL } = useAppContext();
   const userQuery = new UserQuery(baseURL);
@@ -40,23 +40,18 @@ function Transaction() {
     queryFn: async () => {
       return userQuery.status(transactionRef!).then((res) => {
 
-        // ✅ Détection d'un échec
         if (res.data[0].status === "FAILED" || res.data[0].status === "NOT_FOUND") {
           setPaymentStatus("failed");
-
-          // Et maintenant on va passer le paymentStatus à "failed" pour arrêter le polling
           setPaymentStatus("error");
-        }else if (res.data[0].status === "COMPLETED") {
+        } else if (res.data[0].status === "COMPLETED") {
           setPaymentStatus("success");
         }
-
         return res;
       });
     },
     enabled: !!transactionRef,
-    // ✅ Désactive le polling si paiement échoué ou réussi
     refetchInterval: paymentStatus === "pending" ? 10000 : false,
-    retry: paymentStatus === "pending" ,
+    retry: paymentStatus === "pending",
   });
 
 
@@ -71,8 +66,7 @@ function Transaction() {
     const status = data?.data[0]?.status?.toLowerCase();
     if (!status) return;
 
-    // ✅ Empêcher plusieurs exécutions
-    if (status.includes("success") && paymentStatus !== "success") {
+    if (status.includes("completed") && paymentStatus !== "success") {
       setPaymentStatus("success");
       setOpen(true);
 
@@ -85,7 +79,7 @@ function Transaction() {
           <p>
             Votre paiement a été validé avec succès, restez près de votre
             téléphone pour la livraison. Le Carino vous remercie pour votre
-            confiance
+            confiance.
           </p>
         ),
       });
@@ -94,17 +88,17 @@ function Transaction() {
       setTimeout(() => setTransaction(null), 9000);
     }
 
-    if (status.includes("fail") && paymentStatus !== "failed") {
+    if ((status.includes("failed") || status.includes("not_found")) && paymentStatus !== "failed") {
       setPaymentStatus("failed");
-      setOpen(false);
+      setOpen(true); // on ouvre pour montrer l'échec
 
       toast({
         title: "Transaction échouée",
         variant: "destructive",
         description: (
           <p>
-            Aie ! Votre paiement a échoué. N'hésitez pas à contacter notre
-            support si nécessaire.
+            Aie ! Votre paiement a échoué. Contactez notre{" "}
+            <a href={`mailto:${config.contact.email}`}>support</a> si nécessaire.
           </p>
         ),
       });
@@ -112,7 +106,8 @@ function Transaction() {
       setTimeout(() => setTransaction(null), 9000);
     }
 
-    if (!status.includes("success") && !status.includes("failled")) {
+    if (status.includes("pending")) {
+      setPaymentStatus("pending");
       setOpen(true);
     }
   }, [
@@ -132,10 +127,10 @@ function Transaction() {
         <DialogHeader>
           <DialogTitle
             className={`py-5 min-h-[60px] justify-center flex items-center px-4 ${paymentStatus === "success"
-                ? "bg-green-500 text-gray-900"
-                : paymentStatus === "failed"
-                  ? "bg-red-700 text-white"
-                  : "bg-slate-200 text-slate-900"
+              ? "bg-green-500 text-gray-900"
+              : paymentStatus === "failed"
+                ? "bg-red-700 text-white"
+                : "bg-slate-200 text-slate-900"
               }`}
           >
             {paymentStatus === "success"
