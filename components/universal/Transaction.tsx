@@ -46,6 +46,8 @@ function Transaction() {
 
           // Et maintenant on va passer le paymentStatus à "failed" pour arrêter le polling
           setPaymentStatus("error");
+        }else if (res.data[0].status === "COMPLETED") {
+          setPaymentStatus("success");
         }
 
         return res;
@@ -54,7 +56,7 @@ function Transaction() {
     enabled: !!transactionRef,
     // ✅ Désactive le polling si paiement échoué ou réussi
     refetchInterval: paymentStatus === "pending" ? 10000 : false,
-    retry: paymentStatus === "pending",
+    retry: paymentStatus === "pending" ,
   });
 
 
