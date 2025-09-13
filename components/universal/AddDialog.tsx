@@ -249,7 +249,7 @@ function AddDialog({
       id: id.toString(),
       qte: data.quantity,
       nom: name,
-      itemId: Date.now(),
+      itemId: id,
       options: cartOption(),
       price: getTotal(cartOption()),
       image: image ? image : "/images/imagePlaceholder.svg",
