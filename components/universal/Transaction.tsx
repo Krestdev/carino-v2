@@ -39,15 +39,16 @@ function Transaction() {
     queryKey: ["transaction", transactionRef],
     queryFn: async () => {
       return userQuery.status(transactionRef!).then((res) => {
-        if (res.data[0].status === "FAILED") {
+        console.log(res.data[0].status);
+        if (res.data[0].status === "FAILED" || res.data[0].status === "NOT_FOUND") {
           setPaymentStatus("failed");
         }
         return res;
       });
     },
     enabled: !!transactionRef,
-    refetchInterval: paymentStatus === "pending" ? 10000 : false, 
-    retry: true,
+    refetchInterval: paymentStatus === "pending" ? 10000 : false,
+    retry: paymentStatus === "pending",
   });
 
   useEffect(() => {
@@ -102,8 +103,7 @@ function Transaction() {
       setTimeout(() => setTransaction(null), 9000);
     }
 
-    if (!status.includes("success") && !status.includes("fail")) {
-      setPaymentStatus("pending");
+    if (!status.includes("success") && !status.includes("failled")) {
       setOpen(true);
     }
   }, [

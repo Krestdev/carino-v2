@@ -34,7 +34,7 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const baseURL = process.env.API_BASE_URL ?? "https://www.le-carino.com/api/";
+  const baseURL = process.env.NEXT_PUBLIC_API_BASE_URL ?? "https://www.le-carino.com/api/";
   return (
     <html lang="fr">
       <body className={`${ptSans.variable} ${oleo.variable} antialiased`}>
