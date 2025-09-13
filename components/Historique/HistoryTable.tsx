@@ -132,7 +132,6 @@ const HistoryTable = ({ title, data, towns }: Props) => {
                       };
 
                       const items = removeParenthesesContent(parseItems(order.items));
-                      console.log(removeParenthesesContent(parseItems(order.items)), parseItems(order.items));
 
                       const preview = items.join(`\n `);
                       return preview
