@@ -22,7 +22,6 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Minus, Plus } from "lucide-react";
-import useStore from "@/context/store";
 import { useEffect, useState } from "react";
 import { ProductsData, otherOption, Option } from "@/types/types";
 import { Label } from "@radix-ui/react-label";
@@ -33,6 +32,7 @@ import { toast } from "../ui/use-toast";
 import { Alert, AlertTitle } from "../ui/alert";
 import { Input } from "../ui/input";
 import { LuMinus, LuPlus } from "react-icons/lu";
+import useStore from "@/context/store";
 
 const FormSchema = z.object({
   quantity: z.number().positive({ message: "Doit être supérieur à 0" }),
