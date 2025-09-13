@@ -24,7 +24,7 @@ function Transaction() {
   const { transactionRef, setTransaction, emptyCart, receiptData } = useStore();
   const [open, setOpen] = useState(false);
   const [paymentStatus, setPaymentStatus] = useState<
-    "pending" | "success" | "failed"
+    "pending" | "success" | "failed" | "error"
   >("pending");
   const { baseURL } = useAppContext();
   const userQuery = new UserQuery(baseURL);
@@ -40,16 +40,24 @@ function Transaction() {
     queryFn: async () => {
       return userQuery.status(transactionRef!).then((res) => {
         console.log(res.data[0].status);
+
+        // ✅ Détection d'un échec
         if (res.data[0].status === "FAILED" || res.data[0].status === "NOT_FOUND") {
           setPaymentStatus("failed");
+
+          // Et maintenant on va passer le paymentStatus à "failed" pour arrêter le polling
+          setPaymentStatus("error");
         }
+
         return res;
       });
     },
     enabled: !!transactionRef,
+    // ✅ Désactive le polling si paiement échoué ou réussi
     refetchInterval: paymentStatus === "pending" ? 10000 : false,
     retry: paymentStatus === "pending",
   });
+
 
   useEffect(() => {
     if (!transactionRef) {
@@ -87,7 +95,7 @@ function Transaction() {
 
     if (status.includes("fail") && paymentStatus !== "failed") {
       setPaymentStatus("failed");
-      setOpen(true);
+      setOpen(false);
 
       toast({
         title: "Transaction échouée",
@@ -122,19 +130,18 @@ function Transaction() {
       <DialogContent>
         <DialogHeader>
           <DialogTitle
-            className={`py-5 min-h-[60px] justify-center flex items-center px-4 ${
-              paymentStatus === "success"
+            className={`py-5 min-h-[60px] justify-center flex items-center px-4 ${paymentStatus === "success"
                 ? "bg-green-500 text-gray-900"
                 : paymentStatus === "failed"
-                ? "bg-red-700 text-white"
-                : "bg-slate-200 text-slate-900"
-            }`}
+                  ? "bg-red-700 text-white"
+                  : "bg-slate-200 text-slate-900"
+              }`}
           >
             {paymentStatus === "success"
               ? "Paiement validé"
               : paymentStatus === "failed"
-              ? "Echec de paiement"
-              : "En attente de paiement"}
+                ? "Echec de paiement"
+                : "En attente de paiement"}
           </DialogTitle>
           <DialogDescription className="text-center px-4 py-1">
             {paymentStatus === "pending" &&

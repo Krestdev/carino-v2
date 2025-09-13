@@ -161,6 +161,8 @@ const TakeawayForm = ({
   // });
 
   function onSubmit(values: z.infer<typeof formSchema>) {
+    console.log("submitting1");
+    
     const dueDate = new Date(values.takeDate);
     dueDate.setHours(
       Number(values.time.split(":")[0]),
@@ -169,8 +171,9 @@ const TakeawayForm = ({
       0
     );
     if (user !== null) {
-
+      console.log("submitting2");
       if (isDeliveryOpen()) {
+        console.log("submitting3");
         postOrder.mutate({
           phone: values.phoneNumber,
           total_amount: totalPrice() + fees,
@@ -187,6 +190,8 @@ const TakeawayForm = ({
           client_mail: user.email,
         });
       } else {
+        console.log("Veuillez définir une heure au moins une heure plus tard que l'heure actuelle");
+        
         toast({
           title: "Livraison  fermée.",
           description: "La livraison est disponible uniquement entre 10h30 et 20h30.",
@@ -194,6 +199,7 @@ const TakeawayForm = ({
         });
       }
     } else {
+      console.log("Veuillez vous connecter pour passer une commande");
       toast({
         title: "Connectez-vous pour terminer l'opération",
         description:
@@ -202,6 +208,8 @@ const TakeawayForm = ({
       });
       router.push("/connexion");
     }
+
+    console.log("Fin");
   }
   useEffect(() => {
     setFees(0);
@@ -387,7 +395,7 @@ const TakeawayForm = ({
           </div>
           <div className="flex flex-col gap-2 items-end">
             <div className="flex gap-2 items-center">
-              <Button disabled={isDisable()} className="h-[54px]" type="submit">
+              <Button type="submit" disabled={isDisable()} className="h-[54px]">
                 {"Proceder au paiement"}
               </Button>
               <img src="/images/momo.webp" alt="" className="w-[54px] h-[54px]" />
