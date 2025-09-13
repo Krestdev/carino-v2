@@ -127,8 +127,6 @@ function AddDialog({
 }: DialogProps & ProductsData) {
   const { addToCart } = useStore();
   const router = useRouter();
-  //console.log(options);
-
   const [open, setOpen] = useState(false);
   //function to return a default value for option that must have a value
   const getDefaultValues = (fish: Option[]) => {
@@ -656,7 +654,6 @@ function AddDialog({
                                                 )
                                               : null;
 
-                                            //console.log(form.getValues())
                                             e.preventDefault();
                                           }}
                                         >
@@ -881,7 +878,6 @@ function AddDialog({
                                                 )
                                               : null;
 
-                                            //console.log(form.getValues())
                                             e.preventDefault();
                                           }}
                                         >

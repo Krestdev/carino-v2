@@ -60,9 +60,6 @@ const ViewOrderDialog = ({ open, onClose, order, towns }: ViewOrderDialogProps) 
 
   const parsedItems = parseItems(order.items);
 
-  console.log(parsedItems);
-
-
   const jsonArray = (array: string) => {
     if (typeof array === "string") {
       return JSON.parse(array.replace(/\n/g, ""));
@@ -90,9 +87,6 @@ const ViewOrderDialog = ({ open, onClose, order, towns }: ViewOrderDialogProps) 
     created_at: order.created_at,
     reference: order.reference,
   };
-
-  console.log(metadata);
-
 
   return (
     <Dialog open={open} onOpenChange={onClose}>

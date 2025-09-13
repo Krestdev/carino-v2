@@ -1,8 +1,6 @@
 import { cartItem } from "@/types/types";
 
 export function ApplyPromotion(data: cartItem[]): cartItem[] {
-  // console.log("en cours");
-
   const today = new Date();
   const startDate = new Date(today.getFullYear(), 6, 10);
   const endDate = new Date(today.getFullYear(), 8, 5);

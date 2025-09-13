@@ -40,7 +40,6 @@ export default class UserQuery {
       .then((res) => res.data);
   };
   PlaceOrder = async (data: Order) => {
-    console.log(data);
     return this.api.post(`${this.route}/orders`, data).then((res) => res.data);
   };
   allUsersOrders = async (id: number): Promise<UserOrdersResponse> => {

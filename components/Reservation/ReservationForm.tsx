@@ -150,12 +150,10 @@ const ReservationForm = () => {
   };
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values);
     if (user) {
       if (isValidDate(values.date)) {
         reservationData.mutate(values);
       } else {
-        console.log("Veuillez choisir une date future");
 
         toast({
           title: "Date invalide",

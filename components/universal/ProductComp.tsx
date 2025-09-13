@@ -9,6 +9,7 @@ type Props = {
 };
 
 const ProductComp = ({ produit }: Props) => {
+
   return (
     <div className="relative grid grid-cols-2 md:flex md:flex-col gap-3 md:gap-[22px] w-full md:max-w-[350px] h-full bg-white shadow-[0_4px_4px_rgba(0,0,0,0.25)] border border-gray-300 p-4">
       {produit.disable && (
@@ -21,7 +22,7 @@ const ProductComp = ({ produit }: Props) => {
       )}
       <AddDialog
         {...produit}
-        id={0}
+        id={produit.id}
         name={produit.name}
         image={produit.image}
         description={produit.description}
@@ -42,7 +43,7 @@ const ProductComp = ({ produit }: Props) => {
         </div>
         <AddDialog
           {...produit}
-          id={0}
+          id={produit.id}
           name={produit.name}
           image={produit.image}
           description={produit.description}

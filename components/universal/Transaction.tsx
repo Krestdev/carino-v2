@@ -39,7 +39,6 @@ function Transaction() {
     queryKey: ["transaction", transactionRef],
     queryFn: async () => {
       return userQuery.status(transactionRef!).then((res) => {
-        console.log(res.data[0].status);
 
         // ✅ Détection d'un échec
         if (res.data[0].status === "FAILED" || res.data[0].status === "NOT_FOUND") {
