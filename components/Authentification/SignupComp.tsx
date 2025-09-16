@@ -145,20 +145,22 @@ const SignupComp = () => {
               control={form.control}
               name="phoneNumber"
               render={({ field }) => (
-                <FormItem className="inputFormCustom relative">
+                <FormItem className="inputFormCustom">
                   <FormLabel className="customFormLabel">
                     {"Numéro de téléphone"}
                   </FormLabel>
-                  <span className="absolute top-[24px] left-0 px-2 h-10 inline-flex items-center rounded-l-md bg-muted text-sm">
-                    {"+237"}
-                  </span>
-                  <FormControl>
-                    <Input
-                      placeholder="Numéro de téléphone"
-                      {...field}
-                      className="pl-16 z-10"
-                    />
-                  </FormControl>
+                  <div className="relative h-full">
+                    <span className="absolute top-0 left-0 px-2 h-full inline-flex items-center rounded-l-md bg-muted text-sm border border-r-0 border-input">
+                      {"+237"}
+                    </span>
+                    <FormControl>
+                      <Input
+                        placeholder="Numéro de téléphone"
+                        {...field}
+                        className="pl-12 z-10"
+                      />
+                    </FormControl>
+                  </div>
                   <FormMessage />
                 </FormItem>
               )}

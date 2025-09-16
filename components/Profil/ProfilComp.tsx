@@ -55,7 +55,7 @@ const ProfilComp = ({ orders }: { orders: UserOrdersResponse }) => {
               <p className="text-[12px] font-semibold">{"Tel"}</p>
               <p className="text-[12px]">{user?.phone}</p>
             </div>
-            <div className="flex flex-row items-end justify-between max-w-[291px]">
+            {/* <div className="flex flex-row items-end justify-between max-w-[291px]">
               <div>
                 <p className="text-[12px] font-semibold">{"Mot de passe"}</p>
                 <Input
@@ -70,7 +70,7 @@ const ProfilComp = ({ orders }: { orders: UserOrdersResponse }) => {
                 <LuSquarePen />
                 {"Modifier"}
               </Button>
-            </div>
+            </div> */}
           </div>
         </div>
       </div>
