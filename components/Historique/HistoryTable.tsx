@@ -12,6 +12,9 @@ import { useState } from "react";
 import { LuEye } from "react-icons/lu";
 import { Button } from "../ui/button";
 import ViewOrderDialog from "./ViewOrderDialog";
+import { normalizeText, parseItems } from "@/lib/utils";
+import { formatRelative } from "date-fns";
+import { fr } from "date-fns/locale";
 
 interface Props {
   title: string;
@@ -64,7 +67,8 @@ const HistoryTable = ({ title, data, towns }: Props) => {
               </TableCell>
             </TableRow>
           ) : (
-            data.reverse().map((order, id) => {
+            data.filter(x=>x.reference.toLocaleLowerCase().startsWith("pizz")).toReversed().map((order, id) => {
+              const items = parseItems(order.items);
               return (
                 <TableRow key={id} className={`divide-x divide-gray-200 ${id % 2 === 0 ? "bg-gray-100" : ""}`}>
                   <TableCell className={`font-medium text-center`}>
@@ -98,49 +102,19 @@ const HistoryTable = ({ title, data, towns }: Props) => {
                   }
                   </TableCell>
                   <TableCell className="truncate max-w-[200px]">
-                    {(() => {
-                      // Parse items to ensure it's an array
-                      const parseItems = (items: unknown): string[] => {
-                        if (Array.isArray(items)) {
-                          return items.map((item) =>
-                            typeof item === "string" ? item.replace(/"/g, "").trim() : String(item)
-                          );
-                        }
-
-                        if (typeof items === "string") {
-                          // Prend tout ce qui est avant le premier "]"
-                          const beforeBracket = items.includes("]")
-                            ? items.split("]")[0]
-                            : items;
-
-                          // Retire les crochets
-                          const cleaned = beforeBracket.replace(/\[|\]/g, "").trim();
-
-                          return cleaned
-                            .split(",")
-                            .map((item) => item.replace(/"/g, "").trim())
-                            .filter((item) => item.length > 0);
-                        }
-
-                        return [];
-                      };
-
-                      const removeParenthesesContent = (items: string[]): string[] => {
-                        return items
-                          .map(item => item.replace(/\([^)]*\)/g, "").trim()) // supprime tout contenu entre parenthèses
-                          .filter(item => item.length > 0); // supprime les chaînes vides
-                      };
-
-                      const items = removeParenthesesContent(parseItems(order.items));
-
-                      const preview = items.join(`\n `);
-                      return preview
-                    })()}
+                    <div className="flex flex-col gap-1">
+                      {items.map((item,id)=>
+                      <div key={id} className="w-full text-sm font-medium text-gray-900 flex items-center gap-2">
+                        <span>{normalizeText(item.name)}</span>
+                        {item.details.length > 0 && <p className="text-xs text-gray-600 font-normal whitespace-normal break-words line-clamp-1">({item.details.map(el=> `${normalizeText(el.name)}${el.quantity > 1 ? ` x${el.quantity}`:""}`).join(", ")})</p>}
+                      </div>
+                      )}
+                    </div>
                   </TableCell>
 
                   <TableCell>{XAF.format(Number(order.prix_total))}</TableCell>
                   <TableCell>
-                    {order.created_at.toString().slice(0, 10)}
+                    {formatRelative(order.created_at, new Date(), {locale: fr})}
                   </TableCell>
                   <TableCell>
                     <Button

@@ -421,7 +421,7 @@ export interface OrdersData {
   id: number;
   zelty_order_id?: number;
   reference: string;
-  items: string[];
+  items: string;
   user_id: number;
   prix_total: number;
   lieu_livraison: string;
@@ -567,3 +567,6 @@ export interface ReservationResponse {
   comment?: string;
   final_price?: null;
 }
+
+export type Detail = { name: string; quantity: number };
+export type Item = { name: string; details: Detail[] };
