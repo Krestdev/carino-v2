@@ -6,7 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import z from "zod";
 import { Button } from "../ui/button";
@@ -19,8 +19,9 @@ import {
   FormMessage,
 } from "../ui/form";
 import { Input } from "../ui/input";
-import { toast } from "../ui/use-toast";
 import { useAppContext } from "@/providers/appContext";
+import { AxiosError } from "axios";
+import { toast } from "react-toastify";
 
 const formSchema = z.object({
   email: z.string().email({ message: "Adresse mail invalide" }),
@@ -29,6 +30,7 @@ const formSchema = z.object({
 
 const LoginComp = () => {
   // const [displayError, setDisplayError] = useState(false);
+  const [error, setError] = useState<string | undefined>();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -45,6 +47,13 @@ const LoginComp = () => {
   const userLoginData = useMutation({
     mutationFn: (values: { email: string; password: string }) =>
       userLogIn.login(values),
+    onError: (error) => {
+      if((error as AxiosError).status === 400){
+        console.log((error as AxiosError).status);
+        
+        setError("Adresse mail ou mot de passe incorrect !");
+      }
+    }
   });
 
   function onSubmit(values: z.infer<typeof formSchema>) {
@@ -58,10 +67,7 @@ const LoginComp = () => {
         userLoginData.data.data["bearer token"]
       );
 
-      toast({
-        title: "Connexion réussie !",
-        variant: "success",
-      });
+      toast("Connexion réussie !");
     }
     if (userLoginData.isError) {
       // setDisplayError(true);
@@ -116,6 +122,7 @@ const LoginComp = () => {
               </FormItem>
             )}
           />
+          {error && <p className="text-red-400">{error}</p>}
           <div className="max-w-[290px] w-full flex flex-col gap-2 justify-center">
             <Button
               type="submit"
