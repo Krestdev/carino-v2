@@ -30,8 +30,8 @@ const Panier = ({ items }: Props) => {
   const [fees, setFees] = useState<number>(0);
 
   return cart.length > 0 ? (
-    <div className="px-7 grid grid-cols-1 md:grid-cols-2 justify-center gap-7 py-20">
-      <div className="max-w-[1440px] w-full mx-auto flex flex-col items-end gap-10">
+    <div className="grid grid-cols-1 @min-[760px]:grid-cols-2 justify-center gap-10 py-10 sm:py-14 lg:py-20">
+      <div className="w-full flex flex-col gap-10">
         <div className="flex flex-col max-w-[495px] w-full gap-6">
         {token === null && <p className="text-red-500 w-full">🚨🚨 Veuillez vous <Link href="/connexion" className="italic text-blue-500 underline">connecter</Link> pour passer une commande.</p>}
           <h3>{"Paiement"}</h3>
@@ -69,9 +69,7 @@ const Panier = ({ items }: Props) => {
       </div>
       <div className="flex flex-col gap-6 items-start justify-start max-w-[600px] w-full">
         <h3>{"Ma commande"}</h3>
-        {cart.length > 0 && (
           <Button onClick={emptyCart}>{"Vider le panier"}</Button>
-        )}
         <div className="flex flex-col gap-4 max-h-[300px] overflow-auto">
           <div className="flex flex-col gap-4">
             {items.map((item, index) => (
@@ -99,6 +97,10 @@ const Panier = ({ items }: Props) => {
                       >
                         {item.price === 0 ? "Gratuit" : XAF.format(item.price)}
                       </p>
+                      {
+                        !!item.originalPrice &&
+                        <p className="text-sm line-through text-muted-foreground">{XAF.format(item.originalPrice)}</p> 
+                      }
                     </div>
                   </div>
                   <div className="flex flex-col gap-6 items-end">
@@ -137,18 +139,18 @@ const Panier = ({ items }: Props) => {
         <div className="flex flex-col gap-3 w-full items-end">
           <div>
             <p className="text-[24px] font-normal text-end">
-              Commande:{" "}
+              {"Commande: "}
               <span className="text-[28px] font-bold">
                 {XAF.format(totalPrice())}
               </span>
             </p>
             <p className="text-[24px] font-normal text-end">
-              Frais de livraison:{" "}
+              {"Frais de livraison: "}
               <span className="text-[28px] font-bold">{XAF.format(fees)}</span>
             </p>
           </div>
           <p className="text-[24px] font-normal text-end">
-            TOTAL:{" "}
+            {"TOTAL: "}
             <span className="text-[28px] font-bold">
               {XAF.format(totalPrice() + fees)}
             </span>
@@ -157,7 +159,7 @@ const Panier = ({ items }: Props) => {
       </div>
     </div>
   ) : (
-    <div className="flex flex-col gap-6 items-center justify-center w-full h-full py-24">
+    <div className="flex flex-col gap-6 items-center justify-center w-full py-20">
       <p className="text-[32px] font-bold">{"Votre panier est vide"}</p>
       <ShoppingBasket size={48} className="text-gray-400" />
     </div>

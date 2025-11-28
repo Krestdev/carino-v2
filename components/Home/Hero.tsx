@@ -3,6 +3,7 @@ import React from "react";
 import { Button } from "../ui/button";
 import PromoMessage from "../universal/PromoMessage";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 const Hero = () => {
   const message =
@@ -33,16 +34,14 @@ const Hero = () => {
               {config.description}
             </p>
             <div className="flex flex-row gap-2">
-              <Button
-                onClick={() => router.push("/produits")}
-                className="bg-[#29235C]">{"Commander"}</Button>
-              <Button
-                className="bg-[#FFC336] text-primary "
-                variant={"outline"}
-                onClick={() => router.push("/reservation")}
-              >
-                {"Réserver une Table"}
-              </Button>
+              <Link href="/produits">
+                <Button size={"lg"}>{"Commander"}</Button>
+              </Link>
+              <Link href={"/reservation"}>
+                <Button size={"lg"} variant={"accent"}>
+                  {"Réserver une Table"}
+                </Button>
+              </Link>
             </div>
           </div>
         </div>

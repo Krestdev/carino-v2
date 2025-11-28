@@ -8,6 +8,7 @@ import PopAccount from "./Authentification/PopAccount";
 import { usePathname, useRouter } from "next/navigation";
 import useStore from "@/context/store";
 import MenuComp from "./menu";
+import { cn } from "@/lib/utils";
 
 const Header = () => {
 
@@ -16,6 +17,11 @@ const Header = () => {
   const isLogin = token !== null;
 
   const pathname = usePathname();
+  const menuLinks = [
+    { name: "Catalogue", path: "/catalogue" },
+    { name: "Tous nos produits", path: "/produits" },
+    { name: "Réserver", path: "/reservation" },
+  ];
 
   const isActiveTab = (tab: string) => {
     return pathname === tab;
@@ -35,20 +41,17 @@ const Header = () => {
               className="rounded-full w-[46.79px] h-[46.79px] md:w-[60px] md:h-[60px]"
             />
           </Link>
-          <div className="hidden md:flex flex-row items-center gap-2">
-            <Link href={"/catalogue"} className={isActiveTab("/catalogue") ? "border-b-2 border-black" : ""}>
-              <Button variant={"link"}>{"Catalogue"}</Button>
-            </Link>
-            <Link href={"/produits"} className={isActiveTab("/produits") ? "border-b-2 border-black" : ""}>
-              <Button variant={"link"}>{"Tous nos produits"}</Button>
-            </Link>
-            <Link href={"/reservation"} className={isActiveTab("/reservation") ? "border-b-2 border-black" : ""}>
-              <Button variant={"link"}>{"Réserver"}</Button>
-            </Link>
+          <div className="hidden md:flex flex-row items-center gap-0">
+            {
+              menuLinks.map((item)=>
+              <Link key={item.name} href={item.path} >
+                <Button variant={"navigation"} size={"lg"} className={cn(pathname === item.path && "font-semibold text-primary")}>{item.name}</Button>
+              </Link>)
+            }
             <Link target="_blank" href={"/telechargement/catalogue.pdf"}>
-              <Button variant={"link"}>
-                <ArrowUpRight />
+              <Button variant={"navigation"} size={"lg"}>
                 {"Carte Menu"}
+                <ArrowUpRight />
               </Button>
             </Link>
           </div>
@@ -71,13 +74,13 @@ const Header = () => {
         ) : (
           <div className="hidden md:flex flex-row gap-2 items-center">
             <PopAccount>
-              <Button variant={"outline"} className="text-black border-black h-[54px] text-[20px]">
+              <Button variant={"secondary"} size={"lg"}>
                 <LuCircleUser />
-                {"compte"}
+                {"Compte"}
               </Button>
             </PopAccount>
             <Link href={"/panier"}>
-              <Button className="bg-[#FFC336] hover:bg-[#FFC336]/90 text-black h-[54px] text-[20px]">
+              <Button variant={"accent"} size={"lg"}>
                 <ShoppingCart />
                 {"Panier"}
               </Button>

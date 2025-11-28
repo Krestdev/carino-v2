@@ -1,6 +1,90 @@
-import { cartItem } from "@/types/types";
+import { cartItem, Promotion } from "@/types/types";
 
-export function ApplyPromotion(data: cartItem[]): cartItem[] {
+export const pizzaCategoryIds = [403441, 403438, 406718, 403440];
+
+const promos: Array<Promotion> = [
+  {
+    id: "black-week",
+    name: "Black Week",
+    priority: 1,
+    combinable: true,
+    isActive: () => {
+      const now = new Date();
+      const start = new Date(2025, 10, 28); // 28 Nov 2025
+      const end = new Date(2025, 11, 7);   // 7 Dec 2025
+      const hourStart = 13; // 13h
+      const hourEnd = 16;   // 16h
+      return (
+        now >= start &&
+        now <= end &&
+        now.getHours() >= hourStart &&
+        now.getHours() < hourEnd
+      );
+    },
+    apply: (cart: cartItem[]) => {
+      const MULTIPLIER = 0.75; // 25% de réduction => prix * 0.75
+
+      // 1) On compte le nombre total de pizzas
+      const totalPizzaQty = cart.reduce((sum, item) => {
+        const isPizza = item.cat.some((cat) =>
+          pizzaCategoryIds.includes(cat.id)
+        );
+        return sum + (isPizza ? item.qte : 0);
+      }, 0);
+
+      // 2) Si moins de 2 pizzas -> on remet les prix d’origine
+      if (totalPizzaQty < 2) {
+        return cart.map((item) => {
+          const isPizza = item.cat.some((cat) =>
+            pizzaCategoryIds.includes(cat.id)
+          );
+
+          // Si ce n'est pas une pizza ou qu'on n'a pas d'originalPrice, on ne touche à rien
+          if (!isPizza || item.originalPrice === undefined) return item;
+
+          return {
+            ...item,
+            price: item.originalPrice,
+            originalPrice: undefined, // on peut la virer pour éviter la confusion
+          };
+        });
+      }
+
+      // 3) Sinon, on applique la réduction sur les pizzas
+      return cart.map((item) => {
+        const isPizza = item.cat.some((cat) =>
+          pizzaCategoryIds.includes(cat.id)
+        );
+        if (!isPizza) return item;
+
+        const basePrice = item.originalPrice ?? item.price;
+        const newPrice = Math.ceil(basePrice * MULTIPLIER);
+
+        return {
+          ...item,
+          price: newPrice,
+          originalPrice: basePrice,
+        };
+      });
+    },
+  },
+];
+
+
+export function ApplyPromotions(data: cartItem[]): cartItem[] {
+  const promotions:Array<Promotion> = promos;
+  const sorted = promotions
+    .filter((p) => p.isActive())
+    .sort((a, b) => a.priority - b.priority);
+
+  // Pour l’instant on les applique toutes en chaîne.
+  // Tu pourras ensuite affiner les règles de combinabilité si besoin.
+  return sorted.reduce((currentCart, promo) => promo.apply(currentCart), data);
+}
+
+
+
+/* export function ApplyPromotion(data: cartItem[]): cartItem[]{
   const today = new Date();
   const startDate = new Date(today.getFullYear(), 6, 10);
   const endDate = new Date(today.getFullYear(), 8, 5);
@@ -41,82 +125,7 @@ export function ApplyPromotion(data: cartItem[]): cartItem[] {
   }
 
   return data;
-}
-
-export function SendWithPromotion(data: cartItem[]): cartItem[] {
-  const result = [...data];
-  const today = new Date();
-  const startDate = new Date(today.getFullYear(), 6, 10);
-  const endDate = new Date(today.getFullYear(), 8, 5);
-
-  const includedCategoryIds = [403441, 403438, 406718, 403440];
-
-  if (today >= startDate && today <= endDate) {
-    const eligibleItems = data.filter((item) =>
-      item.cat.some((cat) => includedCategoryIds.includes(cat.id))
-    );
-
-    const freePizza = Math.floor(
-      eligibleItems.reduce((acc, item) => acc + item.qte, 0) / 2
-    );
-
-    if (freePizza === 0) return result;
-
-    const pizzaArray = Array.from({ length: freePizza }, () => ({
-      id: "1745383",
-      qte: 1,
-      nom: "NAPOLETANA",
-      itemId: 1739530998442,
-      options: [],
-      price: 0,
-      image: "https://media.zelty.fr/images/2221/6100/5bd21.jpg",
-      cat: [
-        {
-          name: "Les Classiques Indémodables",
-          id: 403441,
-          id_zelty: "6100",
-          id_parent: 253199,
-        },
-      ],
-    }));
-
-    return [...result, ...pizzaArray];
-  }
-
-  return result;
-}
-
-export function deliveryPromotion(
-  data: cartItem[],
-  fees: number,
-  address: string
-): number {
-  const today = new Date();
-  const startDate = new Date(today.getFullYear(), 6, 10);
-  const endDate = new Date(today.getFullYear(), 8, 5);
-
-  const includedCategoryIds = [403441, 403438, 406718, 403440];
-
-  if (today >= startDate && today <= endDate) {
-    const eligibleItems = data.filter((item) =>
-      item.cat.some((cat) => includedCategoryIds.includes(cat.id))
-    );
-
-    const freePizza = Math.floor(
-      eligibleItems.reduce((acc, item) => acc + item.qte, 0) / 2
-    );
-
-    if (freePizza < 1) return fees;
-
-    if (freePizza >= 2 && !address.toLowerCase().startsWith("bonabe")) {
-      return 0;
-    }
-
-    return fees;
-  }
-
-  return fees;
-}
+} */
 
 export function sendPackPromotion(data: cartItem[]): cartItem[] {
   const result = [...data];

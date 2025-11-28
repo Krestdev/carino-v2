@@ -30,7 +30,7 @@ import {
   SelectValue,
 } from "../ui/select";
 import { toast } from "../ui/use-toast";
-import { ApplyPromotion, sendPackPromotion } from "../universal/promotions";
+import { ApplyPromotions } from "../universal/promotions";
 
 const formSchema = z
   .object({
@@ -174,7 +174,7 @@ const TakeawayForm = ({
           phone: values.phoneNumber,
           total_amount: totalPrice() + fees,
           user: user.id,
-          commande: sendPackPromotion(ApplyPromotion(cart)),
+          commande: ApplyPromotions(cart),
           due_date: dueDate.toISOString(),
         });
         //receipt here !
@@ -252,7 +252,7 @@ const TakeawayForm = ({
           // className="grid gap-y-7 gap-x-2 grid-cols-1 md:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2 max-w-2xl items-baseline"
           className="flex flex-col gap-10 w-full items-end"
         >
-          <div className="grid grid-cols-2 gap-4 max-w-[495px] w-full">
+          <div className="w-full grid grid-cols-1 @min-[460px]:grid-cols-2 gap-4">
             <FormField
               control={form.control}
               name="takeDate"
@@ -265,7 +265,7 @@ const TakeawayForm = ({
                         <Button
                           variant={"outline"}
                           className={cn(
-                            "w-full pl-3 h-10 text-left font-normal normal-case tracking-normal border-input hover:bg-input text-current bg-background",
+                            "w-full pl-3 h-10 rounded-md text-left font-normal normal-case tracking-normal border-input hover:bg-input text-current bg-background",
                             !field.value && "text-muted-foreground"
                           )}
                         >
