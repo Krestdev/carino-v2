@@ -24,7 +24,7 @@ import { toast } from "@/components/ui/use-toast";
 import { Minus, Plus } from "lucide-react";
 import useStore from "@/context/store";
 import { useEffect, useState } from "react";
-import { cartItemOption, otherOption } from "@/types/types";
+import { cartItemOption, otherOption, ProductsData } from "@/types/types";
 import { Label } from "@radix-ui/react-label";
 import Link from "next/link";
 //import Image from "next/image";
@@ -146,51 +146,61 @@ function EditProductDialog({
   const { baseURL } = useAppContext();
 
   const [open, setOpen] = useState(false);
-  const products = new ProductQuery(baseURL);
-  const productData = useQuery({
+  const productQuery = new ProductQuery(baseURL);
+  const [currentProduct, setCurrentProduct] = useState<ProductsData>();
+    const {data, isSuccess, isLoading} = useQuery({
+      queryKey: ["productFetchAll"],
+      queryFn: () => productQuery.getAllProducts(),
+    });
+  /* const productData = useQuery({
     queryKey: ["produit", nom],
     queryFn: () => products.getProductByName(nom),
     enabled: nom ? true : false,
   });
-
-  const accompagnements = productData.isSuccess
-    ? productData.data.data[0].options.filter(
+ */
+useEffect(()=>{
+  if(!!isSuccess && !!data){
+    setCurrentProduct(data.data.find(x=>x.name.toLocaleLowerCase() === nom.toLocaleLowerCase()))
+  }
+},[isSuccess,data]);
+  const accompagnements = isSuccess && !!currentProduct
+    ? currentProduct.options.filter(
         (option) => option.name.toLocaleLowerCase() === "accompagnement"
       )
     : [];
 
-  const suppSauce = productData.isSuccess
-    ? productData.data.data[0].options.filter(
+  const suppSauce = isSuccess && !!currentProduct
+    ? currentProduct.options.filter(
         (option) => option.name.toLocaleLowerCase() === "supplément sauces"
       )
     : [];
-  const cuissonPates = productData.isSuccess
-    ? productData.data.data[0].options.filter(
+  const cuissonPates = isSuccess && !!currentProduct
+    ? currentProduct.options.filter(
         (option) => option.name.toLocaleLowerCase() === "cuisson pates"
       )
     : [];
-  const typePates = productData.isSuccess
-    ? productData.data.data[0].options.filter(
+  const typePates = isSuccess && !!currentProduct
+    ? currentProduct.options.filter(
         (option) => option.name.toLocaleLowerCase() === "types de pâtes"
       )
     : [];
-  const sauces = productData.isSuccess
-    ? productData.data.data[0].options.filter(
+  const sauces = isSuccess && !!currentProduct
+    ? currentProduct.options.filter(
         (option) => option.name.toLocaleLowerCase() === "sauces"
       )
     : [];
-  const cuissonViande = productData.isSuccess
-    ? productData.data.data[0].options.filter(
+  const cuissonViande = isSuccess && !!currentProduct
+    ? currentProduct.options.filter(
         (option) => option.name.toLocaleLowerCase() === "cuisson viande"
       )
     : [];
-  const flavors = productData.isSuccess
-    ? productData.data.data[0].options.filter(
+  const flavors = isSuccess && !!currentProduct
+    ? currentProduct.options.filter(
         (option) => option.name.toLocaleLowerCase() === "saveurs"
       )
     : [];
-  const supplements = productData.isSuccess
-    ? productData.data.data[0].options
+  const supplements = isSuccess && !!currentProduct
+    ? currentProduct.options
         .map((option) => ({
           name: option.name,
           id_zelty: option.id_zelty,
@@ -263,7 +273,7 @@ function EditProductDialog({
     },
   });
 
-  const price = productData.isSuccess ? productData.data.data[0].price : 0;
+  const price = isSuccess && !!currentProduct ? currentProduct.price : 0;
 
   // const getTotal = (val: otherOption[]) => {
   //   let total = price;
@@ -389,10 +399,10 @@ function EditProductDialog({
             <span className="px-4 text-white">{nom}</span>
           </DialogTitle>
         </DialogHeader>
-        {productData.isLoading ? (
+        {isLoading ? (
           <div className="py-3 px-4">Chargement...</div>
         ) : (
-          productData.isSuccess && (
+          isSuccess && (
             <Form {...form}>
               <form
                 onSubmit={form.handleSubmit(onSubmit)}
