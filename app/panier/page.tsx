@@ -12,20 +12,8 @@ import { useEffect, useState } from 'react';
 import Loading from '../loading';
 
 const Page = () => {
-  const { cart } = useStore();
-  const [cartItems, setCartItems] = useState<cartItem[]>(cart);
+  const cart = useStore((s)=>s.cartWithPromo());
   const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    setCartItems(ApplyPromotions(cart))
-    setIsLoading(false);
-  }, [cart]);
-
-  if (isLoading) {
-    return (
-      <Loading />
-    );
-  }
 
   return (
     <div>
@@ -34,7 +22,7 @@ const Page = () => {
           <Link className='mt-8' href={"/produits"}>
             <Button size={"lg"}><ArrowLeft />{"Continuer mes achats"}</Button>
           </Link>
-        <Panier items={cartItems} />
+        <Panier items={cart} />
       </div>
     </div>
   )

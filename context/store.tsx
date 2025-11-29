@@ -1,3 +1,4 @@
+import { ApplyPromotions } from "@/components/universal/promotions";
 import { cartItem, ReceiptProps, User } from "@/types/types";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
@@ -15,6 +16,7 @@ type Store = {
   transactionRef: string | null;
   receiptData: ReceiptProps | null;
   isFirstOrder: boolean;
+  isHydrated: boolean;
 };
 
 type Actions = {
@@ -28,6 +30,8 @@ type Actions = {
   setFees: (fees?: number) => void;
   setTransaction: (refString: string | null) => void;
   setReceiptData: (data?: ReceiptProps) => void;
+  setIsHydrated: (v: boolean) => void;
+  cartWithPromo: ()=>Array<cartItem>;
 };
 
 const initialState: Store = {
@@ -38,6 +42,7 @@ const initialState: Store = {
   DeliveryFees: 0,
   transactionRef: "",
   isFirstOrder: true,
+  isHydrated: false,
 };
 
 const useStore = create<Store & Actions>()(
@@ -95,11 +100,27 @@ const useStore = create<Store & Actions>()(
           }
         }
       },
+      setIsHydrated: (v) => set({ isHydrated: v }),
+      cartWithPromo: ()=>{
+        const baseCart = get().cart;
+        return ApplyPromotions(baseCart);
+      },
       setTransaction: (refString) => set({ transactionRef: refString }),
       setReceiptData: (data) =>
         data ? set({ receiptData: data }) : set({ receiptData: null }),
     }),
-    { name: "cartStore" }
+    { name: "cartStore",
+      onRehydrateStorage: () => (state, error) => {
+        if (error) {
+          console.error("Erreur rehydrate cartStore", error);
+          return;
+        }
+        if (state) {
+          // ✅ on modifie directement la propriété dans l'objet de state
+          state.isHydrated = true;
+        }
+      },
+     }
   )
 );
 

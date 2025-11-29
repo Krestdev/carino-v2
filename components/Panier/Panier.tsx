@@ -18,26 +18,31 @@ import useStore from "@/context/store";
 import EditProductDialog from "@/app/panier/editProductDialog";
 import { ShoppingBasket } from "lucide-react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { CartTotal } from "@/lib/utils";
 
 interface Props {
   items: cartItem[];
 }
 
+type deliveryMode = "takeAway" | "delivery";
+
 const Panier = ({ items }: Props) => {
-  const { totalPrice, cart, removeFromCart, emptyCart, token } = useStore();
-  const [deliveryMode, setDeliveryMode] = useState<string>("");
+  const { removeFromCart, emptyCart, token } = useStore();
+  const [deliveryMode, setDeliveryMode] = useState<deliveryMode>("delivery");
   const [postOrderStatus, setPostOrderStatus] = useState<boolean>(false);
   const [fees, setFees] = useState<number>(0);
+  const pathname = usePathname();
 
-  return cart.length > 0 ? (
+  return items.length > 0 ? (
     <div className="grid grid-cols-1 @min-[760px]:grid-cols-2 justify-center gap-10 py-10 sm:py-14 lg:py-20">
       <div className="w-full flex flex-col gap-10">
         <div className="flex flex-col max-w-[495px] w-full gap-6">
-        {token === null && <p className="text-red-500 w-full">🚨🚨 Veuillez vous <Link href="/connexion" className="italic text-blue-500 underline">connecter</Link> pour passer une commande.</p>}
+        {token === null && <p className="text-red-500 w-full">🚨🚨 Veuillez vous <Link href={`/connexion?redirect=${encodeURIComponent(pathname)}`} className="italic text-blue-500 underline">{"connecter"}</Link> pour passer une commande.</p>}
           <h3>{"Paiement"}</h3>
           <div className="flex flex-col gap-2">
             <label className="text-sm font-medium">{"Mode de livraison"}</label>
-            <Select onValueChange={setDeliveryMode}>
+            <Select value={deliveryMode} onValueChange={(e:deliveryMode)=>setDeliveryMode(e)}>
               <SelectTrigger className="w-full h-[60px]">
                 <SelectValue placeholder="Selectionner un mode" />
               </SelectTrigger>
@@ -45,7 +50,7 @@ const Panier = ({ items }: Props) => {
                 <SelectItem value="takeAway">
                   <NewTag endNew={new Date(2025, 2, 31)}>{"À Emporter"}</NewTag>
                 </SelectItem>
-                <SelectItem value="homeDelivery">
+                <SelectItem value="delivery">
                   {"Livraison à domicile"}
                 </SelectItem>
               </SelectContent>
@@ -141,7 +146,7 @@ const Panier = ({ items }: Props) => {
             <p className="text-[24px] font-normal text-end">
               {"Commande: "}
               <span className="text-[28px] font-bold">
-                {XAF.format(totalPrice())}
+                {XAF.format(CartTotal(items))}
               </span>
             </p>
             <p className="text-[24px] font-normal text-end">
@@ -152,7 +157,7 @@ const Panier = ({ items }: Props) => {
           <p className="text-[24px] font-normal text-end">
             {"TOTAL: "}
             <span className="text-[28px] font-bold">
-              {XAF.format(totalPrice() + fees)}
+              {XAF.format(CartTotal(items) + fees)}
             </span>
           </p>
         </div>

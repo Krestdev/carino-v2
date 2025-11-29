@@ -1,4 +1,4 @@
-import { Item } from "@/types/types";
+import { cartItem, Item } from "@/types/types";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 
@@ -110,4 +110,9 @@ export function normalizeText(text: string): string {
   const cleaned = text.trim().toLowerCase();
   if (!cleaned) return "";
   return cleaned.charAt(0).toUpperCase() + cleaned.slice(1);
+}
+
+export function CartTotal(cart: Array<cartItem>):number{
+  return cart.reduce((accumulator, item) => accumulator + item.price * item.qte,
+          0)
 }

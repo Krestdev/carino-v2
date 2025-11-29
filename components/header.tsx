@@ -13,8 +13,7 @@ import { cn } from "@/lib/utils";
 const Header = () => {
 
   const router = useRouter();
-  const { token } = useStore();
-  const isLogin = token !== null;
+  const { token, cart } = useStore();
 
   const pathname = usePathname();
   const menuLinks = [
@@ -22,10 +21,6 @@ const Header = () => {
     { name: "Tous nos produits", path: "/produits" },
     { name: "Réserver", path: "/reservation" },
   ];
-
-  const isActiveTab = (tab: string) => {
-    return pathname === tab;
-  };
 
   return (
     <div className="sticky top-0 z-50 mx-3">
@@ -56,37 +51,33 @@ const Header = () => {
             </Link>
           </div>
         </div>
-        {!isLogin ? (
-          <div className="hidden md:flex flex-row gap-2 items-center">
-            <Link href={"/connexion"}>
-              <Button variant={"link"}>{"Connexion"}</Button>
-            </Link>
-            <Link href={"/inscription"}>
-              <Button variant={"link"}>{"Inscription"}</Button>
-            </Link>
-            <Link href={"/panier"}>
-              <Button className="bg-[#FFC336] hover:bg-[#FFC336]/90 text-black h-[54px] text-[20px]">
-                <ShoppingCart />
-                {"Panier"}
-              </Button>
-            </Link>
-          </div>
-        ) : (
-          <div className="hidden md:flex flex-row gap-2 items-center">
+        <div className="hidden md:flex flex-row gap-2 items-center">
+          {
+            !!token ?
             <PopAccount>
               <Button variant={"secondary"} size={"lg"}>
                 <LuCircleUser />
                 {"Compte"}
               </Button>
             </PopAccount>
-            <Link href={"/panier"}>
+            :
+            <>
+            <Link href={"/connexion"}>
+              <Button variant={"navigation"} size={"lg"}>{"Connexion"}</Button>
+            </Link>
+            <Link href={"/inscription"}>
+              <Button variant={"navigation"} size={"lg"}>{"Inscription"}</Button>
+            </Link>
+            </>
+          }
+          <Link href={"/panier"}>
               <Button variant={"accent"} size={"lg"}>
                 <ShoppingCart />
                 {"Panier"}
+                { cart.length > 0 && <span className="min-w-6 min-h-6 px-1.5 rounded-sm bg-white text-primary flex items-center justify-center">{cart.length}</span> }
               </Button>
             </Link>
-          </div>
-        )}
+        </div>
         <div className="md:hidden flex gap-2">
           <MenuComp>
             <Button variant={"outline"}>

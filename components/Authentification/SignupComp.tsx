@@ -1,6 +1,5 @@
 "use client";
 
-import useStore from "@/context/store";
 import { useAppContext } from "@/providers/appContext";
 import UserQuery from "@/queries/userQueries";
 import { UserRegistration } from "@/types/types";
@@ -49,7 +48,6 @@ const SignupComp = () => {
   const { baseURL } = useAppContext();
   const userQuery = new UserQuery(baseURL);
   // const [displayError, setDisplayError] = useState(false);
-  const { token } = useStore();
   const { mutate, isError, isSuccess, error, isPending } = useMutation({
     mutationFn: ({
       email,
@@ -103,10 +101,6 @@ const SignupComp = () => {
       // setDisplayError(true);
     }
   }, [isSuccess, isError]);
-
-  if (token) {
-    redirect("/");
-  }
 
   return (
     <div className="border border-[#848484] px-[32px] py-8 flex flex-col items-center gap-[60px]">

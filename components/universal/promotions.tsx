@@ -2,7 +2,7 @@ import { cartItem, Promotion } from "@/types/types";
 
 export const pizzaCategoryIds = [403441, 403438, 406718, 403440];
 
-const promos: Array<Promotion> = [
+export const promos: Array<Promotion> = [
   {
     id: "black-week",
     name: "Black Week",
@@ -12,7 +12,7 @@ const promos: Array<Promotion> = [
       const now = new Date();
       const start = new Date(2025, 10, 28); // 28 Nov 2025
       const end = new Date(2025, 11, 7);   // 7 Dec 2025
-      const hourStart = 13; // 13h
+      const hourStart = 6; // 13h
       const hourEnd = 16;   // 16h
       return (
         now >= start &&

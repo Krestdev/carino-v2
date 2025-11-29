@@ -208,7 +208,7 @@ const DelieveryForm = ({
               name="district"
               render={({ field }) => (
                 <FormItem className="flex flex-col gap-1 w-full">
-                  <FormLabel className="customFormLabel">
+                  <FormLabel isRequired className="customFormLabel">
                     {"Quartier"}
                   </FormLabel>
                   <Popover open={viewAddresses} onOpenChange={setViewAddresses}>
@@ -293,7 +293,7 @@ const DelieveryForm = ({
             render={({ field }) => (
               <FormItem className="max-w-[495px] w-full">
                 <FormLabel className="customFormLabel">
-                  {"Operateur de Paiement"}
+                  {"Opérateur de Paiement"}
                 </FormLabel>
                 <Select
                   onValueChange={field.onChange}
@@ -318,8 +318,8 @@ const DelieveryForm = ({
               name="phoneNumber"
               render={({ field }) => (
                 <FormItem className="flex flex-col gap-1 w-full">
-                  <FormLabel className="customFormLabel">
-                    {"Numéro de payement"}
+                  <FormLabel isRequired className="customFormLabel">
+                    {"Numéro de paiement"}
                   </FormLabel>
                   <FormControl>
                     <Input
@@ -337,7 +337,7 @@ const DelieveryForm = ({
               name="deliveryNumber"
               render={({ field }) => (
                 <FormItem className="flex flex-col gap-1 w-full">
-                  <FormLabel className="customFormLabel">
+                  <FormLabel isRequired className="customFormLabel">
                     {"Numéro à appeler"}
                   </FormLabel>
                   <FormControl>
