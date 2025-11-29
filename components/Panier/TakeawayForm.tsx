@@ -1,8 +1,8 @@
 import useStore from "@/context/store";
-import { cn, isDeliveryOpen } from "@/lib/utils";
+import { CartTotal, cn, isDeliveryOpen } from "@/lib/utils";
 import { useAppContext } from "@/providers/appContext";
 import UserQuery from "@/queries/userQueries";
-import { Order, OrderTypeProps } from "@/types/types";
+import { cartItem, Order, OrderTypeProps } from "@/types/types";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
 import { CalendarIcon } from "lucide-react";
@@ -75,8 +75,9 @@ const formSchema = z
           );
         },
         {
-          message: `Uniquement entre ${process.env.NEXT_PUBLIC_OPENTIME || "11:00"
-            } et ${process.env.NEXT_PUBLIC_CLOSETIME || "22:00"}`,
+          message: `Uniquement entre ${
+            process.env.NEXT_PUBLIC_OPENTIME || "11:00"
+          } et ${process.env.NEXT_PUBLIC_CLOSETIME || "22:00"}`,
         }
       ),
   })
@@ -108,17 +109,15 @@ const TakeawayForm = ({
   fees,
   setFees,
   setPostOrderStatus,
-}: OrderTypeProps) => {
+  cart
+}: OrderTypeProps&{cart:Array<cartItem>}) => {
   const router = useRouter();
   // const axiosClient = axiosConfig();
-  const {
-    cart,
-    totalPrice,
-    user,
-    setTransaction,
-    transactionRef,
-    setReceiptData,
-  } = useStore();
+  //const { cart, user, setTransaction, transactionRef, setReceiptData } = useStore();
+  const user = useStore(s=>s.user);
+  const setTransaction = useStore(s=>s.setTransaction);
+  const transactionRef = useStore(s=>s.transactionRef);
+  const setReceiptData = useStore(s=>s.setReceiptData);
 
   const { baseURL } = useAppContext();
 
@@ -172,7 +171,7 @@ const TakeawayForm = ({
       if (isDeliveryOpen()) {
         postOrder.mutate({
           phone: values.phoneNumber,
-          total_amount: totalPrice() + fees,
+          total_amount: CartTotal(cart),
           user: user.id,
           commande: ApplyPromotions(cart),
           due_date: dueDate.toISOString(),
@@ -188,7 +187,8 @@ const TakeawayForm = ({
       } else {
         toast({
           title: "Livraison  fermée.",
-          description: "La livraison est disponible uniquement entre 10h30 et 20h30.",
+          description:
+            "La livraison est disponible uniquement entre 10h30 et 20h30.",
           variant: "info",
         });
       }
@@ -229,10 +229,8 @@ const TakeawayForm = ({
   ]);
 
   function isDisable() {
-
     if (
-      cart.length === 0
-      ||
+      cart.length === 0 ||
       // totalPrice() + fees <
       // Number(process.env.NEXT_PUBLIC_MINIMUM_AMOUNT || 4999) ||
       postOrder.isPending ||
@@ -389,10 +387,20 @@ const TakeawayForm = ({
               <Button type="submit" disabled={isDisable()} className="h-[54px]">
                 {"Proceder au paiement"}
               </Button>
-              <img src="/images/momo.webp" alt="" className="w-[54px] h-[54px]" />
+              <img
+                src="/images/momo.webp"
+                alt=""
+                className="w-[54px] h-[54px]"
+              />
               <img src="/images/om.webp" alt="" className="w-[54px] h-[54px]" />
             </div>
-            {totalPrice() < 5000 && <p className="text-[14px] text-red-500">{"Le montant minimum pour soumettre une commande est de 5000 Fcfa"}</p>}
+            {CartTotal(cart) < 5000 && (
+              <p className="text-[14px] text-red-500">
+                {
+                  "Le montant minimum pour soumettre une commande est de 5000 Fcfa"
+                }
+              </p>
+            )}
           </div>
         </form>
       </Form>

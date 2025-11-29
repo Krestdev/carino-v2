@@ -26,7 +26,6 @@ type Actions = {
   emptyCart: () => void;
   login: (user: User, token: string) => void;
   logout: () => void;
-  totalPrice: () => number;
   setFees: (fees?: number) => void;
   setTransaction: (refString: string | null) => void;
   setReceiptData: (data?: ReceiptProps) => void;
@@ -86,11 +85,6 @@ const useStore = create<Store & Actions>()(
         set({ user: user, token: token, isFirstOrder: user.isFirstOrder }),
       logout: () => set(initialState),
       setToken: (token: string) => set({ token }),
-      totalPrice: () =>
-        get().cart.reduce(
-          (accumulator, item) => accumulator + item.price * item.qte,
-          0
-        ),
       setFees: (fees) => {
         if (!fees) {
           set({ DeliveryFees: 0 });

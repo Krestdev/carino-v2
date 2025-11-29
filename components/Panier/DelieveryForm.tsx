@@ -1,9 +1,10 @@
+import { ApplyDeliveryPromo } from "@/app/panier/fees-promotion";
 import useStore from "@/context/store";
-import { cn, isDeliveryOpen } from "@/lib/utils";
+import { CartTotal, cn, isDeliveryOpen } from "@/lib/utils";
 import { useAppContext } from "@/providers/appContext";
 import TownQuery from "@/queries/townQuery";
 import UserQuery from "@/queries/userQueries";
-import { City, Order, OrderTypeProps } from "@/types/types";
+import { cartItem, City, Order, OrderTypeProps } from "@/types/types";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { Check, ChevronsUpDown } from "lucide-react";
@@ -37,7 +38,6 @@ import {
   SelectValue,
 } from "../ui/select";
 import { toast } from "../ui/use-toast";
-import { ApplyDeliveryPromo } from "@/app/panier/fees-promotion";
 
 const formSchema = z.object({
   city: z.string().min(3, { message: "Selectionnez une ville" }),
@@ -56,28 +56,19 @@ const DelieveryForm = ({
   fees,
   setFees,
   setPostOrderStatus,
-}: OrderTypeProps) => {
+  cart,
+}: OrderTypeProps&{cart:Array<cartItem>}) => {
   const router = useRouter();
-  const {
-    cart,
-    totalPrice,
-    user,
-    setTransaction,
-    transactionRef,
-    setReceiptData,
-  } = useStore();
+  //store
+  const user = useStore(s=> s.user);
+  const setTransaction = useStore(s=>s.setTransaction);
+  const transactionRef = useStore(s=>s.transactionRef);
+  const setReceiptData = useStore(s=>s.setReceiptData);
+  //end Store
 
-  const [cartIsEmpty, setCartIsEmpty] = useState(true);
   const [addresses, setAddresses] = useState<City[]>([]);
   const [viewAddresses, setViewAddresses] = useState(false);
 
-  useEffect(() => {
-    if (cart.length > 0) {
-      setCartIsEmpty(false);
-    } else {
-      setCartIsEmpty(true);
-    }
-  }, [cart]);
 
   const { baseURL } = useAppContext();
 
@@ -114,13 +105,16 @@ const DelieveryForm = ({
   });
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    const realFees = Number(addresses.find(x=>x.quartier === values.district)?.prix ?? "0");
+    const realFees = Number(
+      addresses.find((x) => x.quartier === values.district)?.prix ?? "0"
+    );
     setFees(ApplyDeliveryPromo(realFees, values.district, cart));
     if (user !== null) {
       if (isDeliveryOpen()) {
         postOrder.mutate({
           phone: values.phoneNumber,
-          total_amount: totalPrice() + ApplyDeliveryPromo(realFees, values.district, cart),
+          total_amount:
+            CartTotal(cart) + ApplyDeliveryPromo(realFees, values.district, cart),
           user: user.id,
           Address: values.city,
           commande: cart,
@@ -137,7 +131,6 @@ const DelieveryForm = ({
             city: "yaounde",
           },
           client_mail: user.email,
-
         });
       } else {
         toast({
@@ -182,9 +175,9 @@ const DelieveryForm = ({
 
   function isDisable() {
     if (
-      cartIsEmpty ||
-      totalPrice() + fees <
-      Number(process.env.NEXT_PUBLIC_MINIMUM_AMOUNT || 4999) ||
+      cart.length === 0 ||
+      CartTotal(cart) + fees <
+        Number(process.env.NEXT_PUBLIC_MINIMUM_AMOUNT || 4999) ||
       postOrder.isPending ||
       !!transactionRef
     ) {
@@ -217,14 +210,17 @@ const DelieveryForm = ({
                         <Button
                           variant="outline"
                           role="combobox"
-                          className={cn("rounded-md border-input justify-between",
-                            !field.value ? "text-muted-foreground" : "text-slate-900"
+                          className={cn(
+                            "rounded-md border-input justify-between",
+                            !field.value
+                              ? "text-muted-foreground"
+                              : "text-slate-900"
                           )}
                         >
                           {field.value
                             ? addresses.find(
-                              (item) => item.quartier === field.value
-                            )?.quartier
+                                (item) => item.quartier === field.value
+                              )?.quartier
                             : "Choisissez un quartier"}
                           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                         </Button>
@@ -242,7 +238,13 @@ const DelieveryForm = ({
                                 key={id}
                                 onSelect={() => {
                                   form.setValue("district", item.quartier);
-                                  setFees(ApplyDeliveryPromo(Number(item.prix), item.quartier, cart));
+                                  setFees(
+                                    ApplyDeliveryPromo(
+                                      Number(item.prix),
+                                      item.quartier,
+                                      cart
+                                    )
+                                  );
                                   setViewAddresses(false);
                                 }}
                                 className="capitalize"
@@ -355,14 +357,28 @@ const DelieveryForm = ({
           <div className="flex flex-col gap-2 items-end">
             <div className="flex gap-2 items-center flex-wrap">
               <span className="inline-flex">
-                <img src="/images/momo.webp" alt="mobile money" className="size-10" />
-                <img src="/images/om.webp" alt="orange money" className="size-10" />
+                <img
+                  src="/images/momo.webp"
+                  alt="mobile money"
+                  className="size-10"
+                />
+                <img
+                  src="/images/om.webp"
+                  alt="orange money"
+                  className="size-10"
+                />
               </span>
               <Button disabled={isDisable()} size={"lg"} type="submit">
                 {"Procéder au paiement"}
               </Button>
             </div>
-            {totalPrice() < 5000 && <p className="text-[14px] text-red-500">{"Le montant minimum pour soumettre une commande est de 5000 Fcfa"}</p>}
+            {CartTotal(cart) < 5000 && (
+              <p className="text-[14px] text-red-500">
+                {
+                  "Le montant minimum pour soumettre une commande est de 5000 Fcfa"
+                }
+              </p>
+            )}
           </div>
         </form>
       </Form>

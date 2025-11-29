@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { cartItem } from "@/types/types";
-import React, { useState } from "react";
+import EditProductDialog from "@/app/panier/editProductDialog";
 import {
   Select,
   SelectContent,
@@ -8,33 +7,43 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import NewTag from "../newTag";
-import DelieveryForm from "./DelieveryForm";
-import TakeawayForm from "./TakeawayForm";
-import { Button } from "../ui/button";
-import { LuX } from "react-icons/lu";
-import { XAF } from "@/lib/functions";
 import useStore from "@/context/store";
-import EditProductDialog from "@/app/panier/editProductDialog";
+import { XAF } from "@/lib/functions";
+import { CartTotal } from "@/lib/utils";
 import { ShoppingBasket } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { CartTotal } from "@/lib/utils";
+import { useEffect, useMemo, useState } from "react";
+import { LuX } from "react-icons/lu";
+import NewTag from "../newTag";
+import { Button } from "../ui/button";
+import DelieveryForm from "./DelieveryForm";
+import TakeawayForm from "./TakeawayForm";
+import { ApplyPromotions } from "../universal/promotions";
+import { cartItem } from "@/types/types";
 
-interface Props {
-  items: cartItem[];
-}
 
 type deliveryMode = "takeAway" | "delivery";
 
-const Panier = ({ items }: Props) => {
-  const { removeFromCart, emptyCart, token } = useStore();
+const Panier = () => {
+  //const { removeFromCart, emptyCart, token } = useStore();
+  const removeFromCart = useStore(s=> s.removeFromCart);
+  const token = useStore(s=> s.token);
+  const emptyCart = useStore(s=>s.emptyCart);
+  const baseCart = useStore(s=>s.cart);
+  const [cart, setCart] = useState<Array<cartItem>>([]);
   const [deliveryMode, setDeliveryMode] = useState<deliveryMode>("delivery");
   const [postOrderStatus, setPostOrderStatus] = useState<boolean>(false);
   const [fees, setFees] = useState<number>(0);
   const pathname = usePathname();
 
-  return items.length > 0 ? (
+  useEffect(()=>{
+    if(baseCart){
+      setCart(ApplyPromotions(baseCart));
+    }
+  },[baseCart]);
+
+  return cart.length > 0 ? (
     <div className="grid grid-cols-1 @min-[760px]:grid-cols-2 justify-center gap-10 py-10 sm:py-14 lg:py-20">
       <div className="w-full flex flex-col gap-10">
         <div className="flex flex-col max-w-[495px] w-full gap-6">
@@ -62,12 +71,14 @@ const Panier = ({ items }: Props) => {
             fees={fees}
             setFees={setFees}
             setPostOrderStatus={setPostOrderStatus}
+            cart={cart}
           />
         ) : (
           <DelieveryForm
             fees={fees}
             setFees={setFees}
             setPostOrderStatus={setPostOrderStatus}
+            cart={cart}
           />
         )}
         
@@ -77,7 +88,7 @@ const Panier = ({ items }: Props) => {
           <Button onClick={emptyCart}>{"Vider le panier"}</Button>
         <div className="flex flex-col gap-4 max-h-[300px] overflow-auto">
           <div className="flex flex-col gap-4">
-            {items.map((item, index) => (
+            {cart.map((item, index) => (
               <div
                 key={index}
                 className={`flex flex-row gap-6 items-center justify-between w-full px-7 py-5 rounded-[20px] ${index % 2 === 0 && item.price !== 0
@@ -146,18 +157,20 @@ const Panier = ({ items }: Props) => {
             <p className="text-[24px] font-normal text-end">
               {"Commande: "}
               <span className="text-[28px] font-bold">
-                {XAF.format(CartTotal(items))}
+                {XAF.format(CartTotal(cart))}
               </span>
             </p>
-            <p className="text-[24px] font-normal text-end">
+            {
+              deliveryMode === "delivery" &&
+              <p className="text-[24px] font-normal text-end">
               {"Frais de livraison: "}
               <span className="text-[28px] font-bold">{XAF.format(fees)}</span>
-            </p>
+            </p>}
           </div>
           <p className="text-[24px] font-normal text-end">
             {"TOTAL: "}
             <span className="text-[28px] font-bold">
-              {XAF.format(CartTotal(items) + fees)}
+              {XAF.format(CartTotal(cart) + fees)}
             </span>
           </p>
         </div>
