@@ -36,7 +36,7 @@ const Header = () => {
               className="rounded-full w-[46.79px] h-[46.79px] md:w-[60px] md:h-[60px]"
             />
           </Link>
-          <div className="hidden md:flex flex-row items-center gap-0">
+          <div className="hidden lg:flex flex-row items-center gap-0">
             {
               menuLinks.map((item)=>
               <Link key={item.name} href={item.path} >
@@ -51,7 +51,7 @@ const Header = () => {
             </Link>
           </div>
         </div>
-        <div className="hidden md:flex flex-row gap-2 items-center">
+        <div className="hidden lg:flex flex-row gap-2 items-center">
           {
             !!token ?
             <PopAccount>
@@ -78,7 +78,7 @@ const Header = () => {
               </Button>
             </Link>
         </div>
-        <div className="md:hidden flex gap-2">
+        <div className="flex gap-2 lg:hidden">
           <MenuComp>
             <Button variant={"outline"}>
               <Menu className="text-primary" />

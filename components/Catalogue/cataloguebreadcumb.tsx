@@ -4,12 +4,12 @@ import Link from "next/link";
 
 const Cataloguebreadcumb = () => {
   return (
-    <div className="flex gap-2 border-b-[1px]  border-b-[#D9D9D9] pt-3 pr-5 pb-3 pl-5 ">
-      <p className="text-orange-300">
-        <Link href="/">Home</Link>
+    <div className="flex gap-2 pt-3 pr-5 pb-3 pl-5 items-center">
+      <p className="text-accent">
+        <Link href="/">{"Accueil"}</Link>
       </p>
-      <ChevronRight />
-      <p>Catalogue</p>
+      <ChevronRight size={16}/>
+      <p>{"Catalogue"}</p>
     </div>
   );
 };

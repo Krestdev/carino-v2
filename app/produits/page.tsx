@@ -7,6 +7,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState, useTransition } from "react";
 import Loading from "../loading";
 import { useAppContext } from "@/providers/appContext";
+import NavigationBreadcrumb from "@/components/breadcrumb-item";
 
 const Page = () => {
   const { baseURL } = useAppContext();
@@ -48,7 +49,7 @@ const Page = () => {
         {/* <Hero /> */}
         <Head image="/images/catalog.jpg" title="Tous nos Produits" />
         <div className=" pt-10 container mx-auto ">
-          <Breadcumb />
+          <NavigationBreadcrumb className="mt-5 mb-2"/>
           <DishGrid
             categories={categoryData.data.data}
             dishes={productData.data.data.filter(x => x.price > 500)}

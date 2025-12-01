@@ -8,6 +8,10 @@ import QueryProvider from "@/providers/queryProvider";
 import { Toaster } from "@/components/ui/sonner";
 import Transaction from "@/components/universal/Transaction";
 import { AppProvider } from "@/providers/appContext";
+import { ThemeProvider } from "@/components/theme-provider";
+import { ThemeActivator } from "@/components/theme-selector";
+import Snowfall from "@/components/snowfall";
+import { UseOnTheme } from "@/hooks/useOnTheme";
 
 // Police principale
 const ptSans = PT_Sans({
@@ -36,17 +40,28 @@ export default function RootLayout({
 }) {
   const baseURL = process.env.NEXT_PUBLIC_API_BASE_URL ?? "https://www.le-carino.com/api/";
   return (
-    <html lang="fr">
+    <html lang="fr" suppressHydrationWarning>
       <body className={`${ptSans.variable} ${oleo.variable} antialiased`}>
-        <AppProvider baseURL={baseURL ?? ""}>
-          <QueryProvider>
-            <Header />
-            <main>{children}</main>
-            <Transaction />
-            <Footer />
-            <Toaster />
-          </QueryProvider>
-        </AppProvider>
+        <ThemeProvider
+        attribute={"class"}
+        defaultTheme="default" 
+        enableSystem 
+        disableTransitionOnChange
+        themes={["default", "christmas", "newyear"]}>
+          <AppProvider baseURL={baseURL ?? ""}>
+            <QueryProvider>
+              <ThemeActivator/>
+              <UseOnTheme selectedTheme="christmas">
+                <Snowfall/>
+              </UseOnTheme>
+              <Header />
+              <main>{children}</main>
+              <Transaction />
+              <Footer />
+              <Toaster />
+            </QueryProvider>
+          </AppProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

@@ -127,18 +127,18 @@ const ProductCarousel = ({ products, category, isLeft = true }: Props) => {
             />
           )}
           <div className="absolute bottom-0 left-0 w-full flex flex-col gap-4 p-7 items-center">
-            <p className="text-white text-[40px] font-bold uppercase text-center">
+            <h2 className="font-sans leading-[120%] text-white text-[40px] font-bold uppercase text-center">
               {category?.name}
-            </p>
-            <p className="text-white line-clamp-2">
-              {category?.description
-                ? category.description
-                : "Nos menu pour vous tous les jours"}
-            </p>
+            </h2>
+            {
+              category?.description &&
+              <p className="text-white line-clamp-2">
+              {category.description}
+            </p>}
             <Link href={`/catalogue/${category?.id}`}>
-              <Button>
-                <ArrowUpRight />
+              <Button variant={"accent"}>
                 {"Voir tout"}
+                <ArrowUpRight />
               </Button>
             </Link>
           </div>

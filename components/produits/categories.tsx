@@ -14,24 +14,24 @@ const Category = ({ categories, handleFilter }: Props) => {
 
   const [selected, setSelected] = useState(-1);
   return (
-    <div className="flex flex-wrap gap-4 gap pl-5 pt-2 w-full  ">
+    <div className="flex flex-wrap gap-2 gap pl-5 pt-2 w-full  ">
       <Button
         onClick={() => {
           handleFilter(-1);
           setSelected(-1);
         }}
-        className={`pt-3 pr-4 pb-3 pl-4 rounded-[27px] h-10 hover:text-white ${selected === -1 ? "bg-black text-white" : "bg-white text-black"
-          }  border-[1px] border-[#191537] `}
+        className={`pt-3 pr-4 pb-3 pl-4 rounded-full hover:bg-accent/20 h-10 ${selected === -1 ? "bg-primary text-primary-foreground hover:bg-primary/80" : "bg-white text-black"
+          }  border border-primary/20`}
       >
         {"Tous"}
       </Button>
       {categories.map((value, i) => {
         return (
           <Button
-            className={`pt-3 pr-4 pb-3 pl-4 rounded-[27px] h-10 hover:text-white  ${selected === value.id
-                ? "bg-black text-white"
-                : "bg-white text-black"
-              }  border-[1px] border-[#191537] `}
+            className={`pt-3 pr-4 pb-3 pl-4 rounded-full hover:bg-accent/20 h-10  ${selected === value.id
+                ? "bg-primary text-primary-foreground hover:bg-primary/80"
+                : "bg-white text-primary"
+              }  border border-primary/20 `}
             key={i}
             onClick={() => {
               handleFilter(value.id);
