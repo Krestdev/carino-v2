@@ -11,8 +11,8 @@ export const promos: Array<Promotion> = [
     combinable: true,
     isActive: () => {
       const now = new Date();
-      const start = new Date(2026, 2, 9); // 09 Feb 2026
-      const end = new Date(2026, 2, 15);
+      const start = new Date(2026, 1, 9); // 09 Feb 2026
+      const end = new Date(2026, 1, 15);
       return now >= start && now <= end;
     },
     apply: (cart: Array<cartItem>) => {
@@ -30,7 +30,7 @@ export const promos: Array<Promotion> = [
             nom: "FANTA 33CL",
             itemId: 1149579,
             options: [],
-            price: 1000,
+            price: 0,
             image: "https://media.zelty.fr/images/2221/6100/b6871.jpg",
             cat: [
               {
