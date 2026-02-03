@@ -1,8 +1,48 @@
 import { cartItem, Promotion } from "@/types/types";
+import { X } from "lucide-react";
 
 export const pizzaCategoryIds = [403441, 403438, 406718, 403440];
 
 export const promos: Array<Promotion> = [
+  {
+    id: "margherita-can",
+    name: "Margherita Special",
+    priority: 1,
+    combinable: true,
+    isActive: () => {
+      const now = new Date();
+      const start = new Date(2026, 2, 9); // 09 Feb 2026
+      const end = new Date(2026, 2, 15);
+      return now >= start && now <= end;
+    },
+    apply: (cart: Array<cartItem>) => {
+      const pizzaId: number = 1149662;
+      const fanta: number = 1149579;
+      const quantity = cart
+        .filter((c) => c.itemId === pizzaId)
+        .reduce((t, v) => t + v.qte, 0);
+      if (quantity > 0)
+        return [
+          ...cart,
+          {
+            id: "1149579",
+            qte: quantity,
+            nom: "FANTA 33CL",
+            itemId: 1149579,
+            options: [],
+            price: 1000,
+            image: "https://media.zelty.fr/images/2221/6100/b6871.jpg",
+            cat: [
+              {
+                id: 253214,
+                name: "Boissons gazeuses",
+              },
+            ],
+          },
+        ];
+      return cart;
+    },
+  },
   {
     id: "black-week",
     name: "Black Week",
@@ -11,9 +51,9 @@ export const promos: Array<Promotion> = [
     isActive: () => {
       const now = new Date();
       const start = new Date(2025, 10, 28); // 28 Nov 2025
-      const end = new Date(2025, 11, 7);   // 7 Dec 2025
+      const end = new Date(2025, 11, 7); // 7 Dec 2025
       const hourStart = 6; // 13h
-      const hourEnd = 16;   // 16h
+      const hourEnd = 16; // 16h
       return (
         now >= start &&
         now <= end &&
@@ -27,7 +67,7 @@ export const promos: Array<Promotion> = [
       // 1) On compte le nombre total de pizzas
       const totalPizzaQty = cart.reduce((sum, item) => {
         const isPizza = item.cat.some((cat) =>
-          pizzaCategoryIds.includes(cat.id)
+          pizzaCategoryIds.includes(cat.id),
         );
         return sum + (isPizza ? item.qte : 0);
       }, 0);
@@ -36,7 +76,7 @@ export const promos: Array<Promotion> = [
       if (totalPizzaQty < 2) {
         return cart.map((item) => {
           const isPizza = item.cat.some((cat) =>
-            pizzaCategoryIds.includes(cat.id)
+            pizzaCategoryIds.includes(cat.id),
           );
 
           // Si ce n'est pas une pizza ou qu'on n'a pas d'originalPrice, on ne touche à rien
@@ -53,7 +93,7 @@ export const promos: Array<Promotion> = [
       // 3) Sinon, on applique la réduction sur les pizzas
       return cart.map((item) => {
         const isPizza = item.cat.some((cat) =>
-          pizzaCategoryIds.includes(cat.id)
+          pizzaCategoryIds.includes(cat.id),
         );
         if (!isPizza) return item;
 
@@ -70,9 +110,8 @@ export const promos: Array<Promotion> = [
   },
 ];
 
-
 export function ApplyPromotions(data: cartItem[]): cartItem[] {
-  const promotions:Array<Promotion> = promos;
+  const promotions: Array<Promotion> = promos;
   const sorted = promotions
     .filter((p) => p.isActive())
     .sort((a, b) => a.priority - b.priority);
@@ -81,8 +120,6 @@ export function ApplyPromotions(data: cartItem[]): cartItem[] {
   // Tu pourras ensuite affiner les règles de combinabilité si besoin.
   return sorted.reduce((currentCart, promo) => promo.apply(currentCart), data);
 }
-
-
 
 /* export function ApplyPromotion(data: cartItem[]): cartItem[]{
   const today = new Date();
