@@ -12,7 +12,7 @@ export const promos: Array<Promotion> = [
     isActive: () => {
       const now = new Date();
       const start = new Date(2026, 1, 9); // 09 Feb 2026
-      const end = new Date(2026, 1, 15);
+      const end = new Date(2026, 1, 16);
       return now >= start && now <= end;
     },
     apply: (cart: Array<cartItem>) => {
