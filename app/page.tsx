@@ -71,8 +71,8 @@ export default function Home() {
         <CatProdMob products={dailyMenu} category={dailyCategory} />
         <PubComp
           pub1={"/tempo/pub1.webp"}
-          pub2={"/tempo/pub3.webp"}
-          pub3={"/images/black-week.webp"}
+          pub2={"/tempo/promo_pizza.webp"}
+          pub3={"/tempo/pizza_marguerita.webp"}
         />
         <CategoryCarousel
           categories={categoryData.data.data.filter(

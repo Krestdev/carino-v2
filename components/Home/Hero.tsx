@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import OnViewAnimation from "../frame-animation";
 import { UseOnTheme } from "@/hooks/useOnTheme";
+import { promos } from "../universal/promotions";
 
 const Hero = () => {
   const message =
@@ -57,9 +58,7 @@ const Hero = () => {
       </div>
       <div className="absolute bottom-0 left-0">
         <PromoMessage
-          start={new Date()}
-          end={new Date(2025, 8, 5)}
-          message={message}
+          promotions={promos}
         />
       </div>
     </div>

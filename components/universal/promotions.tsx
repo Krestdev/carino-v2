@@ -9,6 +9,8 @@ export const promos: Array<Promotion> = [
     name: "Margherita Special",
     priority: 1,
     combinable: true,
+    message: "PROMOTION JEUNESSE DISPONIBLE ! : 09 au 15 Février 2026",
+    href: "/produits",
     isActive: () => {
       const now = new Date();
       const start = new Date(2026, 1, 9); // 09 Feb 2026
@@ -47,6 +49,7 @@ export const promos: Array<Promotion> = [
     id: "black-week",
     name: "Black Week",
     priority: 1,
+    message: "Black week, exceptionnel ! Profitez de notre promo sur les pizzas !",
     combinable: true,
     isActive: () => {
       const now = new Date();

@@ -579,6 +579,9 @@ export interface Promotion {
   combinable: boolean;       // si elle peut se cumuler avec d’autres
   isActive: () => boolean;
   apply: (cart: cartItem[]) => cartItem[];
+  image?:string;
+  message:string;
+  href?:string;
 }
 
 export interface PromotionDelivery {
