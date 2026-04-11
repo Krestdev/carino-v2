@@ -52,23 +52,44 @@ export default function Home() {
 
   if (productData.isSuccess && categoryData.isSuccess) {
     // === Ton rendu principal une fois la transition finie ===
-    const dailyMenu: ProductsData[] = productData.data.data.filter((product) =>product.cat.some(
+    const dailyMenu: ProductsData[] = productData.data.data.filter((product) =>
+      product.cat?.some(
         (element) =>
-          element.name.toLocaleLowerCase().includes("suggestion") ||
-          element.name.toLocaleLowerCase() === "suggestions du chef"
+          element.name?.toLocaleLowerCase().includes("suggestion") ||
+          element.name?.toLocaleLowerCase() === "suggestions du chef"
       )
     );
+    
+    // Check if dailyMenu has items before accessing
+    if (!dailyMenu.length) {
+      return (
+        <div className="overflow-clip">
+          <Hero />
+          <CategoryCarousel
+            categories={categoryData.data.data.filter(
+              (x: Categories) => x.id_parent === null
+            )}
+          />
+          <Reservation />
+        </div>
+      );
+    }
+    
     const dailyCategory = categoryData.data.data.find(
-      (category: Categories) => category.id === dailyMenu[0].cat[0].id
+      (category: Categories) => category.id === dailyMenu[0]?.cat?.[0]?.id
     );
 
     return (
       <div className="overflow-clip">
         <Hero />
         <div className="md:pt-6 container mx-auto ">
-          <ProductCarousel products={dailyMenu} category={dailyCategory} />
+          {dailyMenu.length > 0 && dailyCategory && (
+            <ProductCarousel products={dailyMenu} category={dailyCategory} />
+          )}
         </div>
-        <CatProdMob products={dailyMenu} category={dailyCategory} />
+        {dailyMenu.length > 0 && dailyCategory && (
+          <CatProdMob products={dailyMenu} category={dailyCategory} />
+        )}
         <PubComp
           pub1={"/tempo/pub1.webp"}
           pub2={"/tempo/pub3.webp"}
