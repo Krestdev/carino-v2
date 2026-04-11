@@ -8,18 +8,19 @@ import PopAccount from "./Authentification/PopAccount";
 import { usePathname, useRouter } from "next/navigation";
 import useStore from "@/context/store";
 import MenuComp from "./menu";
+import { cn } from "@/lib/utils";
 
 const Header = () => {
 
   const router = useRouter();
-  const { token } = useStore();
-  const isLogin = token !== null;
+  const { token, cart } = useStore();
 
   const pathname = usePathname();
-
-  const isActiveTab = (tab: string) => {
-    return pathname === tab;
-  };
+  const menuLinks = [
+    { name: "Catalogue", path: "/catalogue" },
+    { name: "Tous nos produits", path: "/produits" },
+    { name: "Réserver", path: "/reservation" },
+  ];
 
   return (
     <div className="sticky top-0 z-50 mx-3">
@@ -35,56 +36,49 @@ const Header = () => {
               className="rounded-full w-[46.79px] h-[46.79px] md:w-[60px] md:h-[60px]"
             />
           </Link>
-          <div className="hidden md:flex flex-row items-center gap-2">
-            <Link href={"/catalogue"} className={isActiveTab("/catalogue") ? "border-b-2 border-black" : ""}>
-              <Button variant={"link"}>{"Catalogue"}</Button>
-            </Link>
-            <Link href={"/produits"} className={isActiveTab("/produits") ? "border-b-2 border-black" : ""}>
-              <Button variant={"link"}>{"Tous nos produits"}</Button>
-            </Link>
-            <Link href={"/reservation"} className={isActiveTab("/reservation") ? "border-b-2 border-black" : ""}>
-              <Button variant={"link"}>{"Réserver"}</Button>
-            </Link>
+          <div className="hidden lg:flex flex-row items-center gap-0">
+            {
+              menuLinks.map((item)=>
+              <Link key={item.name} href={item.path} >
+                <Button variant={"navigation"} size={"lg"} className={cn(pathname === item.path && "font-semibold text-primary")}>{item.name}</Button>
+              </Link>)
+            }
             <Link target="_blank" href={"/telechargement/catalogue.pdf"}>
-              <Button variant={"link"}>
-                <ArrowUpRight />
+              <Button variant={"navigation"} size={"lg"}>
                 {"Carte Menu"}
+                <ArrowUpRight />
               </Button>
             </Link>
           </div>
         </div>
-        {!isLogin ? (
-          <div className="hidden md:flex flex-row gap-2 items-center">
-            <Link href={"/connexion"}>
-              <Button variant={"link"}>{"Connexion"}</Button>
-            </Link>
-            <Link href={"/inscription"}>
-              <Button variant={"link"}>{"Inscription"}</Button>
-            </Link>
-            <Link href={"/panier"}>
-              <Button className="bg-[#FFC336] hover:bg-[#FFC336]/90 text-black h-[54px] text-[20px]">
-                <ShoppingCart />
-                {"Panier"}
-              </Button>
-            </Link>
-          </div>
-        ) : (
-          <div className="hidden md:flex flex-row gap-2 items-center">
+        <div className="hidden lg:flex flex-row gap-2 items-center">
+          {
+            !!token ?
             <PopAccount>
-              <Button variant={"outline"} className="text-black border-black h-[54px] text-[20px]">
+              <Button variant={"secondary"} size={"lg"}>
                 <LuCircleUser />
-                {"compte"}
+                {"Compte"}
               </Button>
             </PopAccount>
-            <Link href={"/panier"}>
-              <Button className="bg-[#FFC336] hover:bg-[#FFC336]/90 text-black h-[54px] text-[20px]">
+            :
+            <>
+            <Link href={"/connexion"}>
+              <Button variant={"navigation"} size={"lg"}>{"Connexion"}</Button>
+            </Link>
+            <Link href={"/inscription"}>
+              <Button variant={"navigation"} size={"lg"}>{"Inscription"}</Button>
+            </Link>
+            </>
+          }
+          <Link href={"/panier"}>
+              <Button variant={"accent"} size={"lg"}>
                 <ShoppingCart />
                 {"Panier"}
+                { cart.length > 0 && <span className="min-w-6 min-h-6 px-1.5 rounded-sm bg-white text-primary flex items-center justify-center">{cart.length}</span> }
               </Button>
             </Link>
-          </div>
-        )}
-        <div className="md:hidden flex gap-2">
+        </div>
+        <div className="flex gap-2 lg:hidden">
           <MenuComp>
             <Button variant={"outline"}>
               <Menu className="text-primary" />

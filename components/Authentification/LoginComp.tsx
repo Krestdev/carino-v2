@@ -1,13 +1,15 @@
 "use client";
 
 import useStore from "@/context/store";
+import { useAppContext } from "@/providers/appContext";
 import UserQuery from "@/queries/userQueries";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
+import { AxiosError } from "axios";
 import Link from "next/link";
-import { redirect } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
+import { toast } from "react-toastify";
 import z from "zod";
 import { Button } from "../ui/button";
 import {
@@ -19,18 +21,15 @@ import {
   FormMessage,
 } from "../ui/form";
 import { Input } from "../ui/input";
-import { useAppContext } from "@/providers/appContext";
-import { AxiosError } from "axios";
-import { toast } from "react-toastify";
 
 const formSchema = z.object({
-  email: z.string().email({ message: "Adresse mail invalide" }),
+  email: z.email({ message: "Adresse mail invalide" }),
   password: z.string(),
 });
 
 const LoginComp = () => {
   // const [displayError, setDisplayError] = useState(false);
-  const [error, setError] = useState<string | undefined>();
+  const [errorValue, setErrorValue] = useState<string | undefined>();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -42,46 +41,26 @@ const LoginComp = () => {
 
   const { baseURL } = useAppContext();
 
-  const { login, token } = useStore();
+  const { login } = useStore();
   const userLogIn = new UserQuery(baseURL);
   const userLoginData = useMutation({
     mutationFn: (values: { email: string; password: string }) =>
       userLogIn.login(values),
-    onError: (error) => {
+    onSuccess: (data)=>{
+      login(data.data.user, data.data["bearer token"]);
+      toast(`Connexion reussie ! Bon retour, ${data.data.user.name}`);
+    },
+     onError: (error) => {
       if((error as AxiosError).status === 400){
         console.log((error as AxiosError).status);
         
-        setError("Adresse mail ou mot de passe incorrect !");
+        setErrorValue("Adresse mail ou mot de passe incorrect !");
       }
-    }
+    },
   });
 
   function onSubmit(values: z.infer<typeof formSchema>) {
     userLoginData.mutate(values);
-  }
-
-  useEffect(() => {
-    if (userLoginData.isSuccess) {
-      login(
-        userLoginData.data.data.user,
-        userLoginData.data.data["bearer token"]
-      );
-
-      toast("Connexion réussie !");
-    }
-    if (userLoginData.isError) {
-      // setDisplayError(true);
-    }
-  }, [
-    userLoginData.isSuccess,
-    userLoginData.isPending,
-    userLoginData.data,
-    login,
-    userLoginData.isError,
-  ]);
-
-  if (token) {
-    redirect("/");
   }
 
   return (
@@ -122,7 +101,7 @@ const LoginComp = () => {
               </FormItem>
             )}
           />
-          {error && <p className="text-red-400">{error}</p>}
+          {errorValue && <p className="text-red-400">{errorValue}</p>}
           <div className="max-w-[290px] w-full flex flex-col gap-2 justify-center">
             <Button
               type="submit"

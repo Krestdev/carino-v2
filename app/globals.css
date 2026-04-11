@@ -1,14 +1,10 @@
-@import "tailwindcss/theme.css"layer(theme);
-@import "tailwindcss/preflight.css"layer(base);
-@import "tailwindcss/utilities.css"layer(utilities);
-
 @import "tailwindcss";
 @import "tw-animate-css";
 
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  --primary: oklch(0.205 0 0);
+  --primary: oklch(0.2986 0.0983 283.47);
   --secondary: oklch(0.97 0 0);
   --font-pt-sans: "PT Sans", sans-serif;
   --font-oleo: "Oleo Script", cursive;
@@ -23,7 +19,7 @@
   --secondary-foreground: oklch(0.205 0 0);
   --muted: oklch(0.97 0 0);
   --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
+  --accent: oklch(0.8495 0.16 83.67);
   --accent-foreground: oklch(0.205 0 0);
   --destructive: oklch(0.577 0.245 27.325);
   --border: oklch(0.922 0 0);
@@ -42,6 +38,13 @@
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
+}
+.christmas {
+  --accent: oklch(0.5365 0.1991 20.95);
+  --accent-foreground: oklch(0.98 0 0);
+}
+.newyear {
+  --primary: oklch(15.434% 0.00002 271.152);
 }
 
 @theme inline {

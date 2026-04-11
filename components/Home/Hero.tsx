@@ -3,6 +3,10 @@ import React from "react";
 import { Button } from "../ui/button";
 import PromoMessage from "../universal/PromoMessage";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
+import OnViewAnimation from "../frame-animation";
+import { UseOnTheme } from "@/hooks/useOnTheme";
+import { promos } from "../universal/promotions";
 
 const Hero = () => {
   const message =
@@ -23,7 +27,14 @@ const Hero = () => {
       <div className="px-0 lg:px-24 z-10">
         <div className="flex flex-col gap-4 px-8 w-fit">
           <div className="flex flex-col ">
-            <h1 className="text-white uppercase w-fit">{config.siteName}</h1>
+            <h1 className="text-white uppercase w-fit relative">
+              {config.siteName}
+              <UseOnTheme selectedTheme="christmas">
+                <OnViewAnimation animation="fadeDown" duration={2} className="absolute top-0 -right-2.5 md:-right-3.5 lg:-right-6" >
+                  <img src={"/images/xmas_hat.webp"} className="h-6 md:h-10 lg:h-15 w-auto" />
+                </OnViewAnimation>
+              </UseOnTheme>
+            </h1>
             <p className="text-[#FFC336] uppercase text-[14px] md:text-[24px] w-fit tracking-[0.18em] md:tracking-[0.25em] lg:tracking-[0.50em]">
               {config.slogan}
             </p>
@@ -33,25 +44,21 @@ const Hero = () => {
               {config.description}
             </p>
             <div className="flex flex-row gap-2">
-              <Button
-                onClick={() => router.push("/produits")}
-                className="bg-[#29235C]">{"Commander"}</Button>
-              <Button
-                className="bg-[#FFC336] text-primary "
-                variant={"outline"}
-                onClick={() => router.push("/reservation")}
-              >
-                {"Réserver une Table"}
-              </Button>
+              <Link href="/produits">
+                <Button size={"lg"}>{"Commander"}</Button>
+              </Link>
+              <Link href={"/reservation"}>
+                <Button size={"lg"} variant={"accent"}>
+                  {"Réserver une Table"}
+                </Button>
+              </Link>
             </div>
           </div>
         </div>
       </div>
       <div className="absolute bottom-0 left-0">
         <PromoMessage
-          start={new Date()}
-          end={new Date(2025, 8, 5)}
-          message={message}
+          promotions={promos}
         />
       </div>
     </div>

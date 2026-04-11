@@ -32,6 +32,7 @@ export interface cartItem {
   price: number;
   image: string;
   cat: Array<Cat>;
+  originalPrice?: number;
 }
 export interface cartItemOption {
   name: string;
@@ -421,7 +422,7 @@ export interface OrdersData {
   id: number;
   zelty_order_id?: number;
   reference: string;
-  items: string[];
+  items: string;
   user_id: number;
   prix_total: number;
   lieu_livraison: string;
@@ -566,4 +567,28 @@ export interface ReservationResponse {
   src?: string;
   comment?: string;
   final_price?: null;
+}
+
+export type Detail = { name: string; quantity: number };
+export type Item = { name: string; details: Detail[] };
+
+export interface Promotion {
+  id: string;
+  name: string;
+  priority: number;          // pour choisir l’ordre d’application
+  combinable: boolean;       // si elle peut se cumuler avec d’autres
+  isActive: () => boolean;
+  apply: (cart: cartItem[]) => cartItem[];
+  image?:string;
+  message:string;
+  href?:string;
+}
+
+export interface PromotionDelivery {
+  id: string;
+  name: string;
+  priority: number;          // pour choisir l’ordre d’application
+  combinable: boolean;       // si elle peut se cumuler avec d’autres
+  isActive: () => boolean;
+  apply: (fees: number, district: string, cart: Array<cartItem>) => number;
 }

@@ -92,8 +92,8 @@ export default function Home() {
         )}
         <PubComp
           pub1={"/tempo/pub1.webp"}
-          pub2={"/tempo/pub3.webp"}
-          pub3={"/tempo/pub3.webp"}
+          pub2={"/tempo/promo_pizza.webp"}
+          pub3={"/tempo/pizza_marguerita.webp"}
         />
         <CategoryCarousel
           categories={categoryData.data.data.filter(
