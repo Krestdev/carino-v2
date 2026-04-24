@@ -2,8 +2,8 @@ import React from "react";
 
 function MaintenancePage() {
   return (
-    <div className="mx-auto max-w-7xl flex flex-col gap-5">
-      <img src="/Logo.png" alt="logo" className="h-20 w-auto mx-auto" />
+    <div className="mx-auto max-w-7xl flex flex-col gap-5 text-white">
+      <img src="/Logo.png" alt="logo" className="h-28 w-auto mx-auto" />
       <h1 className="text-2xl font-bold text-center">Maintenance</h1>
       <p className="text-center">
         Nous effectuons des améliorations sur notre site pour mieux vous servir
