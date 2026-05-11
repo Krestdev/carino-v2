@@ -1,6 +1,6 @@
 import AxiosConfig from "@/providers/axios";
 import api from "@/providers/axios";
-import { AddressResponse } from "@/types/types";
+import { AddressResponse, AddtressData } from "@/types/types";
 import { AxiosInstance } from "axios";
 
 export default class TownQuery {
@@ -10,7 +10,7 @@ export default class TownQuery {
   constructor(baseURL: string) {
     this.api = new AxiosConfig(baseURL).api;
   }
-  getTowns = async (): Promise<AddressResponse> => {
+  getTowns = async (): Promise<AddtressData[]> => {
     return this.api.get(`${this.route}/`).then((res) => res.data);
   };
 }

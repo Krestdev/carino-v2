@@ -1,18 +1,32 @@
-"use client";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+// app/providers/QueryProvider.tsx
+'use client';
 
-const queryClient = new QueryClient();
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
+import { useState } from 'react';
 
 export default function QueryProvider({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const [queryClient] = useState(
+    () =>
+      new QueryClient({
+        defaultOptions: {
+          queries: {
+            staleTime: 60 * 1000,
+            gcTime: 5 * 60 * 1000,
+            refetchOnWindowFocus: false,
+            retry: 1,
+          },
+        },
+      })
+  );
+
   return (
     <QueryClientProvider client={queryClient}>
-      <TooltipProvider>{children}</TooltipProvider>
+      {children}
       <ReactQueryDevtools initialIsOpen={false} />
     </QueryClientProvider>
   );

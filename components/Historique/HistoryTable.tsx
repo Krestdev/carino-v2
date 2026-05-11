@@ -47,7 +47,7 @@ const HistoryTable = ({ title, data, towns }: Props) => {
   return (
     <div className="flex flex-col gap-5 w-full">
       <h3 className="text-xl font-bold">{title}</h3>
-      <Table className="max-w-[1440px] w-full mx-auto border border-gray-300">
+      {/* <Table className="max-w-[1440px] w-full mx-auto border border-gray-300">
         <TableHeader className="bg-primary text-white">
           <TableRow className="divide-x divide-gray-300 hover:bg-primary/90">
             <TableHead className="font-bold text-white">{"References"}</TableHead>
@@ -131,7 +131,7 @@ const HistoryTable = ({ title, data, towns }: Props) => {
             })
           )}
         </TableBody>
-      </Table>
+      </Table> */}
 
       {selectedOrder && (
         <ViewOrderDialog

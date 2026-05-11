@@ -11,24 +11,31 @@ import { useRouter } from "next/navigation";
 import Loading from "@/app/loading";
 import { AnimatePresence } from "framer-motion";
 import { useEffect, useState, useTransition } from "react";
-import { useAppContext } from "@/providers/appContext";
 import TownQuery from "@/queries/townQuery";
+import { XAF } from "@/lib/functions";
 
 const Page = () => {
-  const { baseURL } = useAppContext();
   const { user, token } = useStore();
   const router = useRouter();
+  const baseURL = process.env.NEXT_PUBLIC_API_BASE_URL2 || "http://localhost:3000/api/";
   const userLogIn = new UserQuery(baseURL);
   const lieu = new TownQuery(baseURL);
 
-  const townData = useQuery({
-    queryKey: ["towns"],
-    queryFn: () => lieu.getTowns(),
-  });
+  // const townData = useQuery({
+  //   queryKey: ["towns"],
+  //   queryFn: () => lieu.getTowns(),
+  // });
 
+  // Récupérer le profil complet de l'utilisateur depuis le serveur
   const userData = useQuery({
     queryKey: ["userInfo", user?.id],
-    queryFn: () => userLogIn.allUsersOrders(user ? user.id : -1),
+    queryFn: () => userLogIn.profile(),
+    enabled: !!user,
+  });
+
+  const orderData = useQuery({
+    queryKey: ["myOrders"],
+    queryFn: () => userLogIn.getMine(),
     enabled: !!user,
   });
 
@@ -41,18 +48,18 @@ const Page = () => {
   }, []);
 
   useEffect(() => {
-    if (userData.isSuccess) {
+    if (userData.isSuccess && orderData.isSuccess) {
       startTransition(() => {
         setShowContent(true);
       });
     }
-  }, [userData.isSuccess]);
+  }, [userData.isSuccess, orderData.isSuccess]);
 
-  if (!isHydrated || isPending || !showContent) {
+  if (!isHydrated || isPending || !showContent || userData.isLoading || orderData.isLoading) {
     return <Loading />;
   }
 
-  if (!token) {
+  if (!token || !user || userData.isError || orderData.isError) {
     router.push("/");
     return null;
   }
@@ -66,12 +73,73 @@ const Page = () => {
               <ArrowLeft />
               {"Retour à l'accueil"}
             </Button>
-            <ProfilComp orders={userData.data} />
-            <HistoryTable
-              title={"Dernières Commandes"}
-              data={userData.data.data.slice(-5)}
-              towns={townData.data?.data}
-            />
+            <div className="flex flex-col gap-7 px-7 py-24">
+              <div className="flex flex-col gap-7">
+                <p className="text-[24px] font-semibold font-general">{"Informations personnelles"}</p>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 px-5 py-8 bg-[#FFFBF3]">
+                  <div className="flex flex-col gap-1">
+                    <p className="text-[14px] text-[#4B5563] uppercase">{"Nom"}</p>
+                    <p className="text-[#111827] font-semibold">{userData.data.fname ?? "N/A"}</p>
+                  </div>
+                  <div className="flex flex-col gap-1">
+                    <p className="text-[14px] text-[#4B5563] uppercase">{"Adresse mail"}</p>
+                    <p className="text-[#111827] font-semibold">{userData.data.mail ?? "N/A"}</p>
+                  </div>
+                  <div className="flex flex-col gap-1">
+                    <p className="text-[14px] text-[#4B5563] uppercase">{"Téléphone"}</p>
+                    <p className="text-[#111827] font-semibold">{userData.data.phone ?? "N/A"}</p>
+                  </div>
+                  <div className="flex flex-col gap-1">
+                    <p className="text-[14px] text-[#4B5563] uppercase">{"Né le"}</p>
+                    <p className="text-[#111827] font-semibold">{userData.data.birthday ?? "N/A"}</p>
+                  </div>
+                  <div className="flex flex-col gap-1">
+                    <p className="text-[14px] text-[#4B5563] uppercase">{"Derniere connexion"}</p>
+                    <p className="text-[#111827] font-semibold">{new Date(userData.data.last_login).toLocaleDateString('fr-FR', {
+                      day: '2-digit',
+                      month: '2-digit',
+                      year: 'numeric',
+                      hour: '2-digit',
+                      minute: '2-digit',
+                      second: '2-digit',
+                      hour12: false,
+                    }) ?? "N/A"}</p>
+                  </div>
+                  <div className="flex flex-col gap-1">
+                    <p className="text-[14px] text-[#4B5563] uppercase">{"Point de fidélité"}</p>
+                    <p className="text-[#111827] font-semibold">{userData.data.loyalty ?? "N/A"}</p>
+                  </div>
+                </div>
+              </div>
+              <div className="flex flex-col gap-7">
+                <p className="text-[24px] font-semibold font-general">{"Historique des commandes"}</p>
+                <div className="grid grid-cols-1 overflow-auto w-full">
+                  {
+                    orderData.data?.data?.map((order, index) => {
+                      return (
+                        <div key={index} className={`grid grid-cols-4 px-5 py-4 ${index % 2 === 0 ? "bg-[#F9FAFB]" : ""}`}>
+                          <div className="flex flex-col gap-0.5">
+                            <p className="text-[#4B5563] text-[14px]">{"Référence"}</p>
+                            <p className="text-[#111827] font-semibold">{order.id}</p>
+                          </div>
+                          <div className="flex flex-col gap-0.5">
+                            <p className="text-[#4B5563] text-[14px]">{"Date"}</p>
+                            <p className="text-[#111827] font-semibold">{order.created_at.toDateString()}</p>
+                          </div>
+                          <div className="flex flex-col gap-0.5">
+                            <p className="text-[#4B5563] text-[14px]">{"Montant Total"}</p>
+                            <p className="text-[#111827] font-semibold">{XAF.format(order.prix_total)}</p>
+                          </div>
+                          <div className="flex flex-col gap-0.5">
+                            <Button variant={"outline"}>{"Voir la commande"}</Button>
+                          </div>
+                        </div>
+                      )
+                    })
+                  }
+                </div>
+              </div>
+            </div>
           </div>
         )}
       </AnimatePresence>

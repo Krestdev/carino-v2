@@ -6,7 +6,7 @@ import React from "react";
 const Page = () => {
   return (
     <div>
-      <Head image={"/tempo/pub1.webp"} title="Politique & Confidentialité" />
+      <Head image={"/tempo/pub1.webp"} title="Politique & Confidentialité" subTitle="confidentialité" />
       <div className="pb-24 max-w-[1440px] w-full mx-auto">
         <Homebutton />
 

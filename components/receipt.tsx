@@ -4,9 +4,9 @@ import { ReceiptProps } from "@/types/types";
 
 
 Font.register({
-    family: "merchant",
-    src: 'https://res.cloudinary.com/dxpmvi0lp/raw/upload/v1741769904/merchant_nflzjj.ttf', // Use a public path
-  });
+  family: "merchant",
+  src: 'https://res.cloudinary.com/dxpmvi0lp/raw/upload/v1741769904/merchant_nflzjj.ttf', // Use a public path
+});
 
 // Styles for the PDF
 const styles = StyleSheet.create({
@@ -24,7 +24,7 @@ const styles = StyleSheet.create({
   section: {
     marginBottom: 10,
   },
-  commandInfo:{
+  commandInfo: {
     paddingVertical: 10,
     borderTop: "1px dashed #000",
     borderBottom: "1px dashed #000",
@@ -45,11 +45,11 @@ const styles = StyleSheet.create({
   },
 });
 
-const Receipt:React.FC<ReceiptProps> = ({fees, due_date, commande, client_name, loyalty, Address}) => {
-    const total_amount = commande.reduce((accumulator, item) => {
-        const price = item.price * item.qte;
-        return accumulator + price;
-      }, 0);
+const Receipt: React.FC<ReceiptProps> = ({ fees, due_date, commande, client_name, loyalty, Address }) => {
+  const total_amount = commande.reduce((accumulator, item) => {
+    const price = item.price * item.quantity;
+    return accumulator + price;
+  }, 0);
   return (
     <Document>
       <Page size="A6" style={styles.page}>
@@ -58,7 +58,7 @@ const Receipt:React.FC<ReceiptProps> = ({fees, due_date, commande, client_name, 
         <Text style={styles.header}>{"Le Carino Pizzeria"}</Text>
 
         {/* Description*/}
-        <View style={{marginBottom: 10, textAlign: "center"}}>
+        <View style={{ marginBottom: 10, textAlign: "center" }}>
           <Text>{"Carrefour PlaYce Warda"}</Text>
           <Text>{"Yaoundé - Cameroun"}</Text>
           <Text>{"Tel: (+237) 696 54 10 55"}</Text>
@@ -70,29 +70,29 @@ const Receipt:React.FC<ReceiptProps> = ({fees, due_date, commande, client_name, 
 
         {/* Order Info */}
         <View style={styles.commandInfo}>
-          <Text style={{marginBottom:2}}>Type de commande: {fees > 0 ? "Livraison" : "Emporte"}</Text>
-          {due_date && <Text style={{marginBottom:2}}>A livrer le : {due_date.toString()}</Text>}
-          <Text style={{marginBottom:2}}>Commande de: {client_name}</Text>
-          <Text style={{marginBottom:2}}>{`${new Date().toString()}`}</Text>
-          <Text>{`Points de fidélité : ${loyalty + Math.floor(total_amount/500)}`}</Text>
+          <Text style={{ marginBottom: 2 }}>Type de commande: {fees > 0 ? "Livraison" : "Emporte"}</Text>
+          {due_date && <Text style={{ marginBottom: 2 }}>A livrer le : {due_date.toString()}</Text>}
+          <Text style={{ marginBottom: 2 }}>Commande de: {client_name}</Text>
+          <Text style={{ marginBottom: 2 }}>{`${new Date().toString()}`}</Text>
+          <Text>{`Points de fidélité : ${loyalty + Math.floor(total_amount / 500)}`}</Text>
         </View>
 
         {/* Order Items */}
-        <View style={{marginVertical:15}}>
+        <View style={{ marginVertical: 15 }}>
           {commande.map((item, index) => (
             <View key={index} style={styles.tableRow}>
-              <Text>{item.nom} x {item.qte}</Text>
-              <Text>{item.price * item.qte} FCFA</Text>
+              <Text>{item.name} x {item.quantity}</Text>
+              <Text>{item.price * item.quantity} FCFA</Text>
             </View>
           ))}
           {fees > 0 && <View style={styles.tableRow}>
             <Text>Frais de Livraison</Text>
             <Text>{fees} FCFA</Text>
-            </View>}
+          </View>}
           {Address && <View style={styles.tableRow}>
             <Text>Adresse</Text>
             <Text>{`${Address.name}, ${Address.street}`}</Text>
-            </View>}
+          </View>}
         </View>
 
         {/* Total */}
@@ -109,7 +109,7 @@ const Receipt:React.FC<ReceiptProps> = ({fees, due_date, commande, client_name, 
 
 export default Receipt;
 
-export async function receiptBuffer(data:ReceiptProps){
-  const stream = await renderToBuffer(<Receipt {...data}/>);
+export async function receiptBuffer(data: ReceiptProps) {
+  const stream = await renderToBuffer(<Receipt {...data} />);
   return stream;
 } 

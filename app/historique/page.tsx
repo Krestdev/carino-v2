@@ -21,7 +21,7 @@ const Page = () => {
 
   const userData = useQuery({
     queryKey: ["userInfo", user?.id],
-    queryFn: () => userLogIn.allUsersOrders(user ? user.id : -1),
+    queryFn: () => userLogIn.getMine(),
     enabled: !!user,
   });
 
@@ -62,11 +62,11 @@ const Page = () => {
           <ArrowLeft />
           {"Retour a l'accueil"}
         </Button>
-        <HistoryTable
+        {/* <HistoryTable
           title={"Historique des commandes"}
           data={userData.data?.data}
-          towns={townData.data?.data}
-        />
+          towns={townData.data}
+        /> */}
       </div>
     </div>
   ) : (

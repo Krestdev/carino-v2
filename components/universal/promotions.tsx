@@ -10,7 +10,7 @@ export const promos: Array<Promotion> = [
     priority: 1,
     combinable: true,
     message: "PROMOTION JEUNESSE DISPONIBLE ! : 09 au 15 Février 2026",
-    href: "/produits",
+    href: "/catalogue",
     isActive: () => {
       const now = new Date();
       const start = new Date(2026, 1, 9); // 09 Feb 2026
@@ -21,25 +21,20 @@ export const promos: Array<Promotion> = [
       const pizzaId: number = 1149662;
       const fanta: number = 1149579;
       const quantity = cart
-        .filter((c) => c.itemId === pizzaId)
-        .reduce((t, v) => t + v.qte, 0);
+        .filter((c) => c.item_id === pizzaId)
+        .reduce((t, v) => t + v.quantity, 0);
       if (quantity > 0)
         return [
           ...cart,
           {
             id: "1149579",
-            qte: quantity,
-            nom: "FANTA 33CL",
-            itemId: 1149579,
+            quantity: quantity,
+            name: "FANTA 33CL",
+            item_id: 1149579,
             options: [],
             price: 0,
             image: "https://media.zelty.fr/images/2221/6100/b6871.jpg",
-            cat: [
-              {
-                id: 253214,
-                name: "Boissons gazeuses",
-              },
-            ],
+            tags: [253214],
           },
         ];
       return cart;
@@ -69,17 +64,17 @@ export const promos: Array<Promotion> = [
 
       // 1) On compte le nombre total de pizzas
       const totalPizzaQty = cart.reduce((sum, item) => {
-        const isPizza = item.cat.some((cat) =>
-          pizzaCategoryIds.includes(cat.id),
+        const isPizza = item.tags.some((cat) =>
+          pizzaCategoryIds.includes(cat as number),
         );
-        return sum + (isPizza ? item.qte : 0);
+        return sum + (isPizza ? item.quantity : 0);
       }, 0);
 
       // 2) Si moins de 2 pizzas -> on remet les prix d’origine
       if (totalPizzaQty < 2) {
         return cart.map((item) => {
-          const isPizza = item.cat.some((cat) =>
-            pizzaCategoryIds.includes(cat.id),
+          const isPizza = item.tags.some((cat) =>
+            pizzaCategoryIds.includes(cat as number),
           );
 
           // Si ce n'est pas une pizza ou qu'on n'a pas d'originalPrice, on ne touche à rien
@@ -95,8 +90,8 @@ export const promos: Array<Promotion> = [
 
       // 3) Sinon, on applique la réduction sur les pizzas
       return cart.map((item) => {
-        const isPizza = item.cat.some((cat) =>
-          pizzaCategoryIds.includes(cat.id),
+        const isPizza = item.tags.some((cat) =>
+          pizzaCategoryIds.includes(cat as number),
         );
         if (!isPizza) return item;
 
@@ -189,18 +184,18 @@ export function sendPackPromotion(data: cartItem[]): cartItem[] {
 
   for (const item of data) {
     const bonusItems = promotions[item.id];
-    if (bonusItems && item.qte > 0) {
+    if (bonusItems && item.quantity > 0) {
       bonusItems.forEach((bonus) => {
-        for (let i = 0; i < item.qte; i++) {
+        for (let i = 0; i < item.quantity; i++) {
           result.push({
             id: bonus.id,
-            qte: 1,
-            nom: bonus.nom,
-            itemId: parseInt(bonus.id),
+            quantity: 1,
+            name: bonus.nom,
+            item_id: parseInt(bonus.id),
             options: [],
             price: 0,
             image: "",
-            cat: [],
+            tags: [],
           });
         }
       });

@@ -3,9 +3,9 @@ import { XAF } from "./functions";
 
 export function generateReceiptEmail(order: ReceiptProps) {
     const total_amount = order.commande.reduce((accumulator, item) => {
-        const price = item.price * item.qte;
+        const price = item.price * item.quantity;
         return accumulator + price;
-      }, 0);
+    }, 0);
     return `
     <!DOCTYPE html>
     <html lang="fr">
@@ -30,18 +30,18 @@ export function generateReceiptEmail(order: ReceiptProps) {
                 <th style="border-bottom: 2px solid #000; padding: 5px; text-align: right;">Prix</th>
             </tr>
             ${order.commande
-              .map(
+            .map(
                 (item) => `
             <tr>
-                <td style="padding: 5px;">${item.qte} x ${item.nom}</td>
+                <td style="padding: 5px;">${item.quantity} x ${item.name}</td>
                 <td style="padding: 5px; text-align: right;">${XAF.format(item.price)}</td>
                 <td style="padding: 5px; text-align: right;">${XAF.format(
-                  item.price * item.qte
+                    item.price * item.quantity
                 )}</td>
             </tr>
             `
-              )
-              .join("")}
+            )
+            .join("")}
               ${order.fees > 0 && `
               <tr>
               <td style="padding:5px;">Frais de livraison</td>
@@ -72,5 +72,4 @@ export function generateReceiptEmail(order: ReceiptProps) {
     </body>
     </html>
     `;
-  }
-  
+}

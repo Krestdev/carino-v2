@@ -1,65 +1,33 @@
-import { config } from "@/data/config";
-import React from "react";
 import { Button } from "../ui/button";
-import PromoMessage from "../universal/PromoMessage";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
-import OnViewAnimation from "../frame-animation";
-import { UseOnTheme } from "@/hooks/useOnTheme";
-import { promos } from "../universal/promotions";
+import SocialSidebar from "./SocialSideBar";
 
 const Hero = () => {
-  const message =
-    "Pour 2 pizzas🍕🍕 achetées, 1 pizza🍕 offerte ! Profitez-en du 10 juillet au 05 Septembre 2025 exclusivement sur notre site.";
 
   const router = useRouter();
   return (
-    <div
-      style={{
-        backgroundImage: "url('/images/hero.webp')",
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-      }}
-      className="relative pt-[calc(60px+48px)] pb-[calc(80px+48px)] sm:pt-[calc(60px+72px)] sm:pb-[calc(80px+72px)] md:py-0 md:h-screen overflow-hidden flex items-center w-screen"
-    >
-      <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-b md:bg-gradient-to-r from-[#191537] from-30% md:from-42% to-transparent to-100%" />
+    <div>
+      <div
+        style={{
+          backgroundImage: "url('/hero.webp')",
+          backgroundPosition: "center",
+        }}
+        className="relative flex flex-col gap-7 px-7 py-10 w-screen"
+      >
+        <div className="absolute top-0 left-0 w-full h-full bg-primary/90" />
 
-      <div className="px-0 lg:px-24 z-10">
-        <div className="flex flex-col gap-4 px-8 w-fit">
-          <div className="flex flex-col ">
-            <h1 className="text-white uppercase w-fit relative">
-              {config.siteName}
-              <UseOnTheme selectedTheme="christmas">
-                <OnViewAnimation animation="fadeDown" duration={2} className="absolute top-0 -right-2.5 md:-right-3.5 lg:-right-6" >
-                  <img src={"/images/xmas_hat.webp"} className="h-6 md:h-10 lg:h-15 w-auto" />
-                </OnViewAnimation>
-              </UseOnTheme>
-            </h1>
-            <p className="text-[#FFC336] uppercase text-[14px] md:text-[24px] w-fit tracking-[0.18em] md:tracking-[0.25em] lg:tracking-[0.50em]">
-              {config.slogan}
-            </p>
-          </div>
-          <div className="flex flex-col gap-8">
-            <p className="text-white text-[14px] w-[320px] md:text-[24px] md:w-[700px] leading-[150%]">
-              {config.description}
-            </p>
-            <div className="flex flex-row gap-2">
-              <Link href="/produits">
-                <Button size={"lg"}>{"Commander"}</Button>
-              </Link>
-              <Link href={"/reservation"}>
-                <Button size={"lg"} variant={"accent"}>
-                  {"Réserver une Table"}
-                </Button>
-              </Link>
-            </div>
+        <div className="mx-auto flex flex-col items-center gap-6 max-w-[768px] w-full z-10 md:mt-24">
+          <h1 className="text-center text-white">Entrez dans un <span className="text-[#FFC336]">univers gourmand</span> rempli de saveurs inoubliables</h1>
+          <p className="text-[#FFFBF3] text-center w-[334px] md:w-[640px]">{"Pizzas, Burgers, Salades, Desserts, Frites, Pâtes, Plats avec sauce, et Boissons à portée de click. Découvrez un festin gourmet livré directement à votre porte!"}</p>
+          <div className="flex flex-col md:flex-row gap-4">
+            <Button onClick={() => router.push("/reservation")} variant="accent" size={"lg"}>{"Réserver une table"}</Button>
+            <Button onClick={() => router.push("/catalogue")} className="bg-white hover:bg-white/80 text-black" size={"lg"}>{"Commander un repas"}</Button>
           </div>
         </div>
-      </div>
-      <div className="absolute bottom-0 left-0">
-        <PromoMessage
-          promotions={promos}
-        />
+        <div className="relative md:mt-8 w-full max-w-[768px] mx-auto h-auto aspect-768/209">
+          <img src="burger.webp" alt="burger" className="absolute md:-top-12" />
+        </div>
+        <SocialSidebar />
       </div>
     </div>
   );

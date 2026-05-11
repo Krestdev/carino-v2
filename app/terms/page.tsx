@@ -7,7 +7,7 @@ import React from "react";
 const Page = () => {
     return (
         <div>
-            <Head image={"/tempo/pub1.webp"} title="Termes & Conditions" />
+            <Head image={"/tempo/pub1.webp"} title="Termes & Conditions" subTitle="Termes & Conditions" />
             <div className="pb-24 max-w-[1440px] w-full mx-auto">
                 <Homebutton />
 
@@ -102,7 +102,7 @@ const Page = () => {
                         <div>
                             <h3>{"8- Limitation de responsabilité"}</h3>
                             <p>
-                               {" Le Carino Pizzeria ne sera pas responsable des dommages directs, indirects, accessoires, consécutifs ou punitifs résultant de votre utilisation de ce site ou des produits achetés via ce site, y compris, mais sans s'y limiter, les erreurs, omissions ou inexactitudes dans le contenu, les interruptions de service, ou les pertes de données."}
+                                {" Le Carino Pizzeria ne sera pas responsable des dommages directs, indirects, accessoires, consécutifs ou punitifs résultant de votre utilisation de ce site ou des produits achetés via ce site, y compris, mais sans s'y limiter, les erreurs, omissions ou inexactitudes dans le contenu, les interruptions de service, ou les pertes de données."}
                             </p>
                         </div>
                         <div>
@@ -120,7 +120,7 @@ const Page = () => {
                         <div>
                             <h3>{"11- Contactez-nous"}</h3>
                             <p>
-                               {" Pour toute question relative à la gestion de vos données personnelles :"}
+                                {" Pour toute question relative à la gestion de vos données personnelles :"}
                             </p>
                             <div className="space-y-2">
                                 <Link href="mailto:info@le-carino.com" className="flex gap-2">

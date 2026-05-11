@@ -1,39 +1,64 @@
+// queries/productQuery.ts
 import AxiosConfig from "@/providers/axios";
-import api from "@/providers/axios";
-import {
-  CategoryData,
-  CategoryResponse,
-  ProductsResponse,
-  ReceiptProps,
-} from "@/types/types";
-import axios, { AxiosInstance } from "axios";
+import { CategoriesData, CategoryResponse, OptionValue, ProdData, ProductOption, ProductsData, ProductsResponse, ReceiptProps } from "@/types/types";
+import type { AxiosInstance } from "axios";
 
 export default class ProductQuery {
-  route = "products";
-  cRoute = "categories";
-  api: AxiosInstance;
+  private route = "catalog/dishes";
+  private cRoute = "catalog/tags";
+  private oRoute = "catalog/options";
+  private api: AxiosInstance;
 
   constructor(baseURL: string) {
     this.api = new AxiosConfig(baseURL).api;
   }
 
-  secondBaseURL = process.env.NEXT_PUBLIC_API;
-
   getProductByName = async (product: string): Promise<ProductsResponse> => {
-    return this.api.get(`/products/${product}`).then((res) => res.data);
+    const res = await this.api.get(`${this.route}/${product}`);
+    return res.data;
   };
+
   getAllCategoryProducts = async (
     category: string
   ): Promise<ProductsResponse> => {
-    return this.api.get(`/${category}/all/cat/product`).then((res) => res.data);
+    const res = await this.api.get(`${this.route}?tag=${category}`);
+    return res.data;
   };
-  getAllProducts = async (): Promise<ProductsResponse> => {
-    return this.api.get(`/${this.route}`).then((res) => res.data);
+
+  getAllProducts = async (): Promise<ProdData[]> => {
+    const res = await this.api.get(`${this.route}`);
+    return res.data;
   };
-  getCategories = (): Promise<CategoryResponse> => {
-    return this.api.get(`/${this.cRoute}`).then((res) => res.data);
+
+  getCategories = async (): Promise<CategoriesData[]> => {
+    const res = await this.api.get(`${this.cRoute}`);
+    return res.data;
   };
-  postTicket = (data: ReceiptProps) => {
-    return axios.post(`api/ticket`, data);
+
+  getOptions = async (): Promise<ProductOption[]> => {
+    const res = await this.api.get(`${this.oRoute}`);
+    return res.data;
+  };
+
+  getProductsOptions = async (ids: number[]): Promise<OptionValue[]> => {
+    const res = await this.api.get(`${this.route}/options/${ids.join(",")}`);
+    return res.data;
+  }
+
+  postTicket = async (data: ReceiptProps) => {
+    const res = await fetch("/api/ticket", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    });
+
+    if (!res.ok) {
+      const error = await res.text();
+      throw new Error(error || "Erreur lors de l'envoi du ticket");
+    }
+
+    return res.json();
   };
 }

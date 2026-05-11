@@ -31,29 +31,29 @@ const ViewOrderDialog = ({ open, onClose, order, towns }: ViewOrderDialogProps) 
 
   // Parse items to ensure it's always an array
   const parseItems = (items: unknown): string[] => {
-  if (Array.isArray(items)) {
-    return items.map((item) =>
-      typeof item === "string" ? item.replace(/"/g, "").trim() : String(item)
-    );
-  }
+    if (Array.isArray(items)) {
+      return items.map((item) =>
+        typeof item === "string" ? item.replace(/"/g, "").trim() : String(item)
+      );
+    }
 
-  if (typeof items === "string") {
-    // Prend tout ce qui est avant le premier "]"
-    const beforeBracket = items.includes("]")
-      ? items.split("]")[0]
-      : items;
+    if (typeof items === "string") {
+      // Prend tout ce qui est avant le premier "]"
+      const beforeBracket = items.includes("]")
+        ? items.split("]")[0]
+        : items;
 
-    // Retire les crochets
-    const cleaned = beforeBracket.replace(/\[|\]/g, "").trim();
+      // Retire les crochets
+      const cleaned = beforeBracket.replace(/\[|\]/g, "").trim();
 
-    return cleaned
-      .split(",")
-      .map((item) => item.replace(/"/g, "").trim()) // 🔥 enlève tous les guillemets
-      .filter((item) => item.length > 0);
-  }
+      return cleaned
+        .split(",")
+        .map((item) => item.replace(/"/g, "").trim()) // 🔥 enlève tous les guillemets
+        .filter((item) => item.length > 0);
+    }
 
-  return [];
-};
+    return [];
+  };
 
 
 
@@ -85,7 +85,7 @@ const ViewOrderDialog = ({ open, onClose, order, towns }: ViewOrderDialogProps) 
     is_paid: order.is_paid,
     is_delivred: order.is_delivred,
     created_at: order.created_at,
-    reference: order.reference,
+    reference: order.vendor_reference,
   };
 
   return (
@@ -143,7 +143,7 @@ const ViewOrderDialog = ({ open, onClose, order, towns }: ViewOrderDialogProps) 
                   <div className="flex flex-col gap-1 w-full border-b border-[#848484] pb-2">
                     <div className="flex items-center justify-between">
                       <h4 className="font-normal">{"ID de transaction:"}</h4>
-                      <h4 className="text-[10.5px]">{`${order.reference}`}</h4>
+                      <h4 className="text-[10.5px]">{`${order.vendor_reference}`}</h4>
                     </div>
                     <div className="flex items-center justify-between">
                       <h4 className="font-normal">{"Numéro de tel:"}</h4>

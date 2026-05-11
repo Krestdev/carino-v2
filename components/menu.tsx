@@ -34,7 +34,6 @@ const MenuComp = ({ children }: MenuProps) => {
     const pages = [
         { name: "Accueil", link: "/", icon: <LucideHome /> },
         { name: "Catalogue", link: "/catalogue", icon: <LucideSquareMenu /> },
-        { name: "Tous nos produits", link: "/produits", icon: <LucideUtensilsCrossed /> },
         { name: "Réserver", link: "/reservation", icon: <LucideTable /> },
         { name: "Profil", link: "/profil", icon: <LucideUser /> },
         { name: "Historique", link: "/historique", icon: <LucideClock /> },

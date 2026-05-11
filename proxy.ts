@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
 export function proxy(req: NextRequest) {
-  const isMaintenanceMode = process.env.MAINTENANCE_MODE === "true";
+  const isMaintenanceMode = process.env.NEXT_PUBLIC_MAINTENANCE_MODE === "true";
   const { pathname } = req.nextUrl;
 
   // Vérifier si l'utilisateur tente d'accéder à /maintenance

@@ -24,14 +24,14 @@ export interface OrderTypeProps {
 // }
 
 export interface cartItem {
-  nom: string;
-  qte: number;
+  name: string;
+  quantity: number;
   id: string;
-  itemId: number;
+  item_id: number;
   options: Array<cartItemOption>;
   price: number;
   image: string;
-  cat: Array<Cat>;
+  tags: Array<Number>;
   originalPrice?: number;
 }
 export interface cartItemOption {
@@ -52,23 +52,11 @@ export type credentialsType = {
 };
 
 export type UserRegistration = {
-  email: string;
-  name: string;
+  mail: string;
+  fname: string;
   phone: string;
   password: string;
-  confirm_password: string;
 };
-
-// export interface ProductData {
-//   id: number;
-//   name: string;
-//   image: string | null;
-//   disable?: boolean;
-//   description: string | null;
-//   price: number;
-//   cat: Array<ProductCategory>;
-//   options: Array<ProductOption>;
-// }
 
 export interface ProductCategory {
   name: string;
@@ -76,18 +64,39 @@ export interface ProductCategory {
   id: number;
   id_parent: number | null;
 }
+
 export interface ProductOption {
+  id: number;
   name: string;
-  id_zelty: string;
-  enfants: Array<ProductOptionChild>;
+  values: OptionValue[];
+  max_choices: number;
+  min_choices: number;
+  donotpresent: boolean;
+  zc_only: boolean;
+  disable: boolean;
 }
-export interface ProductOptionChild {
+
+export interface OptionValue {
+  id: number;
+  remote_id: string | null;
   name: string;
+  description: string | null;
+  image: string;
   price: number;
-  id_zelty: string;
-  min_choices: null | number;
-  max_choices: null | number;
 }
+
+// export interface ProductOption {
+//   name: string;
+//   id_zelty: string;
+//   enfants: Array<ProductOptionChild>;
+// }
+// export interface ProductOptionChild {
+//   name: string;
+//   price: number;
+//   id_zelty: string;
+//   min_choices: null | number;
+//   max_choices: null | number;
+// }
 export interface DataValue {
   name: string;
   quantity: number;
@@ -188,12 +197,12 @@ export interface orderMutationData {
   ref: string;
   status: string;
   updated_at: Date;
+  vendor_reference: string;
 }
 
 export interface checkTransactionStatus {
-  data: orderMutationData[];
-  message: string;
-  success: boolean;
+  vendor_reference?: string;
+  status?: "PENDING" | "COMPLETED" | "FAILED";
 }
 
 export interface CitiesResponse {
@@ -310,7 +319,7 @@ export interface CategoriesData {
 export interface ProductsResponse {
   message: string;
   statusCode: number;
-  data: ProductsData[];
+  dishes: ProductsData[];
 }
 
 export interface ProductsData {
@@ -353,6 +362,47 @@ export interface ProductsData {
   meta: string;
   zc_name?: string;
   cat: Cat[];
+}
+
+export interface ProdData {
+  id: number;
+  remote_id: string | null;
+  id_restaurant: number;
+  sku: string | null;
+  name: string;
+  description: string | null;
+  image: string;
+  thumb: string;
+  price: number; // en cents (ex: 100000 = 1000.00 €)
+  price_togo: number | null;
+  price_delivery: number | null;
+  happy_price: number | null;
+  cost_price: number | null;
+  tva: number;
+  tvat: number | null;
+  tvad: number | null;
+  tax: number;
+  tax_takeaway: number | null;
+  tax_delivery: number | null;
+  tags: number[]; // IDs des catégories/tags
+  options: number[]; // IDs des options
+  id_fabrication_place: number;
+  fab_name: string | null;
+  color: string | null;
+  loyalty_points: number;
+  loyalty_points_discount: number | null;
+  earn_loyalty: number;
+  price_to_define: boolean;
+  weight_for_price: number | null;
+  disable: boolean;
+  disable_takeaway: boolean;
+  disable_delivery: boolean;
+  disable_before: string | null;
+  disable_after: string | null;
+  o: number;
+  zc_only: boolean;
+  meta: Record<string, any>;
+  zc_name: string | null;
 }
 
 export interface Cat {
@@ -418,10 +468,11 @@ export interface UserOrdersResponse {
   data: OrdersData[];
 }
 
+
 export interface OrdersData {
   id: number;
   zelty_order_id?: number;
-  reference: string;
+  vendor_reference: string;
   items: string;
   user_id: number;
   prix_total: number;
@@ -435,13 +486,25 @@ export interface OrdersData {
   updated_at: Date;
 }
 
-export type Order = {
+export type deliveryMode = "takeaway" | "delivery";
+
+export type Retry = {
+  orderUuid: string | undefined;
   phone: string;
-  total_amount: number;
-  user: number;
-  Address?: string;
-  commande: cartItem[];
+  network: 'MTN_CM' | 'ORANGE_CM';
+};
+
+export type Order = {
+  total: number;
+  first_name: string;
+  address?: Omit<AddtressData, 'id' | 'created_at' | 'updated_at'>;
+  items: Omit<cartItem, 'id' | 'options' | 'image' | 'tags' | 'name'>[];
+  payment: {
+    network: 'MTN_CM' | 'ORANGE_CM';
+    phone: string;
+  }
   due_date?: string;
+  mode: deliveryMode
 };
 
 // ##############
@@ -462,6 +525,15 @@ export interface UserLogin {
 export interface UserLoginData {
   user: User;
   "bearer token": string;
+}
+
+export interface AuthUser {
+  id: number;
+  email: string;
+  name: string;
+  phone: string
+  isFirstOrder: boolean
+  loyalty: number;
 }
 
 export interface User {
@@ -501,6 +573,7 @@ export interface User {
   email: string;
   created_at: string;
   "bearer token": string;
+  last_login: string;
 }
 
 export interface UserAddress {
@@ -522,27 +595,22 @@ export interface UserAddress {
 }
 
 export interface ReservationData {
-  id?: number;
-  reservation_id?: number;
-  user_id?: number;
-  transaction_ref?: string;
-  amount?: number;
-  menu?: string;
-  phone?: string;
-  note?: string;
-  created_at?: string;
-  updated_at?: string;
-  //
-  booking_for?: string;
-  places?: number;
-  comment?: string;
-  status?: number;
-  userId?: number;
-
-  //in comment
-  email?: string;
-  name?: string;
-  customerName?: string;
+  id: number
+  remote_id: string
+  id_customer: number
+  id_command: number
+  created_at?: Date
+  booking_for: Date
+  arrived_at?: Date
+  closed_at?: Date
+  table: number
+  places: number
+  status: number
+  cancel_reason?: number
+  src: string
+  comment: string
+  final_price: number
+  customer: User
 }
 
 export interface ReservationResponse {
@@ -579,9 +647,9 @@ export interface Promotion {
   combinable: boolean;       // si elle peut se cumuler avec d’autres
   isActive: () => boolean;
   apply: (cart: cartItem[]) => cartItem[];
-  image?:string;
-  message:string;
-  href?:string;
+  image?: string;
+  message: string;
+  href?: string;
 }
 
 export interface PromotionDelivery {

@@ -79,7 +79,7 @@ export default class AxiosConfig {
         if (res) {
           switch (res.status) {
             case 400:
-              toast.warning(message); // e.g., "Missing required fields"
+              toast.warning(message);
               break;
             case 401:
               toast.error(message || "Unauthorized. Please log in again.");
@@ -97,9 +97,9 @@ export default class AxiosConfig {
               toast.error(message);
           }
         } else if (error.request) {
-          toast.error(
-            "No response from server. Check your internet connection."
-          );
+          // toast.error(
+          //   "No response from server. Check your internet connection."
+          // );
         } else {
           toast.error(`Error: ${error.message}`);
         }

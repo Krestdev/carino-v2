@@ -113,6 +113,6 @@ export function normalizeText(text: string): string {
 }
 
 export function CartTotal(cart: Array<cartItem>):number{
-  return cart.reduce((accumulator, item) => accumulator + item.price * item.qte,
+  return cart.reduce((accumulator, item) => accumulator + item.price * item.quantity,
           0)
 }

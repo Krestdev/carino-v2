@@ -12,7 +12,7 @@ const Page = () => {
   const router = useRouter();
   return (
     <div>
-      <Head image={'/images/reservation1.webp'} title='Réservation' />
+      <Head image={'/images/reservation1.webp'} title='Réservation' subTitle='besoin d’une table ?' />
       <div className='max-w-[1440px] w-full mx-auto'>
         <Button onClick={() => router.push('/')} className='m-8'><ArrowLeft />{"Retour a l'accueil"}</Button>
       </div>

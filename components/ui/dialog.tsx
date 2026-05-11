@@ -60,7 +60,7 @@ function DialogContent({
       <DialogPrimitive.Content
         data-slot="dialog-content"
         className={cn(
-          "bg-background data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 fixed top-[50%] left-[50%] z-50 grid w-full max-w-[calc(100%-2rem)] translate-x-[-50%] translate-y-[-50%] gap-4 rounded-lg border p-6 shadow-lg duration-200 sm:max-w-lg",
+          "bg-background data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 fixed top-[50%] left-[50%] z-50 grid w-full max-w-[calc(100%-2rem)] translate-x-[-50%] translate-y-[-50%] border p-6 shadow-lg duration-200 sm:max-w-lg gap-6",
           className
         )}
         {...props}
@@ -69,10 +69,10 @@ function DialogContent({
         {showCloseButton && (
           <DialogPrimitive.Close
             data-slot="dialog-close"
-            className="ring-offset-background focus:ring-ring data-[state=open]:bg-accent data-[state=open]:text-muted-foreground absolute top-0 right-0 rounded-xs opacity-70 transition-opacity w-8 h-8 hover:opacity-100 focus:ring-2 focus:ring-offset-2 focus:outline-hidden disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4"
+            className="flex items-center justify-center cursor-pointer ring-offset-background focus:ring-ring data-[state=open]:bg-[#FEE2E2] data-[state=open]:text-muted-foreground absolute top-3 right-3 transition-opacity w-8 h-8 hover:opacity-100 focus:ring-2 focus:ring-offset-2 focus:outline-hidden disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 z-50"
           >
             <XIcon
-              className=" text-red-500 border-2 rounded-full color-primary !w-7 !h-7"
+              className=" text-red-500 rounded-full bg-[#FEE2E2] color-primary !w-10 !h-10"
               fill=""
               size={24}
             />
@@ -114,7 +114,7 @@ function DialogTitle({
   return (
     <DialogPrimitive.Title
       data-slot="dialog-title"
-      className={cn("text-lg leading-none font-semibold", className)}
+      className={cn("text-[18px] font-semibold font-general uppercase", className)}
       {...props}
     />
   );

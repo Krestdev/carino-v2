@@ -24,11 +24,11 @@ export function useAuthGuard() {
     if (!isHydrated) return;
 
     const isLoggedIn = Boolean(user && token);
-    const isPublic = ["/connexion", "/inscription"].includes(pathname);
 
-    if (isPublic && isLoggedIn) {
-      router.replace(!!redirectRoute ? decodeURIComponent(redirectRoute) : "/" );
-      toast.error("Vous ne pouvez pas accéder à cette page")
+    if (!isLoggedIn) {
+      !!redirectRoute ? router.replace(decodeURIComponent(redirectRoute))
+        : (router.back(), toast.error("Vous devez être connecté pour accéder à cette page"))
+
       return;
     }
 

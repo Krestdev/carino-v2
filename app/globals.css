@@ -4,10 +4,12 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  --primary: oklch(0.2986 0.0983 283.47);
+  --primary: #29235C;
   --secondary: oklch(0.97 0 0);
-  --font-pt-sans: "PT Sans", sans-serif;
+  --font-open-sans: var(--font-open-sans);
   --font-oleo: "Oleo Script", cursive;
+  --font-playfair: var(--font-playfair);
+  --font-general-sans: var(--font-general-sans);
   --radius: 0.625rem;
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
@@ -39,10 +41,12 @@
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
 }
+
 .christmas {
   --accent: oklch(0.5365 0.1991 20.95);
   --accent-foreground: oklch(0.98 0 0);
 }
+
 .newyear {
   --primary: oklch(15.434% 0.00002 271.152);
 }
@@ -52,8 +56,10 @@
   --color-foreground: var(--foreground);
   --color-primary: var(--primary);
   --color-secondary: var(--secondary);
-  --font-sans: var(--font-pt-sans);
+  --font-sans: var(--font-open-sans);
   --font-mono: var(--font-oleo);
+  --font-serif: var(--font-playfair);
+  --font-general: var(--font-general-sans);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -91,32 +97,32 @@
   :root {
     --primary: #191537;
     --secondary: #000000;
-    --font-pt-sans: "PT Sans", sans-serif;
+    --font-open-sans: var(--font-open-sans);
     --font-oleo: "Oleo Script", cursive;
   }
 }
 
 body {
-  font-family: PT Sans, Helvetica, sans-serif;
+  font-family: "Open Sans", Helvetica, sans-serif;
 }
 
 /* styles/globals.css ou styles/app.css */
 
 @layer base {
   h1 {
-    @apply text-[32px] md:text-[60px] lg:text-[80px] leading-[130%] font-bold tracking-[-3%] font-sans;
+    @apply text-[32px] md:text-[40px] lg:text-[48px] leading-[120%] font-medium tracking-[-3%] font-serif;
   }
 
   h2 {
-    @apply text-[42px] md:text-[48px] lg:text-[52px] leading-[120%] font-bold tracking-[-2%] font-mono;
+    @apply text-[24px] md:text-[32px] lg:text-[40px] leading-[120%] font-medium tracking-[-2%] font-serif;
   }
 
   h3 {
-    @apply text-[24px] md:text-[28px] lg:text-[32px] leading-[150%] font-bold tracking-[-1%] font-sans;
+    @apply text-[24px] md:text-[28px] lg:text-[32px] leading-[150%] font-medium tracking-[-1%] font-serif;
   }
 
   h4 {
-    @apply text-[16px] md:text-[18px] lg:text-[20px] leading-[150%] font-bold tracking-[0%] font-sans;
+    @apply text-[14px] lg:text-[16px] leading-[150%] font-semibold tracking-[0%] font-general text-[#89590C];
   }
 
   p {
@@ -124,7 +130,12 @@ body {
   }
 
   /* Si tu veux uniformiser tous les titres h1-h6 */
-  h1, h2, h3, h4, h5, h6 {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
     @apply transition-all ease-out duration-150;
   }
 
@@ -184,87 +195,111 @@ body {
 }
 
 @layer components {
-  .footerBloc{
+  .footerBloc {
     @apply flex flex-col gap-4 px-2 max-w-[240px];
   }
-  .footerLink{
+
+  .footerLink {
     @apply text-slate-400 hover:text-white transition-colors duration-150 ease-linear;
   }
-  .lien{
+
+  .lien {
     @apply font-bold text-primary hover:underline first-letter:uppercase;
   }
-  .mainTitle{
+
+  .mainTitle {
     @apply leading-[120%] max-w-screen-xl text-white sm:text-[40px] md:text-[48px] lg:text-[60px] xl:text-[72px];
   }
-  .subtitle{
+
+  .subtitle {
     @apply text-xl font-light lg:text-2xl first-letter:uppercase text-slate-200 max-w-4xl;
   }
-  .meshBackground{
-    background-color:hsla(276,69%,27%,1);
+
+  .meshBackground {
+    background-color: hsla(276, 69%, 27%, 1);
     background-image:
-      radial-gradient(at 40% 20%, hsla(233,61%,29%,1) 0px, transparent 50%),
-      radial-gradient(at 80% 0%, hsla(189,100%,56%,1) 0px, transparent 50%),
-      radial-gradient(at 0% 50%, hsla(216,69%,20%,1) 0px, transparent 50%),
-      radial-gradient(at 80% 50%, hsla(291,100%,76%,1) 0px, transparent 50%),
-      radial-gradient(at 0% 100%, hsla(224,49%,44%,1) 0px, transparent 50%),
-      radial-gradient(at 0% 0%, hsla(240,83%,27%,1) 0px, transparent 50%),
-      radial-gradient(at 94% 100%, hsla(235,100%,76%,1) 0px, transparent 50%);
+      radial-gradient(at 40% 20%, hsla(233, 61%, 29%, 1) 0px, transparent 50%),
+      radial-gradient(at 80% 0%, hsla(189, 100%, 56%, 1) 0px, transparent 50%),
+      radial-gradient(at 0% 50%, hsla(216, 69%, 20%, 1) 0px, transparent 50%),
+      radial-gradient(at 80% 50%, hsla(291, 100%, 76%, 1) 0px, transparent 50%),
+      radial-gradient(at 0% 100%, hsla(224, 49%, 44%, 1) 0px, transparent 50%),
+      radial-gradient(at 0% 0%, hsla(240, 83%, 27%, 1) 0px, transparent 50%),
+      radial-gradient(at 94% 100%, hsla(235, 100%, 76%, 1) 0px, transparent 50%);
   }
-  .categoryBlocTitle{
+
+  .categoryBlocTitle {
     @apply text-2xl md:text-3xl lg:text-4xl font-bold text-center text-primary uppercase;
   }
-  .categoryBlocSubtitle{
+
+  .categoryBlocSubtitle {
     @apply text-center mt-1 text-slate-600 max-w-3xl;
   }
-  .heroHeight{
+
+  .heroHeight {
     @apply h-[400px] sm:h-[450px] md:h-[500px] lg:h-[600px];
   }
-  .productCardTitle{
+
+  .productCardTitle {
     @apply font-semibold uppercase line-clamp-2;
   }
-  .productCardPrice{
+
+  .productCardPrice {
     @apply shrink-0 text-sm;
   }
-  .productDetailTitle{
+
+  .productDetailTitle {
     @apply pb-2 pt-3 border-b font-semibold w-full;
   }
+
   .productDiv {
     @apply px-4 xl:px-10 py-8 sm:py-10 md:py-12 lg:py-14 xl:py-16 w-full flex flex-col gap-4 sm:gap-6 lg:gap-10;
   }
+
   .verticalPad {
     @apply py-8 sm:py-10 md:py-12 lg:py-14 xl:py-16;
   }
-  .specialCardHover{
+
+  .specialCardHover {
     @apply text-white text-lg 2xl:text-xl font-semibold uppercase absolute -bottom-16 left-1/2 -translate-x-1/2 translate-y-[100%] text-center z-20 group-hover:bottom-1/2 transition-all duration-300 ease-out;
   }
-  .specialCardHoverBg{
+
+  .specialCardHoverBg {
     @apply absolute w-full h-full bg-gradient-to-t from-black/40 to-black/20 group-hover:from-primary/80 group-hover:to-primary/20 transition-all duration-300 ease-out;
   }
-  .catalogueContainer{
+
+  .catalogueContainer {
     @apply grid grid-cols-1 min-[500px]:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 place-items-center gap-6;
   }
-  .headerImage{
+
+  .headerImage {
     @apply w-full max-h-[300px] h-[20vw] min-h-fit relative flex flex-col gap-2 items-center justify-center text-white;
   }
-  .searchResult{
+
+  .searchResult {
     @apply w-full px-4 py-2 max-w-[300px] capitalize truncate bg-slate-50 dark:bg-slate-950 hover:bg-slate-100 dark:hover:bg-slate-900 transition-all duration-75 ease-linear;
   }
-  .productContainer{
+
+  .productContainer {
     @apply container flex flex-col xl:flex-row items-center xl:justify-between;
   }
-  .productContentContainer{
+
+  .productContentContainer {
     @apply max-w-lg w-4/5 flex flex-col py-8 gap-3 bg-white rounded-md p-5 xl:px-8 xl:py-10;
   }
-  .cartScroll{
+
+  .cartScroll {
     @apply flex flex-col gap-4 w-full max-h-[300px] overflow-y-auto;
   }
-  .cartScroll::-webkit-scrollbar-track{
+
+  .cartScroll::-webkit-scrollbar-track {
     @apply bg-slate-400 h-fit;
   }
-  .cartScroll::-webkit-scrollbar{
+
+  .cartScroll::-webkit-scrollbar {
     @apply w-2;
   }
-  .cartScroll::-webkit-scrollbar-thumb{
+
+  .cartScroll::-webkit-scrollbar-thumb {
     @apply bg-slate-700;
   }
 }

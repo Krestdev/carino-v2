@@ -1,77 +1,88 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import EditProductDialog from "@/app/panier/editProductDialog";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+
 import useStore from "@/context/store";
 import { XAF } from "@/lib/functions";
 import { CartTotal } from "@/lib/utils";
-import { ShoppingBasket } from "lucide-react";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
-import { LuX } from "react-icons/lu";
-import NewTag from "../newTag";
-import { Button } from "../ui/button";
 import DelieveryForm from "./DelieveryForm";
 import TakeawayForm from "./TakeawayForm";
 import { ApplyPromotions } from "../universal/promotions";
-import { cartItem } from "@/types/types";
+import { cartItem, deliveryMode, ProductOption } from "@/types/types";
+import CartItems from "./CartItems";
+import { useQuery } from "@tanstack/react-query";
+import ProductQuery from "@/queries/productQuery";
+import Loading from "@/app/loading";
+import Error from "../universal/error";
+import { ShoppingBasket } from "lucide-react";
 
-
-type deliveryMode = "takeAway" | "delivery";
 
 const Panier = () => {
-  //const { removeFromCart, emptyCart, token } = useStore();
-  const removeFromCart = useStore(s=> s.removeFromCart);
-  const token = useStore(s=> s.token);
-  const emptyCart = useStore(s=>s.emptyCart);
-  const baseCart = useStore(s=>s.cart);
+  const baseCart = useStore(s => s.cart);
   const [cart, setCart] = useState<Array<cartItem>>([]);
   const [deliveryMode, setDeliveryMode] = useState<deliveryMode>("delivery");
   const [postOrderStatus, setPostOrderStatus] = useState<boolean>(false);
   const [fees, setFees] = useState<number>(0);
-  const pathname = usePathname();
 
-  useEffect(()=>{
-    if(baseCart){
+  const baseURL = process.env.NEXT_PUBLIC_API_BASE_URL || (typeof window !== 'undefined' && window.location.origin.includes('localhost') ? `${window.location.origin}/api` : "https://www.le-carino.com/api/");
+
+  const productService = useMemo(() => new ProductQuery(baseURL), [baseURL]);
+  const {
+    data: produits,
+    isLoading: isLoadingProducts,
+    isError: isErrorProducts
+  } = useQuery({
+    queryKey: ["productFetchAll", baseURL],
+    queryFn: () => productService.getAllProducts(),
+    staleTime: 5 * 60 * 1000,
+  });
+
+  const {
+    data: optionsResponse,
+    isLoading: isLoadingOptions,
+    isError: isErrorOptions
+  } = useQuery({
+    queryKey: ["optionFetchAll", baseURL],
+    queryFn: () => productService.getOptions(),
+    staleTime: 5 * 60 * 1000,
+  });
+
+  // Vérification et normalisation des options
+  const safeOptions: ProductOption[] = useMemo(() => {
+    if (!optionsResponse) return [];
+    if (Array.isArray(optionsResponse)) return optionsResponse;
+    if (typeof optionsResponse === 'object') {
+      const anyResponse: ProductOption[] = optionsResponse;
+      if (anyResponse && Array.isArray(anyResponse)) return anyResponse;
+      return Object.values(optionsResponse).filter(v => Array.isArray(v))[0] as ProductOption[] || [];
+    }
+    return [];
+  }, [optionsResponse]);
+
+  useEffect(() => {
+    if (baseCart) {
       setCart(ApplyPromotions(baseCart));
     }
-  },[baseCart]);
+  }, [baseCart]);
+
+  if (isLoadingProducts || isLoadingOptions) {
+    return <Loading />
+  }
+
+  if (isErrorProducts || isErrorOptions) {
+    return <Error />
+  }
 
   return cart.length > 0 ? (
-    <div className="grid grid-cols-1 @min-[760px]:grid-cols-2 justify-center gap-10 py-10 sm:py-14 lg:py-20">
-      <div className="w-full flex flex-col gap-10">
-        <div className="flex flex-col max-w-[495px] w-full gap-6">
-        {token === null && <p className="text-red-500 w-full">🚨🚨 Veuillez vous <Link href={`/connexion?redirect=${encodeURIComponent(pathname)}`} className="italic text-blue-500 underline">{"connecter"}</Link> pour passer une commande.</p>}
-          <h3>{"Paiement"}</h3>
-          <div className="flex flex-col gap-2">
-            <label className="text-sm font-medium">{"Mode de livraison"}</label>
-            <Select value={deliveryMode} onValueChange={(e:deliveryMode)=>setDeliveryMode(e)}>
-              <SelectTrigger className="w-full h-[60px]">
-                <SelectValue placeholder="Selectionner un mode" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="takeAway">
-                  <NewTag endNew={new Date(2025, 2, 31)}>{"À Emporter"}</NewTag>
-                </SelectItem>
-                <SelectItem value="delivery">
-                  {"Livraison à domicile"}
-                </SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-        </div>
-        {deliveryMode === "takeAway" ? (
+    <div className="w-full grid grid-cols-1 @min-[760px]:grid-cols-3 gap-10 py-10 sm:py-14 lg:py-20">
+      <div className="col-span-2 flex flex-col gap-10">
+        {deliveryMode === "takeaway" ? (
           <TakeawayForm
             fees={fees}
             setFees={setFees}
             setPostOrderStatus={setPostOrderStatus}
             cart={cart}
+            deliveryMode={deliveryMode}
+            setDeliveryMode={setDeliveryMode}
           />
         ) : (
           <DelieveryForm
@@ -79,23 +90,39 @@ const Panier = () => {
             setFees={setFees}
             setPostOrderStatus={setPostOrderStatus}
             cart={cart}
+            deliveryMode={deliveryMode}
+            setDeliveryMode={setDeliveryMode}
           />
         )}
-        
       </div>
-      <div className="flex flex-col gap-6 items-start justify-start max-w-[600px] w-full">
+      <div className="flex flex-col gap-3 p-3">
+        <CartItems products={produits} items={cart} options={safeOptions} />
+        <div className="flex flex-col">
+          <p className="text-[14px] font-semibold text-[#4B5563]">{"Sous-total"}</p>
+          <p className="text-[16px] text-primary font-medium font-general">{XAF.format(CartTotal(cart))}</p>
+        </div>
+        <div className="flex flex-col">
+          <p className="text-[14px] font-semibold text-[#4B5563]">{"Livraison"}</p>
+          <p className="text-[16px] text-primary font-medium font-general">{fees === 0 ? "N/A" : XAF.format(fees)}</p>
+        </div>
+        <div className="flex flex-col">
+          <p className="text-[14px] font-semibold text-[#4B5563]">{"Total"}</p>
+          <p className="text-[20px] text-[#29235C] font-semibold font-general">{XAF.format(CartTotal(cart) + fees)}</p>
+        </div>
+      </div>
+      {/* <div className="flex flex-col gap-6 items-start justify-start max-w-[600px] w-full">
         <h3>{"Ma commande"}</h3>
-          <Button onClick={emptyCart}>{"Vider le panier"}</Button>
+        <Button onClick={emptyCart}>{"Vider le panier"}</Button>
         <div className="flex flex-col gap-4 max-h-[300px] overflow-auto">
           <div className="flex flex-col gap-4">
             {cart.map((item, index) => (
               <div
                 key={index}
                 className={`flex flex-row gap-6 items-center justify-between w-full px-7 py-5 rounded-[20px] ${index % 2 === 0 && item.price !== 0
-                    ? "bg-[#848484]/10"
-                    : item.price === 0
-                      ? "bg-green-500/10"
-                      : "border border-[#848484]"
+                  ? "bg-[#848484]/10"
+                  : item.price === 0
+                    ? "bg-green-500/10"
+                    : "border border-[#848484]"
                   }`}
               >
                 <div className="flex flex-row items-center justify-between w-full">
@@ -115,7 +142,7 @@ const Panier = () => {
                       </p>
                       {
                         !!item.originalPrice &&
-                        <p className="text-sm line-through text-muted-foreground">{XAF.format(item.originalPrice)}</p> 
+                        <p className="text-sm line-through text-muted-foreground">{XAF.format(item.originalPrice)}</p>
                       }
                     </div>
                   </div>
@@ -163,9 +190,9 @@ const Panier = () => {
             {
               deliveryMode === "delivery" &&
               <p className="text-[24px] font-normal text-end">
-              {"Frais de livraison: "}
-              <span className="text-[28px] font-bold">{XAF.format(fees)}</span>
-            </p>}
+                {"Frais de livraison: "}
+                <span className="text-[28px] font-bold">{XAF.format(fees)}</span>
+              </p>}
           </div>
           <p className="text-[24px] font-normal text-end">
             {"TOTAL: "}
@@ -174,7 +201,7 @@ const Panier = () => {
             </span>
           </p>
         </div>
-      </div>
+      </div> */}
     </div>
   ) : (
     <div className="flex flex-col gap-6 items-center justify-center w-full py-20">

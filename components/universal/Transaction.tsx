@@ -40,10 +40,10 @@ function Transaction() {
     queryFn: async () => {
       return userQuery.status(transactionRef!).then((res) => {
 
-        if (res.data[0].status === "FAILED" || res.data[0].status === "NOT_FOUND") {
+        if (res.status === "FAILED") {
           setPaymentStatus("failed");
           setPaymentStatus("error");
-        } else if (res.data[0].status === "COMPLETED") {
+        } else if (res.status === "COMPLETED") {
           setPaymentStatus("success");
         }
         return res;
@@ -63,7 +63,7 @@ function Transaction() {
 
     if (!isSuccess) return;
 
-    const status = data?.data[0]?.status?.toLowerCase();
+    const status = data?.status?.toLowerCase();
     if (!status) return;
 
     if (status.includes("completed") && paymentStatus !== "success") {
@@ -112,7 +112,7 @@ function Transaction() {
     }
   }, [
     isSuccess,
-    data?.data,
+    data,
     transactionRef,
     emptyCart,
     receiptData,

@@ -22,7 +22,7 @@ const PopAccount = ({ children }: Props) => {
                 <div className="grid gap-4">
                     <div className="w-full flex flex-col gap-2 border-b border-black pb-1 px-4">
                         <h4 className="leading-none font-medium">Mon Compte</h4>
-                        <p className="px-0 justify-start text-[14px] text-primary">{`Points de fidélité: ${user?.loyalty} pts`}</p>
+                        {/* <p className="px-0 justify-start text-[14px] text-primary">{`Points de fidélité: ${user?.loyalty} pts`}</p> */}
                     </div>
                     <div className="flex flex-col gap-2 px-4">
                         <Link href={"/profil"} className="border px-2">

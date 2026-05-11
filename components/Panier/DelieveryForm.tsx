@@ -1,15 +1,25 @@
+"use client";
+
 import { ApplyDeliveryPromo } from "@/app/panier/fees-promotion";
 import useStore from "@/context/store";
 import { CartTotal, cn, isDeliveryOpen } from "@/lib/utils";
 import { useAppContext } from "@/providers/appContext";
 import TownQuery from "@/queries/townQuery";
 import UserQuery from "@/queries/userQueries";
-import { cartItem, City, Order, OrderTypeProps } from "@/types/types";
+import {
+  AddtressData,
+  cartItem,
+  City,
+  deliveryMode,
+  Order,
+  OrderTypeProps,
+  Retry,
+} from "@/types/types";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { Check, ChevronsUpDown } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import z from "zod";
 import { Button } from "../ui/button";
@@ -38,6 +48,13 @@ import {
   SelectValue,
 } from "../ui/select";
 import { toast } from "../ui/use-toast";
+import NewTag from "../newTag";
+import PaiementStatus, { PaymentStatus } from "./PaiementStatus";
+
+interface DelieveryProps {
+  deliveryMode: deliveryMode;
+  setDeliveryMode: Dispatch<SetStateAction<deliveryMode>>;
+}
 
 const formSchema = z.object({
   city: z.string().min(3, { message: "Selectionnez une ville" }),
@@ -49,28 +66,36 @@ const formSchema = z.object({
   deliveryNumber: z.string().refine((value) => /^\d{9}$/.test(value), {
     message: "Le numéro de téléphone doit comporter 9 chiffres",
   }),
-  operator: z.string(),
+  operator: z.enum(["MTN_CM", "ORANGE_CM"]),
 });
 
 const DelieveryForm = ({
+  deliveryMode,
+  setDeliveryMode,
   fees,
   setFees,
   setPostOrderStatus,
   cart,
-}: OrderTypeProps&{cart:Array<cartItem>}) => {
+}: OrderTypeProps & DelieveryProps & { cart: Array<cartItem> }) => {
   const router = useRouter();
-  //store
-  const user = useStore(s=> s.user);
-  const setTransaction = useStore(s=>s.setTransaction);
-  const transactionRef = useStore(s=>s.transactionRef);
-  const setReceiptData = useStore(s=>s.setReceiptData);
-  //end Store
 
-  const [addresses, setAddresses] = useState<City[]>([]);
+  // Store
+  const { user, emptyCart } = useStore();
+  const setTransaction = useStore((s) => s.setTransaction);
+  const transactionRef = useStore((s) => s.transactionRef);
+  const setReceiptData = useStore((s) => s.setReceiptData);
+
+  const [addresses, setAddresses] = useState<AddtressData[]>([]);
   const [viewAddresses, setViewAddresses] = useState(false);
+  const [retryData, setRetryData] = useState<Retry>();
 
+  // ── Payment status state ──
+  const [paymentStatus, setPaymentStatus] = useState<PaymentStatus>(null);
+  const [sourceError, setSourceError] = useState<string | null>(null);
 
   const { baseURL } = useAppContext();
+  const baseURL2 =
+    process.env.NEXT_PUBLIC_API_BASE_URL2 || "http://localhost:3000";
 
   const townQuery = new TownQuery(baseURL);
   const { data, isSuccess } = useQuery({
@@ -79,10 +104,8 @@ const DelieveryForm = ({
   });
 
   useEffect(() => {
-    if (isSuccess) {
-      setAddresses(data.data);
-    }
-  }, [isSuccess, data?.data]);
+    if (isSuccess) setAddresses(data);
+  }, [isSuccess, data]);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -94,14 +117,234 @@ const DelieveryForm = ({
         user?.phone.slice(user?.phone.length - 9, user?.phone.length) ?? "",
       deliveryNumber:
         user?.phone.slice(user?.phone.length - 9, user?.phone.length) ?? "",
-      operator: "orange",
+      operator: "ORANGE_CM",
     },
   });
 
-  const userQuery = new UserQuery(baseURL);
+  const userQuery = new UserQuery(baseURL2);
+
+  const findFirstValueByKeys = (
+    payload: unknown,
+    candidateKeys: string[]
+  ): string | null => {
+    if (!payload || typeof payload !== "object") return null;
+
+    const normalized = new Set(candidateKeys.map((k) => k.toLowerCase()));
+    const queue: unknown[] = [payload];
+    const visited = new Set<unknown>();
+
+    while (queue.length > 0) {
+      const current = queue.shift();
+      if (!current || typeof current !== "object" || visited.has(current)) {
+        continue;
+      }
+      visited.add(current);
+
+      if (Array.isArray(current)) {
+        for (const item of current) queue.push(item);
+        continue;
+      }
+
+      for (const [key, value] of Object.entries(
+        current as Record<string, unknown>
+      )) {
+        if (normalized.has(key.toLowerCase())) {
+          if (typeof value === "string" && value.trim()) {
+            return value;
+          }
+          if (typeof value === "number" && Number.isFinite(value)) {
+            return String(value);
+          }
+        }
+
+        if (value && typeof value === "object") {
+          queue.push(value);
+        }
+      }
+    }
+
+    return null;
+  };
+
+  const extractVendorReference = (payload: any): string | null => {
+    const extractedRef =
+      payload?.vendor_reference ??
+      payload?.ref ??
+      payload?.reference ??
+      payload?.payment?.vendor_reference ??
+      payload?.payment?.ref ??
+      payload?.payment?.reference ??
+      payload?.vendorReference ??
+      payload?.transaction_ref ??
+      payload?.transactionRef ??
+      payload?.data?.vendor_reference ??
+      payload?.data?.ref ??
+      payload?.data?.reference ??
+      payload?.data?.payment?.vendor_reference ??
+      payload?.data?.payment?.ref ??
+      payload?.data?.payment?.reference ??
+      payload?.data?.vendorReference ??
+      payload?.data?.transaction_ref ??
+      payload?.data?.transactionRef ??
+      payload?.data?.[0]?.vendor_reference ??
+      payload?.data?.[0]?.ref ??
+      payload?.data?.[0]?.reference ??
+      payload?.data?.[0]?.payment?.vendor_reference ??
+      payload?.data?.[0]?.payment?.ref ??
+      payload?.data?.[0]?.payment?.reference ??
+      payload?.data?.[0]?.vendorReference ??
+      payload?.data?.[0]?.transaction_ref ??
+      payload?.data?.[0]?.transactionRef ??
+      findFirstValueByKeys(payload, [
+        "vendor_reference",
+        "vendorReference",
+        "transaction_ref",
+        "transactionRef",
+        "payment_reference",
+        "paymentReference",
+        "ref",
+        "reference",
+      ]);
+
+    const normalizedRef =
+      extractedRef === null || extractedRef === undefined
+        ? null
+        : String(extractedRef).trim() || null;
+
+    return normalizedRef;
+  };
+
+  const extractPaymentStatus = (
+    payload: any
+  ): "COMPLETED" | "FAILED" | "PENDING" | null => {
+    const rawStatus =
+      payload?.status ??
+      payload?.payment_status ??
+      payload?.paymentStatus ??
+      payload?.transaction_status ??
+      payload?.transactionStatus ??
+      payload?.data?.status ??
+      payload?.data?.payment_status ??
+      payload?.data?.paymentStatus ??
+      payload?.data?.transaction_status ??
+      payload?.data?.transactionStatus ??
+      payload?.data?.[0]?.status ??
+      payload?.data?.[0]?.payment_status ??
+      payload?.data?.[0]?.paymentStatus ??
+      payload?.data?.[0]?.transaction_status ??
+      payload?.data?.[0]?.transactionStatus ??
+      findFirstValueByKeys(payload, [
+        "status",
+        "payment_status",
+        "paymentStatus",
+        "transaction_status",
+        "transactionStatus",
+      ]);
+    if (!rawStatus) return null;
+
+    const normalizedStatus = String(rawStatus).toUpperCase();
+    const parsedStatus = normalizedStatus.includes("COMPLETED")
+      ? "COMPLETED"
+      : normalizedStatus.includes("FAILED") ||
+        normalizedStatus.includes("NOT_FOUND")
+        ? "FAILED"
+        : "PENDING";
+
+    return parsedStatus;
+  };
+
+  // Check payment status
+  const checkPaymentStatus = useMutation({
+    mutationFn: async (ref: string) => userQuery.status(ref),
+    onSuccess: (data) => {
+      const status = extractPaymentStatus(data);
+      if (status === "COMPLETED") {
+        setPaymentStatus("COMPLETED");
+        emptyCart();
+      } else if (status === "FAILED") {
+        setPaymentStatus("FAILED");
+      } else {
+        const nextVendorReference = extractVendorReference(data);
+        if (!nextVendorReference) {
+          setPaymentStatus("FAILED");
+          return;
+        }
+        setTimeout(() => {
+          checkPaymentStatus.mutate(nextVendorReference);
+        }, 20000);
+      }
+    },
+    onError: (_error, currentVendorReference) => {
+      setPaymentStatus("PENDING");
+      setSourceError("payment");
+      if (!currentVendorReference) {
+        setPaymentStatus("FAILED");
+        return;
+      }
+      setTimeout(() => {
+        checkPaymentStatus.mutate(currentVendorReference);
+      }, 20000);
+    },
+  });
 
   const postOrder = useMutation({
-    mutationFn: async (data: Order) => userQuery.PlaceOrder(data),
+    mutationFn: async (data: Order) => userQuery.createOrder(data),
+    onMutate: () => {
+      setPaymentStatus("PENDING");
+    },
+    onSuccess: (data) => {
+      const payload = data as any;
+      const orderUuid =
+        payload?.order?.uuid ?? payload?.data?.uuid ?? payload?.uuid;
+      if (orderUuid) {
+        setRetryData({
+          orderUuid,
+          phone: form.getValues().phoneNumber,
+          network: form.getValues().operator,
+        });
+      }
+      const vendorReference = extractVendorReference(data);
+      if (!vendorReference) {
+        setPaymentStatus("FAILED");
+        toast({
+          title: "Référence de transaction introuvable",
+          description:
+            "La commande a été enregistrée, mais le suivi du paiement n'a pas pu démarrer.",
+          variant: "destructive",
+        });
+        return;
+      }
+      checkPaymentStatus.mutate(vendorReference);
+    },
+    onError: () => {
+      setPaymentStatus("FAILED");
+      setSourceError("order");
+    },
+  });
+
+  const retryPayment = useMutation({
+    mutationKey: ["retry-paiement"],
+    mutationFn: async (data: Retry) => userQuery.retryPaiement(data),
+    onSuccess: (data) => {
+      setPaymentStatus("PENDING");
+      setSourceError(null);
+      const vendorReference = extractVendorReference(data);
+      if (vendorReference) {
+        checkPaymentStatus.mutate(vendorReference);
+        return;
+      }
+
+      const status = extractPaymentStatus(data);
+      if (status === "COMPLETED") {
+        setPaymentStatus("COMPLETED");
+      } else if (status === "FAILED") {
+        setPaymentStatus("FAILED");
+      }
+    },
+    onError: () => {
+      setPaymentStatus("FAILED");
+      setSourceError("payment");
+    },
   });
 
   function onSubmit(values: z.infer<typeof formSchema>) {
@@ -109,15 +352,32 @@ const DelieveryForm = ({
       addresses.find((x) => x.quartier === values.district)?.prix ?? "0"
     );
     setFees(ApplyDeliveryPromo(realFees, values.district, cart));
+
     if (user !== null) {
       if (isDeliveryOpen()) {
+        const address = addresses.find((x) => x.quartier === values.district);
         postOrder.mutate({
-          phone: values.phoneNumber,
-          total_amount:
-            CartTotal(cart) + ApplyDeliveryPromo(realFees, values.district, cart),
-          user: user.id,
-          Address: values.city,
-          commande: cart,
+          payment: {
+            network: values.operator,
+            phone: values.phoneNumber,
+          },
+          total:
+            CartTotal(cart) +
+            ApplyDeliveryPromo(realFees, values.district, cart),
+          first_name: user.name,
+          address: {
+            ville: address?.ville!,
+            quartier: address?.quartier!,
+            prix: address?.prix!,
+            id_zelty: address?.id_zelty!,
+          },
+          items: cart.map((item) => ({
+            item_id: Number(item.id),
+            quantity: item.quantity,
+            price: item.price,
+            type: "dish",
+          })),
+          mode: deliveryMode,
         });
         setReceiptData({
           fees: ApplyDeliveryPromo(realFees, values.district, cart),
@@ -134,7 +394,7 @@ const DelieveryForm = ({
         });
       } else {
         toast({
-          title: "Livraison  fermée.",
+          title: "Livraison fermée.",
           description:
             "La livraison est disponible uniquement entre 10h30 et 20h30.",
           variant: "info",
@@ -147,44 +407,35 @@ const DelieveryForm = ({
           "Pour finaliser votre commande vous devez avoir un compte et être connecté sur notre plateforme.",
         variant: "destructive",
       });
-      router.push("/connexion");
     }
   }
 
+  // Sync postOrder pending state with parent
   useEffect(() => {
-    if (postOrder.isPending) {
-      setPostOrderStatus(true);
-    }
-    if (!postOrder.isPending) {
-      setPostOrderStatus(false);
-    }
-    if (postOrder.isSuccess) {
-      setTransaction(postOrder.data.data.ref);
-    }
-    if (postOrder.isError) {
-      //setReceiptData();
-    }
-  }, [
-    postOrder.isError,
-    postOrder.isSuccess,
-    postOrder.isPending,
-    postOrder.data?.data.ref,
-    setTransaction,
-    setPostOrderStatus,
-  ]);
+    setPostOrderStatus(postOrder.isPending);
+  }, [postOrder.isPending, setPostOrderStatus]);
 
   function isDisable() {
-    if (
+    return (
       cart.length === 0 ||
       CartTotal(cart) + fees <
-        Number(process.env.NEXT_PUBLIC_MINIMUM_AMOUNT || 4999) ||
+      Number(process.env.NEXT_PUBLIC_MINIMUM_AMOUNT || 4999) ||
       postOrder.isPending ||
       !!transactionRef
-    ) {
-      return true;
-    } else {
-      return false;
+    );
+  }
+
+  // ── Handlers for PaiementStatus ──
+  function handleCloseStatus() {
+    setPaymentStatus(null);
+    if (paymentStatus === "COMPLETED") {
+      router.push("/commande");
     }
+  }
+
+  function handleRetry() {
+    setPaymentStatus(null);
+    form.handleSubmit(onSubmit)();
   }
 
   return (
@@ -192,35 +443,50 @@ const DelieveryForm = ({
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
-          // className="grid gap-y-7 gap-x-2 grid-cols-1 md:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2 max-w-2xl items-baseline"
           className="flex flex-col gap-10 w-full items-end"
         >
           <div className="w-full grid grid-cols-1 @min-[460px]:grid-cols-2 gap-4">
+            {/* Mode de livraison */}
+            <div className="flex flex-col gap-2">
+              <label className="text-sm font-medium">Mode de livraison</label>
+              <Select
+                value={deliveryMode}
+                onValueChange={(e: deliveryMode) => setDeliveryMode(e)}
+              >
+                <SelectTrigger className="w-full h-[60px]">
+                  <SelectValue placeholder="Selectionner un mode" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="takeAway">
+                    <NewTag endNew={new Date(2025, 2, 31)}>À Emporter</NewTag>
+                  </SelectItem>
+                  <SelectItem value="delivery">Livraison à domicile</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Quartier */}
             <FormField
               control={form.control}
               name="district"
               render={({ field }) => (
-                <FormItem className="flex flex-col gap-1 w-full">
+                <FormItem className="flex flex-col justify-end w-full">
                   <FormLabel isRequired className="customFormLabel">
-                    {"Quartier"}
+                    Quartier
                   </FormLabel>
                   <Popover open={viewAddresses} onOpenChange={setViewAddresses}>
                     <PopoverTrigger asChild>
                       <FormControl>
                         <Button
-                          variant="outline"
-                          role="combobox"
                           className={cn(
-                            "rounded-md border-input justify-between",
-                            !field.value
-                              ? "text-muted-foreground"
-                              : "text-slate-900"
+                            "w-full pl-3 flex justify-between border-b border-[#4B5563] hover:border-[#4B5563] bg-[#F3F4F6] hover:bg-[#F3F4F6] text-left font-normal",
+                            !field.value && "text-muted-foreground"
                           )}
                         >
                           {field.value
                             ? addresses.find(
-                                (item) => item.quartier === field.value
-                              )?.quartier
+                              (item) => item.quartier === field.value
+                            )?.quartier
                             : "Choisissez un quartier"}
                           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                         </Button>
@@ -229,7 +495,7 @@ const DelieveryForm = ({
                     <PopoverContent className="w-[290px] p-0">
                       <Command>
                         <CommandInput placeholder="Sélectionner un quartier..." />
-                        <CommandEmpty>{"Aucun quartier trouvé"}</CommandEmpty>
+                        <CommandEmpty>Aucun quartier trouvé</CommandEmpty>
                         <CommandGroup>
                           <div className="max-h-72 overflow-y-auto">
                             {addresses.map((item, id) => (
@@ -237,7 +503,10 @@ const DelieveryForm = ({
                                 value={item.quartier}
                                 key={id}
                                 onSelect={() => {
-                                  form.setValue("district", item.quartier);
+                                  field.onChange(item.quartier);
+
+                                  form.trigger("district");
+
                                   setFees(
                                     ApplyDeliveryPromo(
                                       Number(item.prix),
@@ -245,6 +514,7 @@ const DelieveryForm = ({
                                       cart
                                     )
                                   );
+
                                   setViewAddresses(false);
                                 }}
                                 className="capitalize"
@@ -253,7 +523,7 @@ const DelieveryForm = ({
                                   className={cn(
                                     "mr-2 h-4 w-4",
                                     item.quartier === field.value
-                                      ? "opacity-100"
+                                      ? "opacity-100 text-black"
                                       : "opacity-0"
                                   )}
                                 />
@@ -269,14 +539,14 @@ const DelieveryForm = ({
                 </FormItem>
               )}
             />
+
+            {/* Lieu dit */}
             <FormField
               control={form.control}
               name="locality"
               render={({ field }) => (
                 <FormItem className="flex flex-col gap-1 w-full">
-                  <FormLabel className="customFormLabel">
-                    {"Lieu dit"}
-                  </FormLabel>
+                  <FormLabel className="customFormLabel">Lieu dit</FormLabel>
                   <FormControl>
                     <Input
                       {...field}
@@ -288,40 +558,42 @@ const DelieveryForm = ({
                 </FormItem>
               )}
             />
-          </div>
-          <FormField
-            control={form.control}
-            name="operator"
-            render={({ field }) => (
-              <FormItem className="max-w-[495px] w-full">
-                <FormLabel className="customFormLabel">
-                  {"Opérateur de Paiement"}
-                </FormLabel>
-                <Select
-                  onValueChange={field.onChange}
-                  defaultValue={field.value}
-                >
-                  <FormControl>
-                    <SelectTrigger className="w-full">
-                      <SelectValue placeholder="Choisissez un opérateur" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    <SelectItem value={"orange"}>{"Orange"}</SelectItem>
-                    <SelectItem value={"mtn"}>{"MTN"}</SelectItem>
-                  </SelectContent>
-                </Select>
-              </FormItem>
-            )}
-          />
-          <div className="grid grid-cols-2 max-w-[495px] w-full gap-4">
+
+            {/* Opérateur */}
+            <FormField
+              control={form.control}
+              name="operator"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="customFormLabel">
+                    Opérateur de Paiement
+                  </FormLabel>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                  >
+                    <FormControl>
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Choisissez un opérateur" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="ORANGE_CM">Orange</SelectItem>
+                      <SelectItem value="MTN_CM">MTN</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </FormItem>
+              )}
+            />
+
+            {/* Numéro de paiement */}
             <FormField
               control={form.control}
               name="phoneNumber"
               render={({ field }) => (
                 <FormItem className="flex flex-col gap-1 w-full">
                   <FormLabel isRequired className="customFormLabel">
-                    {"Numéro de paiement"}
+                    Numéro de paiement
                   </FormLabel>
                   <FormControl>
                     <Input
@@ -334,13 +606,15 @@ const DelieveryForm = ({
                 </FormItem>
               )}
             />
+
+            {/* Numéro à appeler */}
             <FormField
               control={form.control}
               name="deliveryNumber"
               render={({ field }) => (
                 <FormItem className="flex flex-col gap-1 w-full">
                   <FormLabel isRequired className="customFormLabel">
-                    {"Numéro à appeler"}
+                    Numéro à appeler
                   </FormLabel>
                   <FormControl>
                     <Input
@@ -354,34 +628,32 @@ const DelieveryForm = ({
               )}
             />
           </div>
-          <div className="flex flex-col gap-2 items-end">
+
+          {/* Submit */}
+          <div className="flex flex-col items-start w-full gap-2">
             <div className="flex gap-2 items-center flex-wrap">
-              <span className="inline-flex">
-                <img
-                  src="/images/momo.webp"
-                  alt="mobile money"
-                  className="size-10"
-                />
-                <img
-                  src="/images/om.webp"
-                  alt="orange money"
-                  className="size-10"
-                />
-              </span>
-              <Button disabled={isDisable()} size={"lg"} type="submit">
-                {"Procéder au paiement"}
+              <Button disabled={isDisable()} size="lg" type="submit">
+                Procéder au paiement
               </Button>
             </div>
             {CartTotal(cart) < 5000 && (
               <p className="text-[14px] text-red-500">
-                {
-                  "Le montant minimum pour soumettre une commande est de 5000 Fcfa"
-                }
+                Le montant minimum pour soumettre une commande est de 5000 Fcfa
               </p>
             )}
           </div>
         </form>
       </Form>
+
+      {/* ── PaiementStatus Dialog ── */}
+      <PaiementStatus
+        status={paymentStatus}
+        onClose={handleCloseStatus}
+        data={retryData}
+        onRetry={handleRetry}
+        sourceError={sourceError}
+        retryPayment={retryPayment}
+      />
     </div>
   );
 };
