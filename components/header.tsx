@@ -210,7 +210,7 @@ const Header = () => {
                     <Link
                       href={"/admin"}
                       className={cn(
-                        "h-13 w-fit flex px-3 py-1 text-black relative",
+                        "h-13 w-fit flex px-3 py-1 text-white relative",
                         path === "/admin" && "text-[#FFC336]"
                       )}
                     >
