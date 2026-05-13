@@ -36,18 +36,10 @@ const HistoryTable = ({ title, data, towns }: Props) => {
     setSelectedOrder(null);
   };
 
-  // const jsonArray = (array: string) => {
-  //   if (typeof array === "string") {
-  //     return JSON.parse(array.replace(/\n/g, ""));
-  //   } else {
-  //     return array;
-  //   }
-  // };
-
   return (
     <div className="flex flex-col gap-5 w-full">
       <h3 className="text-xl font-bold">{title}</h3>
-      {/* <Table className="max-w-[1440px] w-full mx-auto border border-gray-300">
+      <Table className="max-w-[1440px] w-full mx-auto border border-gray-300">
         <TableHeader className="bg-primary text-white">
           <TableRow className="divide-x divide-gray-300 hover:bg-primary/90">
             <TableHead className="font-bold text-white">{"References"}</TableHead>
@@ -62,17 +54,16 @@ const HistoryTable = ({ title, data, towns }: Props) => {
         <TableBody className="divide-y divide-gray-200">
           {data.length === 0 ? (
             <TableRow className="divide-x divide-gray-200">
-              <TableCell colSpan={7} className="text-center">
+              <TableCell colSpan={7} className="text-center h-24">
                 {"Aucune donnée à afficher."}
               </TableCell>
             </TableRow>
           ) : (
-            data.filter(x=>x.reference.toLocaleLowerCase().startsWith("pizz")).toReversed().map((order, id) => {
-              const items = parseItems(order.items);
+            data.toReversed().map((order, id) => {
               return (
                 <TableRow key={id} className={`divide-x divide-gray-200 ${id % 2 === 0 ? "bg-gray-100" : ""}`}>
                   <TableCell className={`font-medium text-center`}>
-                    {`${order.reference.slice(0, 15)}...`}
+                    {`Ref-${order.uuid?.slice(0, 15)}...`}
                   </TableCell>
                   <TableCell>
                     {!order.is_delivred ? (
@@ -103,18 +94,17 @@ const HistoryTable = ({ title, data, towns }: Props) => {
                   </TableCell>
                   <TableCell className="truncate max-w-[200px]">
                     <div className="flex flex-col gap-1">
-                      {items.map((item,id)=>
-                      <div key={id} className="w-full text-sm font-medium text-gray-900 flex items-center gap-2">
-                        <span>{normalizeText(item.name)}</span>
-                        {item.details.length > 0 && <p className="text-xs text-gray-600 font-normal whitespace-normal break-words line-clamp-1">({item.details.map(el=> `${normalizeText(el.name)}${el.quantity > 1 ? ` x${el.quantity}`:""}`).join(", ")})</p>}
-                      </div>
-                      )}
+                      {order.items ? order.items.map((item, id) =>
+                        <div key={id} className="w-full text-sm font-medium text-gray-900 flex items-center gap-2">
+                          <span>{normalizeText(item.name ?? "---")}</span>
+                        </div>
+                      ) : "---"}
                     </div>
                   </TableCell>
 
-                  <TableCell>{XAF.format(Number(order.prix_total))}</TableCell>
+                  <TableCell>{XAF.format(Number(order.total))}</TableCell>
                   <TableCell>
-                    {formatRelative(order.created_at, new Date(), {locale: fr})}
+                    {formatRelative(order.registration, new Date(), { locale: fr })}
                   </TableCell>
                   <TableCell>
                     <Button
@@ -131,7 +121,7 @@ const HistoryTable = ({ title, data, towns }: Props) => {
             })
           )}
         </TableBody>
-      </Table> */}
+      </Table>
 
       {selectedOrder && (
         <ViewOrderDialog

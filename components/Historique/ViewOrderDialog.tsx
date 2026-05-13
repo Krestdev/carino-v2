@@ -7,13 +7,15 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { AddtressData, OrdersData } from "@/types/types";
+import { AddtressData, MyOrdersResponse, OrdersData } from "@/types/types";
 import { PDFViewer } from "@react-pdf/renderer";
-import { FileText, X } from "lucide-react";
+import { FileText } from "lucide-react";
 import { useState } from "react";
-import OrderInvoice from "./OrderInvoice";
 import Loading from "@/app/loading";
 import { XAF } from "@/lib/functions";
+import { useQuery } from "@tanstack/react-query";
+import UserQuery from "@/queries/userQueries";
+import OrderPDF from "./OrderInvoice";
 
 interface ViewOrderDialogProps {
   open: boolean;
@@ -22,95 +24,54 @@ interface ViewOrderDialogProps {
   towns: AddtressData[] | undefined;
 }
 
-const ViewOrderDialog = ({ open, onClose, order, towns }: ViewOrderDialogProps) => {
+const ViewOrderDialog = ({
+  open,
+  onClose,
+  order,
+  towns,
+}: ViewOrderDialogProps) => {
   const [showPdf, setShowPdf] = useState(false);
+
+  const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL2;
+  const orders = new UserQuery(baseUrl || "");
+
+  const orderData = useQuery({
+    queryKey: ["order", order?.uuid],
+    queryFn: () => orders.getOne(order!.uuid!),
+    enabled: open && !!order?.uuid,
+  });
+
+  const currentOrder: MyOrdersResponse | undefined =
+    orderData.data;
 
   if (!order) return null;
 
-  if (order.items === null || order.items === undefined) return <Loading />;
+  if (orderData.isLoading) {
+    return <Loading />;
+  }
 
-  // Parse items to ensure it's always an array
-  const parseItems = (items: unknown): string[] => {
-    if (Array.isArray(items)) {
-      return items.map((item) =>
-        typeof item === "string" ? item.replace(/"/g, "").trim() : String(item)
-      );
-    }
+  if (!currentOrder) {
+    return null;
+  }
 
-    if (typeof items === "string") {
-      // Prend tout ce qui est avant le premier "]"
-      const beforeBracket = items.includes("]")
-        ? items.split("]")[0]
-        : items;
+  const livraison = currentOrder.address?.quartier || "-";
 
-      // Retire les crochets
-      const cleaned = beforeBracket.replace(/\[|\]/g, "").trim();
-
-      return cleaned
-        .split(",")
-        .map((item) => item.replace(/"/g, "").trim()) // 🔥 enlève tous les guillemets
-        .filter((item) => item.length > 0);
-    }
-
-    return [];
-  };
-
-
-
-
-  const parsedItems = parseItems(order.items);
-
-  const jsonArray = (array: string) => {
-    if (typeof array === "string") {
-      return JSON.parse(array.replace(/\n/g, ""));
-    } else {
-      return array;
-    }
-  };
-
-  const metadata = jsonArray(order.metadata!);
-  const livraison = metadata && metadata.address && metadata.address.name ? metadata.address.name : "-";
-  const frais = towns?.find((town) => town.quartier === livraison)?.prix ?? 0;
-
-  const orderData = {
-    id: order.id,
-    customerName: metadata && metadata.customer && metadata.customer.name ? metadata.customer.name : "-",
-    phoneNumber: metadata && metadata.customer && metadata.customer.phone ? metadata.customer.phone : "-",
-    deliveryAddress: livraison,
-    location: metadata && metadata.address && metadata.address.street ? metadata.address.street : "-",
-    products: parsedItems,
-    deliveryFee: metadata && metadata.mode && metadata.mode === "takeaway" ? 0 : Number(frais),
-    itemsAmount: (Number(order.prix_total) - (metadata && metadata.mode && metadata.mode === "takeaway" ? 0 : Number(frais))).toString(),
-    totalAmount: order.prix_total,
-    is_paid: order.is_paid,
-    is_delivred: order.is_delivred,
-    created_at: order.created_at,
-    reference: order.vendor_reference,
-  };
+  const frais =
+    towns?.find((town) => town.quartier === livraison)?.prix ?? 0;
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl p-0">
-        <DialogHeader className="flex flex-row items-center justify-between bg-primary text-white px-4 py-2">
+      <DialogContent className="max-w-[50vw]! max-h-[85vh]! overflow-x-auto w-full p-0">
+        <DialogHeader className="flex flex-col gap-2 py-10! justify-between bg-primary text-white px-4">
           <DialogTitle className="text-lg font-semibold">
-            Détails de la commande #{order.zelty_order_id}
+            Détails de la commande #{currentOrder.uuid}
           </DialogTitle>
+
           <div className="flex flex-col">
-            <DialogDescription>
-              {`Statut payement : ${order.is_paid ? "Payé" : "Non payé"}`}
-            </DialogDescription>
-            <DialogDescription>
-              {`Statut livraison : ${order.is_delivred ? "Livré" : "Non livré"}`}
+            <DialogDescription className="text-white">
+              {`Statut : ${currentOrder.status}`}
             </DialogDescription>
           </div>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={onClose}
-            className="text-white hover:bg-primary/70"
-          >
-            <X className="h-5 w-5" />
-          </Button>
         </DialogHeader>
 
         <div className="p-4">
@@ -120,74 +81,130 @@ const ViewOrderDialog = ({ open, onClose, order, towns }: ViewOrderDialogProps) 
             className="mb-4 flex items-center gap-2 border-black text-black"
           >
             <FileText className="h-4 w-4" />
-            {showPdf ? "Masquer la facture PDF" : "Afficher la facture PDF"}
+
+            {showPdf
+              ? "Masquer la facture PDF"
+              : "Afficher la facture PDF"}
           </Button>
 
           {!showPdf ? (
             <div className="h-[600px] overflow-auto">
               <div className="relative flex flex-col items-center justify-center max-w-[880px] w-full px-[10px] py-[62px] gap-[10px] bg-white">
                 <img
-                  src="Logo.svg"
+                  src="/Logo.svg"
                   alt="Carino"
                   className="absolute top-[-10px] h-[150px] max-w-[150px] w-full mx-auto left-[35%] z-10 object-cover rounded-full"
                 />
+
                 <div className="w-full flex flex-col items-center gap-6 border pt-[70px] pb-8 px-7">
                   <div className="flex flex-col items-center">
-                    <h3 className="text-[30px]">{"Détails de la commande"}</h3>
+                    <h3 className="text-[30px]">
+                      Détails de la commande
+                    </h3>
+
                     <p className="text-[12px] font-normal w-[250px] text-center">
-                      {
-                        "Service de restauration – plats et boissons consommés sur place / à emporter / Livraison."
-                      }
+                      Service de restauration – plats et boissons
+                      consommés sur place / à emporter / Livraison.
                     </p>
                   </div>
+
                   <div className="flex flex-col gap-1 w-full border-b border-[#848484] pb-2">
                     <div className="flex items-center justify-between">
-                      <h4 className="font-normal">{"ID de transaction:"}</h4>
-                      <h4 className="text-[10.5px]">{`${order.vendor_reference}`}</h4>
+                      <h4 className="font-normal">
+                        ID de commande:
+                      </h4>
+
+                      <h4 className="text-[10.5px]">
+                        {currentOrder.uuid}
+                      </h4>
                     </div>
+
                     <div className="flex items-center justify-between">
-                      <h4 className="font-normal">{"Numéro de tel:"}</h4>
-                      <h4>{orderData.phoneNumber}</h4>
+                      <h4 className="font-normal">
+                        Client:
+                      </h4>
+
+                      <h4>{currentOrder.first_name}</h4>
                     </div>
+
                     <div className="flex items-center justify-between">
-                      <h4 className="font-normal">{"Adresse de livraison:"}</h4>
-                      <h4>{orderData.deliveryAddress}</h4>
+                      <h4 className="font-normal">
+                        Téléphone:
+                      </h4>
+
+                      <h4>{currentOrder.phone || "-"}</h4>
                     </div>
-                    <div className="flex flex-col gap-1">
-                      <h4 className="font-normal">{"Lieu dit:"}</h4>
-                      <h4 className="font-normal">{orderData.location}</h4>
+
+                    <div className="flex items-center justify-between">
+                      <h4 className="font-normal">
+                        Adresse de livraison:
+                      </h4>
+
+                      <h4>{livraison}</h4>
+                    </div>
+
+                    <div className="flex items-center justify-between">
+                      <h4 className="font-normal">
+                        Ville:
+                      </h4>
+
+                      <h4>
+                        {currentOrder.address?.ville || "-"}
+                      </h4>
                     </div>
                   </div>
+
                   <div className="flex flex-col gap-1 w-full border-b border-[#848484] pb-2">
-                    {parsedItems.map((product, index: number) => {
+                    {currentOrder.items.map((product, index) => (
+                      <div
+                        key={index}
+                        className="flex justify-between"
+                      >
+                        <h4 className="font-normal w-[220px]">
+                          {`• ${product.name} x${product.quantity}`}
+                        </h4>
 
-
-                      // Séparer le nom du prix en utilisant le séparateur " -> "
-                      const [productName, pricePart] = product.split(' -> ');
-
-                      // Extraire le prix numérique
-                      const price = pricePart ? pricePart.replace(' FCFA', '') : '0';
-
-                      return (
-                        <div key={index} className="flex justify-between">
-                          <h4 className="font-normal w-[220px]">{`• ${productName}`}</h4>
-                          <h4>{`${price} FCFA`}</h4>
-                        </div>
-                      );
-                    })}
+                        <h4>
+                          {XAF.format(product.price * product.quantity)}
+                        </h4>
+                      </div>
+                    ))}
                   </div>
+
                   <div className="flex flex-col gap-1 w-full border-b border-[#848484] pb-2">
                     <div className="flex justify-between">
-                      <h4 className="font-normal">{"Commande"}</h4>
-                      <h4>{XAF.format(Number(orderData.itemsAmount))}</h4>
+                      <h4 className="font-normal">
+                        Commande
+                      </h4>
+
+                      <h4>
+                        {XAF.format(
+                          Number(currentOrder.total) -
+                          Number(frais)
+                        )}
+                      </h4>
                     </div>
+
                     <div className="flex justify-between">
-                      <h4 className="font-normal">{"Frais de livraison:"}</h4>
-                      <h4>{XAF.format(Number(orderData.deliveryFee))}</h4>
+                      <h4 className="font-normal">
+                        Frais de livraison:
+                      </h4>
+
+                      <h4>
+                        {XAF.format(Number(frais))}
+                      </h4>
                     </div>
+
                     <div className="flex justify-between">
-                      <h4 className="font-semibold">{"Total:"}</h4>
-                      <h4>{XAF.format(Number(orderData.totalAmount))}</h4>
+                      <h4 className="font-semibold">
+                        Total:
+                      </h4>
+
+                      <h4>
+                        {XAF.format(
+                          Number(currentOrder.total)
+                        )}
+                      </h4>
                     </div>
                   </div>
                 </div>
@@ -196,13 +213,14 @@ const ViewOrderDialog = ({ open, onClose, order, towns }: ViewOrderDialogProps) 
           ) : (
             <div className="h-[500px]">
               <PDFViewer width="100%" height="100%">
-                <OrderInvoice
-                  order={{
-                    ...orderData,
-                    is_paid: Boolean(orderData.is_paid),
-                    is_delivred: Boolean(orderData.is_delivred),
-                    zelty_order_id: String(orderData.id),
-                  }}
+                <OrderPDF
+                  order={currentOrder}
+                  deliveryAddress={towns?.find(
+                    (town) => town.quartier === livraison
+                  )}
+                  orderDate={new Date(
+                    currentOrder.registration
+                  ).toDateString()}
                 />
               </PDFViewer>
             </div>
@@ -210,7 +228,11 @@ const ViewOrderDialog = ({ open, onClose, order, towns }: ViewOrderDialogProps) 
         </div>
 
         <DialogFooter className="px-4 py-2">
-          <Button variant="secondary" onClick={onClose} className="text-white">
+          <Button
+            variant="secondary"
+            onClick={onClose}
+            className="text-white"
+          >
             Fermer
           </Button>
         </DialogFooter>

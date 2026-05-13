@@ -473,17 +473,75 @@ export interface OrdersData {
   id: number;
   zelty_order_id?: number;
   vendor_reference: string;
-  items: string;
+  items: cartItem[];
   user_id: number;
-  prix_total: number;
+  total: number;
   lieu_livraison: string;
   is_delivred: number;
   is_paid: number;
   uuid?: string;
   metadata?: string;
   promotionId?: number;
-  created_at: Date;
+  registration: Date;
   updated_at: Date;
+}
+
+export interface MyOrdersResponse {
+  uuid: string;
+  user_uuid: string;
+  status: string;
+  buzzer_ref: string | null;
+  comment: string | null;
+  display_id: string | null;
+  due_date: string | null;
+  first_name: string;
+  fulfillment_type: string | null;
+  id_delivery_address: number | null;
+  id_delivery_zone: number | null;
+  id_promotion: number | null;
+  id_restaurant: number | null;
+  mode: string;
+  phone: string | null;
+  promotion_discount: number | null;
+  remote_id: string | null;
+  restaurant_remote_id: string | null;
+  seats: number | null;
+  source: string;
+  table: string | null;
+  total: number;
+  virtual_brand_name: string | null;
+  registration: string;
+  updated_at: string;
+
+  address: {
+    id: number;
+    id_zelty: number;
+    ville: string;
+    quartier: string;
+    prix: string;
+    created_at: string;
+    updated_at: string;
+    order_uuid: string;
+  } | null;
+
+  items: {
+    id: number;
+    name: string;
+    order_uuid: string;
+    item_id: number;
+    remote_id: string | null;
+    type: string;
+    price: number;
+    quantity: number;
+    comment: string | null;
+    promotion_discount: number | null;
+    modifiers: unknown | null;
+    dishes: unknown | null;
+    tax: unknown | null;
+    place: unknown | null;
+  }[];
+
+  transactions: unknown[];
 }
 
 export type deliveryMode = "takeaway" | "delivery";
@@ -534,11 +592,15 @@ export interface AuthUser {
   phone: string
   isFirstOrder: boolean
   loyalty: number;
+  role?: string;
+  require_password_change?: boolean;
 }
 
 export interface User {
   id: number;
   id_zelty?: number;
+  role?: string;
+  require_password_change?: boolean
   uuid: string;
   remote_id: number;
   nice_name: string;
@@ -595,17 +657,19 @@ export interface UserAddress {
 }
 
 export interface ReservationData {
+  uuid: string
   id: number
   remote_id: string
   id_customer: number
   id_command: number
-  created_at?: Date
-  booking_for: Date
-  arrived_at?: Date
-  closed_at?: Date
+  created_at?: string
+  updated_at?: string
+  booking_for: string
+  arrived_at?: string
+  closed_at?: string
   table: number
   places: number
-  status: number
+  status: string
   cancel_reason?: number
   src: string
   comment: string

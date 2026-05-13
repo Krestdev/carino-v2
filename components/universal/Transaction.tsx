@@ -106,7 +106,7 @@ function Transaction() {
       setTimeout(() => setTransaction(null), 9000);
     }
 
-    if (status.includes("pending")) {
+    if (status.includes("pending") && paymentStatus !== "pending") {
       setPaymentStatus("pending");
       setOpen(true);
     }

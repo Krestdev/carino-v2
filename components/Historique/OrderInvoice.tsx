@@ -1,200 +1,426 @@
-import { XAF } from "@/lib/functions";
+// OrderPDF.tsx
 import {
   Document,
   Page,
   Text,
   View,
   StyleSheet,
-  Image,
+  Font,
 } from "@react-pdf/renderer";
 
-interface OrderInvoiceProps {
-  order: {
-    zelty_order_id: string | number | undefined;
-    customerName: string;
-    phoneNumber: string;
-    deliveryAddress: string;
-    location: string;
-    products: string[];
-    deliveryFee: number;
-    itemsAmount: string;
-    totalAmount: number;
-    is_paid: boolean;
-    is_delivred: boolean;
-    created_at: Date;
-    reference: string
-  };
-}
+import { MyOrdersResponse, AddtressData } from "@/types/types";
+import { XAF } from "@/lib/functions";
 
-const OrderInvoice = ({ order }: OrderInvoiceProps) => (
-
-  <Document>
-    <Page size="A4" style={styles.page}>
-      <View style={styles.header}>
-        <Image src="/Logo.png" style={styles.image} />
-        <View style={styles.body}>
-          <View style={styles.headsection}>
-            <Text style={styles.headTitle}>{"Détails de la commande"}</Text>
-            <Text style={styles.headDescription}>
-              {
-                "Service de restauration – plats et boissons consommés sur place / à emporter / Livraison."
-              }
-            </Text>
-          </View>
-          <View style={styles.section}>
-            <View style={styles.subSection}>
-              <Text style={styles.subSectionLabel}>{"ID de transaction:"}</Text>
-              <Text style={styles.subSectionValue}>{order.reference}</Text>
-            </View>
-            <View style={styles.subSection}>
-              <Text style={styles.subSectionLabel}>{"Numéro de tel:"}</Text>
-              <Text style={styles.subSectionValue}>{order.phoneNumber}</Text>
-            </View>
-            <View style={styles.subSection}>
-              <Text style={styles.subSectionLabel}>
-                {"Adresse de livraison:"}
-              </Text>
-              <Text style={styles.subSectionValue}>
-                {order.deliveryAddress}
-              </Text>
-            </View>
-            <View
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "flex-start",
-                gap: 2,
-                marginBottom: "10px",
-              }}
-            >
-              <Text style={styles.subSectionLabel}>{"Lieu dit:"}</Text>
-              <Text style={styles.subSectionLabel}>{order.location}</Text>
-            </View>
-          </View>
-          <View style={styles.section}>
-            {order.products.map((product, index: number) => {
-              // Séparer le nom du prix en utilisant le séparateur " -> "
-              const [productName, pricePart] = product.split(' -> ');
-
-              // Extraire le prix (enlever "FCFA" si présent et convertir en nombre)
-              const price = parseInt(pricePart.replace(' FCFA', '')) || 0;
-
-              return (
-                <View key={index} style={styles.subSection}>
-                  <Text style={styles.subSectionLabel}>{`• ${productName}`}</Text>
-                  <Text style={styles.subSectionValue}>{`${XAF.format(price)}`}</Text>
-                </View>
-              );
-            })}
-          </View>
-          <View style={styles.section}>
-            <View style={styles.subSection}>
-              <Text style={styles.subSectionLabel}>{"Commande:"}</Text>
-              <Text style={styles.subSectionValue}>{Number(order.itemsAmount)}</Text>
-            </View>
-            <View style={styles.subSection}>
-              <Text style={styles.subSectionLabel}>
-                {"Frais de livraison:"}
-              </Text>
-              <Text style={styles.subSectionValue}>{Number(order.deliveryFee)}</Text>
-            </View>
-            <View style={styles.subSection}>
-              <Text style={styles.subSectionLabel}>{"Total:"}</Text>
-              <Text style={styles.subSectionValue}>{Number(order.totalAmount)}</Text>
-            </View>
-          </View>
-        </View>
-      </View>
-    </Page>
-  </Document>
-);
-
-export default OrderInvoice;
+// Enregistrer une police
+Font.register({
+  family: "Roboto",
+  src: "https://cdnjs.cloudflare.com/ajax/libs/ink/3.1.10/fonts/Roboto/roboto-regular-webfont.ttf",
+});
 
 const styles = StyleSheet.create({
   page: {
-    flexDirection: "column",
-    backgroundColor: "#FFFFFF",
-    padding: 70,
-    fontSize: 12,
-    fontFamily: "Helvetica",
-    width: "100%",
+    padding: 40,
+    fontFamily: "Roboto",
+    fontSize: 11,
   },
+
   header: {
-    position: "relative",
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-    justifyContent: "center",
-    maxWidth: "100%",
-    width: "100%",
-    paddingVertical: "10px",
-    paddingHorizontal: "50px",
-    backgroundColor: "white",
+    textAlign: "center",
+    marginBottom: 30,
+    paddingBottom: 10,
+    borderBottom: 1,
+    borderBottomColor: "#e5e5e5",
   },
-  image: {
-    position: "absolute",
-    top: "-50px",
-    left: "40%",
-    width: "120px",
-    height: "120px",
-    objectFit: "cover",
-    zIndex: 20,
-    borderRadius: "60px",
-  },
-  body: {
-    position: "relative",
-    width: "550px",
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: "24px",
-    border: "1px solid #000",
-    padding: "70px 32px 28px 32px",
-    zIndex: 0,
-  },
-  headsection: {
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-  },
-  headTitle: {
-    fontSize: "24px",
+
+  title: {
+    fontSize: 24,
     fontWeight: "bold",
-    color: "#000",
-    textAlign: "center",
-    width: "300px",
+    marginBottom: 10,
   },
-  headDescription: {
-    fontSize: "12px",
-    fontWeight: "normal",
-    color: "#000",
-    textAlign: "center",
-    width: "250px",
+
+  subtitle: {
+    fontSize: 10,
+    color: "#666",
+    marginBottom: 4,
   },
+
   section: {
-    display: "flex",
-    flexDirection: "column",
-    gap: "4px",
-    width: "100%",
-    borderBottom: "1px solid #848484",
-    marginBottom: "8px",
+    marginBottom: 20,
   },
-  subSection: {
-    display: "flex",
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    marginBottom: "10px",
-  },
-  subSectionLabel: {
-    fontWeight: "normal",
-    fontSize: "16px",
-    width: "60%",
-  },
-  subSectionValue: {
+
+  sectionTitle: {
+    fontSize: 14,
     fontWeight: "bold",
-    fontSize: "16px",
+    marginBottom: 10,
+    backgroundColor: "#f5f5f5",
+    padding: 8,
+  },
+
+  infoGrid: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    marginBottom: 10,
+  },
+
+  infoRow: {
+    flexDirection: "row",
+    marginBottom: 6,
+    width: "50%",
+  },
+
+  infoLabel: {
+    width: "35%",
+    fontWeight: "bold",
+  },
+
+  infoValue: {
+    width: "65%",
+  },
+
+  table: {
+    width: "100%",
+    marginTop: 10,
+  },
+
+  tableHeader: {
+    flexDirection: "row",
+    backgroundColor: "#f5f5f5",
+    paddingVertical: 8,
+    paddingHorizontal: 5,
+    borderBottom: 1,
+    borderBottomColor: "#ddd",
+  },
+
+  tableRow: {
+    flexDirection: "row",
+    paddingVertical: 6,
+    paddingHorizontal: 5,
+    borderBottom: 1,
+    borderBottomColor: "#eee",
+  },
+
+  colProduct: {
+    width: "40%",
+  },
+
+  colQuantity: {
+    width: "20%",
+    textAlign: "right",
+  },
+
+  colPrice: {
+    width: "20%",
+    textAlign: "right",
+  },
+
+  colTotal: {
+    width: "20%",
+    textAlign: "right",
+  },
+
+  totalRow: {
+    flexDirection: "row",
+    paddingVertical: 4,
+    paddingHorizontal: 5,
+    borderTopColor: "#ddd",
+  },
+
+  totalLabel: {
+    width: "80%",
+    textAlign: "right",
+    fontWeight: "bold",
+    fontSize: 12,
+  },
+
+  totalValue: {
+    width: "20%",
+    textAlign: "right",
+    fontWeight: "bold",
+    fontSize: 12,
+  },
+
+  statusContainer: {
+    flexDirection: "row",
+    gap: 10,
+  },
+
+  statusBox: {
+    flex: 1,
+    padding: 10,
+    backgroundColor: "#f9f9f9",
+    borderRadius: 4,
+  },
+
+  statusLabel: {
+    fontSize: 9,
+    color: "#666",
+    marginBottom: 4,
+  },
+
+  statusValue: {
+    fontSize: 11,
+    fontWeight: "bold",
+  },
+
+  footer: {
+    position: "absolute",
+    bottom: 30,
+    left: 40,
+    right: 40,
+    textAlign: "center",
+    fontSize: 9,
+    color: "#999",
+    borderTop: 1,
+    borderTopColor: "#e5e5e5",
+    paddingTop: 20,
   },
 });
+
+interface OrderPDFProps {
+  order: MyOrdersResponse;
+  deliveryAddress: AddtressData | undefined;
+  orderDate: string;
+}
+
+const OrderPDF = ({
+  order,
+  deliveryAddress,
+  orderDate,
+}: OrderPDFProps) => {
+  const itemsWithTotal = order.items.map((item) => ({
+    ...item,
+    total: Number(item.price) * Number(item.quantity),
+  }));
+
+  const deliveryPrice = Number(deliveryAddress?.prix || 0);
+
+  const subTotal = Number(order.total) - deliveryPrice;
+
+  return (
+    <Document>
+      <Page size="A4" style={styles.page}>
+        {/* Header */}
+        <View style={styles.header}>
+          <Text style={styles.title}>
+            Détail de la commande
+          </Text>
+
+          <Text style={styles.subtitle}>
+            Référence: Ref-{order.uuid}
+          </Text>
+
+          <Text style={styles.subtitle}>
+            Date: {orderDate}
+          </Text>
+        </View>
+
+        {/* Informations client */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>
+            Informations client
+          </Text>
+
+          <View style={styles.infoGrid}>
+            <View style={styles.infoRow}>
+              <Text style={styles.infoLabel}>
+                Référence:
+              </Text>
+
+              <Text style={styles.infoValue}>
+                Ref-{order.uuid.slice(0, 12)}
+              </Text>
+            </View>
+
+            <View style={styles.infoRow}>
+              <Text style={styles.infoLabel}>
+                Client:
+              </Text>
+
+              <Text style={styles.infoValue}>
+                {order.first_name}
+              </Text>
+            </View>
+
+            <View style={styles.infoRow}>
+              <Text style={styles.infoLabel}>
+                Téléphone:
+              </Text>
+
+              <Text style={styles.infoValue}>
+                {order.phone || "-"}
+              </Text>
+            </View>
+
+            <View style={styles.infoRow}>
+              <Text style={styles.infoLabel}>
+                Mode:
+              </Text>
+
+              <Text style={styles.infoValue}>
+                {order.mode}
+              </Text>
+            </View>
+
+            {deliveryAddress && (
+              <>
+                <View style={styles.infoRow}>
+                  <Text style={styles.infoLabel}>
+                    Ville:
+                  </Text>
+
+                  <Text style={styles.infoValue}>
+                    {deliveryAddress.ville}
+                  </Text>
+                </View>
+
+                <View style={styles.infoRow}>
+                  <Text style={styles.infoLabel}>
+                    Quartier:
+                  </Text>
+
+                  <Text style={styles.infoValue}>
+                    {deliveryAddress.quartier}
+                  </Text>
+                </View>
+
+                <View style={styles.infoRow}>
+                  <Text style={styles.infoLabel}>
+                    Livraison:
+                  </Text>
+
+                  <Text style={styles.infoValue}>
+                    {XAF.format(deliveryPrice)}
+                  </Text>
+                </View>
+              </>
+            )}
+          </View>
+        </View>
+
+        {/* Articles */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>
+            Articles commandés
+          </Text>
+
+          <View style={styles.table}>
+            <View style={styles.tableHeader}>
+              <Text style={styles.colProduct}>
+                Produit
+              </Text>
+
+              <Text style={styles.colQuantity}>
+                Qté
+              </Text>
+
+              <Text style={styles.colPrice}>
+                Prix unit.
+              </Text>
+
+              <Text style={styles.colTotal}>
+                Total
+              </Text>
+            </View>
+
+            {itemsWithTotal.map((item, index) => (
+              <View style={styles.tableRow} key={index}>
+                <Text style={styles.colProduct}>
+                  {`• ${item.name}`}
+                </Text>
+
+                <Text style={styles.colQuantity}>
+                  {item.quantity}
+                </Text>
+
+                <Text style={styles.colPrice}>
+                  {XAF.format(Number(item.price))}
+                </Text>
+
+                <Text style={styles.colTotal}>
+                  {XAF.format(item.total)}
+                </Text>
+              </View>
+            ))}
+
+            <View style={styles.totalRow}>
+              <Text style={styles.totalLabel}>
+                Sous-total
+              </Text>
+
+              <Text style={styles.totalValue}>
+                {XAF.format(subTotal)}
+              </Text>
+            </View>
+
+            <View style={styles.totalRow}>
+              <Text style={styles.totalLabel}>
+                Livraison
+              </Text>
+
+              <Text style={styles.totalValue}>
+                {XAF.format(deliveryPrice)}
+              </Text>
+            </View>
+
+            <View style={styles.totalRow}>
+              <Text style={styles.totalLabel}>
+                Total TTC
+              </Text>
+
+              <Text style={styles.totalValue}>
+                {XAF.format(Number(order.total))}
+              </Text>
+            </View>
+          </View>
+        </View>
+
+        {/* Statut */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>
+            Statut de la commande
+          </Text>
+
+          <View style={styles.statusContainer}>
+            <View style={styles.statusBox}>
+              <Text style={styles.statusLabel}>
+                Statut
+              </Text>
+
+              <Text style={styles.statusValue}>
+                {order.status}
+              </Text>
+            </View>
+
+            <View style={styles.statusBox}>
+              <Text style={styles.statusLabel}>
+                Source
+              </Text>
+
+              <Text style={styles.statusValue}>
+                {order.source}
+              </Text>
+            </View>
+          </View>
+        </View>
+
+        {/* Footer */}
+        <View style={styles.footer} fixed>
+          <Text>
+            Merci de votre confiance !
+          </Text>
+
+          <Text>
+            Ce document fait office de preuve d'achat.
+          </Text>
+
+          <Text>
+            Généré le{" "}
+            {new Date().toLocaleDateString("fr-FR")}
+          </Text>
+        </View>
+      </Page>
+    </Document>
+  );
+};
+
+export default OrderPDF;

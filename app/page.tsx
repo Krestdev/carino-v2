@@ -15,6 +15,7 @@ import { useMemo } from "react";
 import { useCategories } from "@/hooks/useCategories";
 import { useOptions } from "@/hooks/useOptions";
 import { ProductOption } from "@/types/types";
+import useStore from "@/context/store";
 
 export default function Home() {
   // Utilisation des hooks personnalisés

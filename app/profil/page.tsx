@@ -124,11 +124,11 @@ const Page = () => {
                           </div>
                           <div className="flex flex-col gap-0.5">
                             <p className="text-[#4B5563] text-[14px]">{"Date"}</p>
-                            <p className="text-[#111827] font-semibold">{order.created_at.toDateString()}</p>
+                            <p className="text-[#111827] font-semibold">{order.registration.toDateString()}</p>
                           </div>
                           <div className="flex flex-col gap-0.5">
                             <p className="text-[#4B5563] text-[14px]">{"Montant Total"}</p>
-                            <p className="text-[#111827] font-semibold">{XAF.format(order.prix_total)}</p>
+                            <p className="text-[#111827] font-semibold">{XAF.format(order.total)}</p>
                           </div>
                           <div className="flex flex-col gap-0.5">
                             <Button variant={"outline"}>{"Voir la commande"}</Button>

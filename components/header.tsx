@@ -24,12 +24,25 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
+import ReservationQuery from "@/queries/bookingsQuery";
+import { useQuery } from "@tanstack/react-query";
 
 const Header = () => {
-  const { setOpenLogSign } = useStore();
+  const { setOpenLogSign, user } = useStore();
   const router = useRouter();
   const { token, cart } = useStore();
   const path = usePathname();
+
+  const baseURL2 = process.env.NEXT_PUBLIC_API_BASE_URL2;
+  const reservation = new ReservationQuery(baseURL2 || '');
+  const bookingsQuery = useQuery({
+    queryKey: ["bookings"],
+    queryFn: () => reservation.getReservations().then((res) => res.items),
+    // Ne pas exécuter la requête si l'utilisateur n'est pas admin
+    enabled: !!token && (user?.role === "ADMIN" || user?.role === "MANAGER"),
+  });
+
+  const pendingBookings = bookingsQuery.data?.filter((booking) => booking.status === "Pending") || [];
 
   const links = [
     { name: "Accueil", href: "/" },
@@ -45,31 +58,33 @@ const Header = () => {
   return (
     <div className="md:flex sticky top-0 z-50 flex flex-row items-center gap-6 h-20 bg-primary">
       <div className="hidden md:flex flex-row gap-3 items-center justify-end w-full">
-        {/* <Link href={"/catalogue"} className={cn("h-10 w-fit flex px-3 py-1 text-white", path === "/catalogue" && "text-[#FFC336]")}>{"Catalogue"}</Link> */}
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button className="text-white" variant={"ghost"}>
-              {"Catalogue"}
-              <ChevronDown />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent>
-            <DropdownMenuGroup>
-              <DropdownMenuItem
-                className="cursor-pointer hover:text-white!"
-                onClick={() => router.replace("/catalogue")}
-              >
-                {"Catalogue"}
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                className="cursor-pointer hover:text-white!"
-                onClick={() => router.replace("/menu")}
-              >
-                {"Menu"}
-              </DropdownMenuItem>
-            </DropdownMenuGroup>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        {/* Section Admin - uniquement pour les admins */}
+        {(user?.role === "ADMIN" || user?.role === "MANAGER") && (
+          <Link
+            href={"/admin"}
+            className={cn(
+              "h-10 w-fit flex px-3 py-1 text-white relative",
+              path === "/admin" && "text-[#FFC336]"
+            )}
+          >
+            <span className={cn("text-white", path === "/admin" && "text-[#FFC336]")}>
+              {"Admin"}
+            </span>
+            {pendingBookings.length > 0 && (
+              <span className="absolute -top-2 left-[70%] text-[12px] h-5 w-5 rounded-full bg-red-500 text-white font-medium flex items-center justify-center">
+                {pendingBookings.length}
+              </span>
+            )}
+          </Link>
+        )}
+
+        <Link
+          href={"/catalogue"}
+          className={cn("h-10 w-fit flex px-3 py-1 text-white", path === "/catalogue" && "text-[#FFC336]")}
+        >
+          {"Catalogue"}
+        </Link>
+
         <Link
           target="_blank"
           href={"/telechargement/catalogue.pdf"}
@@ -78,6 +93,7 @@ const Header = () => {
           {"La carte"}
         </Link>
       </div>
+
       <img
         src="/Logo.png"
         alt="logo"
@@ -87,16 +103,18 @@ const Header = () => {
         className="hidden md:flex w-13 h-13 md:w-16 md:h-16 cursor-pointer"
         onClick={() => router.push("/")}
       />
+
       <div className="hidden md:flex flex-row gap-3 items-center justify-start w-full">
         <Link
           href={"/reservation"}
           className={cn(
             "h-10 w-fit flex px-3 py-1 text-white",
-            path === "/reservation" && "text-[#FFC336]",
+            path === "/reservation" && "text-[#FFC336]"
           )}
         >
           {"Réserver"}
         </Link>
+
         {!!token ? (
           <PopAccount>
             <Button className="text-white hover:bg-transparent hover:text-white" variant={"ghost"} size={"lg"}>
@@ -105,29 +123,26 @@ const Header = () => {
             </Button>
           </PopAccount>
         ) : (
-          <>
-            <Link
-              href={"#"}
-              onClick={() => setOpenLogSign(true)}
-              className={cn(
-                "h-10 w-fit flex px-3 py-1 text-white",
-                path === "/connexion" && "text-[#FFC336]",
-              )}
-            >
-              {"Connexion"}
-            </Link>
-          </>
+          <Link
+            href={"#"}
+            onClick={() => setOpenLogSign(true)}
+            className={cn(
+              "h-10 w-fit flex px-3 py-1 text-white",
+              path === "/connexion" && "text-[#FFC336]"
+            )}
+          >
+            {"Connexion"}
+          </Link>
         )}
+
         <Link
           href={"/panier"}
           className={cn(
             "h-10 w-fit flex px-3 py-1 text-white relative",
-            path === "/panier" && "text-[#FFC336]",
+            path === "/panier" && "text-[#FFC336]"
           )}
         >
-          <span
-            className={cn("text-white", path === "/panier" && "text-[#FFC336]")}
-          >
+          <span className={cn("text-white", path === "/panier" && "text-[#FFC336]")}>
             {"Panier"}
           </span>
           {cart.length > 0 && (
@@ -137,6 +152,7 @@ const Header = () => {
           )}
         </Link>
       </div>
+
       <div className="md:hidden w-full flex gap-7">
         <div className="w-full flex flex-row items-center justify-between px-7">
           <img
@@ -148,6 +164,7 @@ const Header = () => {
             className="w-13 h-13 md:w-16 md:h-16 cursor-pointer"
             onClick={() => router.push("/")}
           />
+
           {/* Drawer */}
           <Drawer direction="left">
             <DrawerTrigger>
@@ -168,20 +185,44 @@ const Header = () => {
                   <LuX className="text-white" />
                 </DrawerClose>
               </DrawerHeader>
-              <div className="flex flex-col ">
+              <div className="flex flex-col">
                 {links.map((link) => (
                   <DrawerClose key={link.name}>
                     <Link
                       href={link.href}
                       className={cn(
-                        "h-13 w-fit flex px-3 py-1 text-white",
-                        path === link.href && "text-[#FFC336]",
+                        "h-13 w-fit flex px-3 py-1 text-black",
+                        path === link.href && "text-[#FFC336]"
                       )}
+                      onClick={() => {
+                        if (link.name === "Se connecter") {
+                          setOpenLogSign(true);
+                        }
+                      }}
                     >
                       {link.name}
                     </Link>
                   </DrawerClose>
                 ))}
+                {/* Ajout du lien Admin dans le drawer pour les admins */}
+                {(user?.role === "ADMIN" || user?.role === "MANAGER") && (
+                  <DrawerClose>
+                    <Link
+                      href={"/admin"}
+                      className={cn(
+                        "h-13 w-fit flex px-3 py-1 text-black relative",
+                        path === "/admin" && "text-[#FFC336]"
+                      )}
+                    >
+                      {"Admin"}
+                      {pendingBookings.length > 0 && (
+                        <span className="ml-2 text-[12px] h-5 w-5 rounded-full bg-red-500 text-white font-medium flex items-center justify-center">
+                          {pendingBookings.length}
+                        </span>
+                      )}
+                    </Link>
+                  </DrawerClose>
+                )}
               </div>
             </DrawerContent>
           </Drawer>

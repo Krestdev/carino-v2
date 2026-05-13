@@ -15,6 +15,7 @@ import Snowfall from "@/components/snowfall";
 import { UseOnTheme } from "@/hooks/useOnTheme";
 import Auth from "./Auth";
 import { ToastContainer } from "react-toastify";
+import { RouteGuard } from "@/providers/RouteGuard";
 
 // Police principale
 const openSans = Open_Sans({
@@ -74,7 +75,9 @@ export default function RootLayout({
                 <Snowfall />
               </UseOnTheme>
               <Header />
-              <main>{children}</main>
+              <RouteGuard>
+                <main>{children}</main>
+              </RouteGuard>
               <Transaction />
               <Auth />
               <Footer />

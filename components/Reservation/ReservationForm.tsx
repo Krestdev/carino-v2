@@ -101,10 +101,7 @@ const ReservationForm = () => {
   const [confirm, setConfirm] = useState(false);
   const { setOpenLogSign, } = useStore();
 
-  const { baseURL } = useAppContext();
-
-  console.log(baseURL);
-
+  const baseURL = process.env.NEXT_PUBLIC_API_BASE_URL2 || "";
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -125,9 +122,9 @@ const ReservationForm = () => {
       reservation.createReservation({
         places: Number(data.places),
         comment: data.comment,
-        id_customer: user?.id ?? 0,
-        booking_for: data.date,
-        customer: user as User
+        id_customer: user?.id!,
+        customer: user as User,
+        booking_for: data.date.toISOString()
       }),
     onSuccess: () => {
       setSuccessModal(true);

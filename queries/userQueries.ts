@@ -1,5 +1,5 @@
 import AxiosConfig from "@/providers/axios";
-import { checkTransactionStatus, Order, OrdersData, Retry, User, UserLogin, UserOrdersResponse, UserRegistration } from "@/types/types";
+import { checkTransactionStatus, MyOrdersResponse, Order, OrdersData, Retry, User, UserLogin, UserOrdersResponse, UserRegistration } from "@/types/types";
 import { AxiosInstance } from "axios";
 
 export default class UserQuery {
@@ -26,7 +26,12 @@ export default class UserQuery {
   profile = async (): Promise<User> => {
     return this.api.get(`${this.route}/profile`).then((res) => res.data);
   };
-
+  changePassword = async (data: { oldPassword: string, newPassword: string }): Promise<void> => {
+    return this.api.post(`${this.route}/change-password`, data).then((res) => res.data);
+  };
+  resetInitialPassword = async (data: { identifier: string, oldPassword: string, newPassword: string }): Promise<void> => {
+    return this.api.post(`${this.route}/reset-initial-password`, data).then((res) => res.data);
+  };
 
   // orders
   getAll = async (): Promise<UserOrdersResponse> => {
@@ -35,8 +40,8 @@ export default class UserQuery {
   getMine = async (): Promise<UserOrdersResponse> => {
     return this.api.get(`${this.route1}/my-orders`).then((res) => res.data);
   };
-  getOne = async (id: number): Promise<UserOrdersResponse> => {
-    return this.api.get(`${this.route1}/my-orders/${id}`).then((res) => res.data);
+  getOne = async (id: string): Promise<MyOrdersResponse> => {
+    return this.api.get(`${this.route1}/${id}`).then((res) => res.data);
   };
 
   createOrder = async (data: Order): Promise<{ order: OrdersData, payment: { status: string, vendor_reference: string } }> => {

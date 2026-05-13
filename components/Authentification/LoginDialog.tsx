@@ -28,6 +28,7 @@ import {
 import { Input } from "../ui/input";
 import { ArrowLeft, Eye, EyeOff } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { jwtDecode } from "jwt-decode";
 
 const formSchema = z.object({
@@ -39,8 +40,10 @@ interface JwtPayload {
   sub: string;
   email: string;
   fname?: string;
-  isFirstOrder: boolean
-  phone: string
+  isFirstOrder: boolean;
+  require_password_change?: boolean;
+  phone: string;
+  role?: string;
 }
 
 interface LoginDialogProps {
@@ -52,6 +55,7 @@ interface LoginDialogProps {
 const LoginDialog = ({ open, onOpenChange, setOpenLogSign }: LoginDialogProps) => {
   const [errorValue, setErrorValue] = useState<string>();
   const [showPassword, setShowPassword] = useState(false);
+  const router = useRouter();
 
   const { login } = useStore();
   const baseURL = process.env.NEXT_PUBLIC_API_BASE_URL2 || "http://localhost:3000/api/";
@@ -81,22 +85,44 @@ const LoginDialog = ({ open, onOpenChange, setOpenLogSign }: LoginDialogProps) =
         // Enregistrer le token immédiatement
         localStorage.setItem("token", data.access_token);
 
+        // Décoder le token pour vérifier require_password_change
+        let decodedToken: JwtPayload | null = null;
+        try {
+          decodedToken = jwtDecode<JwtPayload>(data.access_token);
+          console.log("Token décodé:", decodedToken);
+        } catch (error) {
+          console.error("Erreur lors du décodage du token:", error);
+        }
+
         // Récupérer le profil complet de l'utilisateur depuis le serveur
         const userData = await userLogIn.profile();
 
         const user = {
           id: Number(userData.id),
-          email: userData.email,
+          email: userData.mail,
           name: userData.fname || userData.name || form.getValues("email").split("@")[0],
           isFirstOrder: userData.isFirstOrder,
           phone: userData.phone,
           loyalty: userData.loyalty,
+          role: userData.role,
+          require_password_change: userData.require_password_change || decodedToken?.require_password_change || false,
         };
+
+        // Vérifier si c'est un admin avec require_password_change = true
+        const isAdmin = user.role === "MANAGER" || user.role === "ADMIN";
+        const require_password_change = user.require_password_change === false;
+
+        if (isAdmin && require_password_change) {
+          // Rediriger vers la page edit-password
+          toast.info("Veuillez changer votre mot de passe avant de continuer");
+          router.push("/edit-password");
+        }
 
         login(user, data.access_token);
 
         toast.success(`Bienvenue ${user.name}`);
         onOpenChange(false);
+
       } catch (error) {
         console.error("Erreur lors du traitement du profil:", error);
         setErrorValue("Erreur lors de la récupération de votre profil");

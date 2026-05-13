@@ -376,6 +376,7 @@ const DelieveryForm = ({
             quantity: item.quantity,
             price: item.price,
             type: "dish",
+            name: item.name,
           })),
           mode: deliveryMode,
         });
