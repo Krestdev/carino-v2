@@ -191,7 +191,7 @@ const Header = () => {
                     <Link
                       href={link.href}
                       className={cn(
-                        "h-13 w-fit flex px-3 py-1 text-black",
+                        "h-13 w-fit flex px-3 py-1 text-white",
                         path === link.href && "text-[#FFC336]"
                       )}
                       onClick={() => {
