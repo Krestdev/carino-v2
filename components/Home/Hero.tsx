@@ -5,6 +5,9 @@ import SocialSidebar from "./SocialSideBar";
 const Hero = () => {
 
   const router = useRouter();
+  const randomImage = ["burger.webp", "pizza.webp", "salad.webp", "ramen.webp"];
+  const randomIndex = Math.floor(Math.random() * randomImage.length);
+  const selectedImage = randomImage[randomIndex];
   return (
     <div>
       <div
@@ -25,7 +28,7 @@ const Hero = () => {
           </div>
         </div>
         <div className="relative md:mt-8 w-full max-w-[768px] mx-auto h-auto aspect-768/209">
-          <img src="burger.webp" alt="burger" className="absolute md:-top-12" />
+          <img src={`/${selectedImage}`} alt="burger" className="absolute md:-top-12" />
         </div>
         <SocialSidebar />
       </div>
