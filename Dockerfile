@@ -13,6 +13,12 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
+ARG NEXT_PUBLIC_API_BASE_URL
+ENV NEXT_PUBLIC_API_BASE_URL=${NEXT_PUBLIC_API_BASE_URL}
+
+ARG NEXT_PUBLIC_API_BASE_URL2
+ENV NEXT_PUBLIC_API_BASE_URL2=${NEXT_PUBLIC_API_BASE_URL2}
+
 RUN npm run build
 
 # -------- Runtime Stage --------
