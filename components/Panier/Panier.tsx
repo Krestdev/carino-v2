@@ -23,7 +23,7 @@ const Panier = () => {
   const [postOrderStatus, setPostOrderStatus] = useState<boolean>(false);
   const [fees, setFees] = useState<number>(0);
 
-  const baseURL = process.env.NEXT_PUBLIC_API_BASE_URL || (typeof window !== 'undefined' && window.location.origin.includes('localhost') ? `${window.location.origin}/api` : "https://www.le-carino.com/api/");
+  const baseURL = process.env.NEXT_PUBLIC_API_BASE_URL || "";
 
   const productService = useMemo(() => new ProductQuery(baseURL), [baseURL]);
   const {
