@@ -7,6 +7,8 @@ export default class AxiosConfig {
    baseURL2 = process.env.NEXT_PUBLIC_API_BASE_URL2 || "";
 
   constructor(api : boolean = false) {
+    console.log(this.baseURL, this.baseURL2);
+    
     this.api = axios.create({
       baseURL: api ? this.baseURL2 : this.baseURL,
       timeout: 10000,

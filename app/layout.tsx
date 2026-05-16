@@ -59,6 +59,7 @@ export default function RootLayout({
   // Définition de l'URL de base
   // const baseURL = process.env.NEXT_PUBLIC_API_BASE_URL ?? "https://www.le-carino.com/api/";
   const baseURL = process.env.NEXT_PUBLIC_API_BASE_URL ?? "";
+  console.log(baseURL);
   return (
     <html lang="fr" suppressHydrationWarning>
       <body className={`${openSans.variable} ${oleo.variable} ${playfair.variable} ${generalSansVariable.variable} antialiased`}>
