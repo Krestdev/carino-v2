@@ -6,9 +6,10 @@ import ProductCart from "../universal/ProductCart";
 interface ProductGridProps {
     products: ProdData[];
     options: ProductOption[];
+    mandatoryTag: number;
 }
 
-const ProductsGrid = ({ products, options }: ProductGridProps) => {
+const ProductsGrid = ({ products, options, mandatoryTag }: ProductGridProps) => {
     return (
         products.length > 0 ?
             <div className="w-full md:px-4 sm:px-6 lg:px-8">
@@ -21,7 +22,7 @@ const ProductsGrid = ({ products, options }: ProductGridProps) => {
                     auto-rows-fr">
                     {products.map((product, ind) => (
                         <div key={ind} className="h-full">
-                            <ProductCart produit={product} options={options} />
+                            <ProductCart produit={product} options={options} mandatoryTag={mandatoryTag} />
                         </div>
                     ))}
                 </div>

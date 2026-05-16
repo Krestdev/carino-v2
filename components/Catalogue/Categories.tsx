@@ -64,7 +64,7 @@ const Categories = ({ activeTab, setActiveTab, categories }: CategoriesProps) =>
                         onClick={() => setActiveTab(cat.categories.id)}
                         className={`cursor-pointer hover:bg-[#FFC336]/10 flex flex-row items-center justify-between p-2.5 gap-2 rounded transition-colors ${cat.categories.id === activeTab ? "bg-[#FFC336] hover:bg-[#FFC336]/90" : "text-gray-700"}`}
                     >
-                        <p className="font-medium">{cat.categories.name}</p>
+                        <p className="font-medium uppercase">{cat.categories.name}</p>
                         <p className={cat.categories.id === activeTab ? "text-black" : "text-gray-400"}>
                             {cat.total}
                         </p>
