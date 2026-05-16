@@ -8,8 +8,8 @@ export default class UserQuery {
   route2 = "/payments";
   api: AxiosInstance;
 
-  constructor(baseURL: string) {
-    this.api = new AxiosConfig(baseURL).api;
+  constructor() {
+    this.api = new AxiosConfig(true).api;
   }
 
   login = async (data: any): Promise<any> => {

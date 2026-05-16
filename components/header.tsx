@@ -33,8 +33,7 @@ const Header = () => {
   const { token, cart } = useStore();
   const path = usePathname();
 
-  const baseURL2 = process.env.NEXT_PUBLIC_API_BASE_URL2;
-  const reservation = new ReservationQuery(baseURL2 || '');
+  const reservation = new ReservationQuery();
   const bookingsQuery = useQuery({
     queryKey: ["bookings"],
     queryFn: () => reservation.getReservations().then((res) => res.items),

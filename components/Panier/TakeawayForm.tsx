@@ -129,9 +129,6 @@ const TakeawayForm = ({
   const [paymentStatus, setPaymentStatus] = useState<PaymentStatus>(null);
   const [retryData, setRetryData] = useState<Retry>();
   const [sourceError, setSourceError] = useState<string | null>(null);
-  const { baseURL } = useAppContext();
-  const baseURL2 =
-    process.env.NEXT_PUBLIC_API_BASE_URL2 || "http://localhost:3000";
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -147,7 +144,7 @@ const TakeawayForm = ({
     },
   });
 
-  const userQuery = new UserQuery(baseURL2);
+  const userQuery = new UserQuery();
 
   const findFirstValueByKeys = (
     payload: unknown,

@@ -17,9 +17,7 @@ import { XAF } from "@/lib/functions";
 const Page = () => {
   const { user, token } = useStore();
   const router = useRouter();
-  const baseURL = process.env.NEXT_PUBLIC_API_BASE_URL2 || "http://localhost:3000/api/";
-  const userLogIn = new UserQuery(baseURL);
-  const lieu = new TownQuery(baseURL);
+  const userLogIn = new UserQuery();
 
   // const townData = useQuery({
   //   queryKey: ["towns"],

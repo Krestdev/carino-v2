@@ -28,7 +28,7 @@ const Page = () => {
   const router = useRouter();
   const baseURL = process.env.NEXT_PUBLIC_API_BASE_URL || "";
 
-  const productService = useMemo(() => new ProductQuery(baseURL), [baseURL]);
+  const productService = useMemo(() => new ProductQuery(), [baseURL]);
 
   // Récupération des produits
   const {

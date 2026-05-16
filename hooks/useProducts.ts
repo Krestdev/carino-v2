@@ -2,9 +2,7 @@
 import ProductQuery from '@/queries/productQuery';
 import { ReceiptProps } from '@/types/types';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-
-const baseURL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3000/api';
-const productQuery = new ProductQuery(baseURL);
+const productQuery = new ProductQuery();
 
 // Clés de query pour le caching
 export const queryKeys = {

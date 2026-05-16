@@ -25,7 +25,7 @@ const Panier = () => {
 
   const baseURL = process.env.NEXT_PUBLIC_API_BASE_URL || "";
 
-  const productService = useMemo(() => new ProductQuery(baseURL), [baseURL]);
+  const productService = useMemo(() => new ProductQuery(), [baseURL]);
   const {
     data: produits,
     isLoading: isLoadingProducts,

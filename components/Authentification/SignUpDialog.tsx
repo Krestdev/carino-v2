@@ -53,8 +53,7 @@ interface SignupDialogProps {
 }
 
 const SignupDialog = ({ open, onOpenChange, setOpenLogSign }: SignupDialogProps) => {
-    const baseURL = process.env.NEXT_PUBLIC_API_BASE_URL2 || "http://localhost:3000/api/";
-    const userQuery = new UserQuery(baseURL);
+    const userQuery = new UserQuery();
 
     const { mutate, isError, isSuccess, error, isPending } = useMutation({
         mutationFn: ({

@@ -9,8 +9,8 @@ export default class ProductQuery {
   private oRoute = "catalog/options";
   private api: AxiosInstance;
 
-  constructor(baseURL: string) {
-    this.api = new AxiosConfig(baseURL).api;
+  constructor() {
+    this.api = new AxiosConfig(false).api;
   }
 
   getProductByName = async (product: string): Promise<ProductsResponse> => {

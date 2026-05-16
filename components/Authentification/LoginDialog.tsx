@@ -58,8 +58,7 @@ const LoginDialog = ({ open, onOpenChange, setOpenLogSign }: LoginDialogProps) =
   const router = useRouter();
 
   const { login } = useStore();
-  const baseURL = process.env.NEXT_PUBLIC_API_BASE_URL2 || "http://localhost:3000/api/";
-  const userLogIn = new UserQuery(baseURL);
+  const userLogIn = new UserQuery();
 
   const form = useForm({
     resolver: zodResolver(formSchema),

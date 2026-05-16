@@ -81,7 +81,6 @@ const DelieveryForm = ({
 
   // Store
   const { user, emptyCart } = useStore();
-  const setTransaction = useStore((s) => s.setTransaction);
   const transactionRef = useStore((s) => s.transactionRef);
   const setReceiptData = useStore((s) => s.setReceiptData);
 
@@ -93,11 +92,8 @@ const DelieveryForm = ({
   const [paymentStatus, setPaymentStatus] = useState<PaymentStatus>(null);
   const [sourceError, setSourceError] = useState<string | null>(null);
 
-  const { baseURL } = useAppContext();
-  const baseURL2 =
-    process.env.NEXT_PUBLIC_API_BASE_URL2 || "http://localhost:3000";
 
-  const townQuery = new TownQuery(baseURL);
+  const townQuery = new TownQuery();
   const { data, isSuccess } = useQuery({
     queryKey: ["cities"],
     queryFn: () => townQuery.getTowns(),
@@ -121,7 +117,7 @@ const DelieveryForm = ({
     },
   });
 
-  const userQuery = new UserQuery(baseURL2);
+  const userQuery = new UserQuery();
 
   const findFirstValueByKeys = (
     payload: unknown,

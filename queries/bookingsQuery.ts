@@ -7,8 +7,8 @@ export default class ReservationQuery {
   route = "/bookings";
   api: AxiosInstance;
 
-  constructor(baseURL: string) {
-    this.api = new AxiosConfig(baseURL).api;
+  constructor() {
+    this.api = new AxiosConfig(true).api;
   }
 
   // Get all reservations

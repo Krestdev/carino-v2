@@ -25,8 +25,7 @@ const formSchema = z.object({
 })
 
 export default function EditPasswordPage() {
-    const baseURL = process.env.NEXT_PUBLIC_API_BASE_URL2 || "http://localhost:8000/api/";
-    const userQuery = new UserQuery(baseURL);
+    const userQuery = new UserQuery();
     const router = useRouter();
     const { user } = useStore();
 

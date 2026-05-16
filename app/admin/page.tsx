@@ -32,8 +32,7 @@ interface FilterState {
 
 const AdminPage = () => {
     const router = useRouter();
-    const baseURL2 = process.env.NEXT_PUBLIC_API_BASE_URL2;
-    const reservation = new ReservationQuery(baseURL2 || '');
+    const reservation = new ReservationQuery();
     const reservationData = useQuery({
         queryKey: ["reservations"],
         queryFn: () => reservation.getReservations().then((res) => res.items),

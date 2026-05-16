@@ -6,8 +6,8 @@ export default class PromotionQuery {
   route = "promotion";
   api: AxiosInstance;
 
-  constructor(baseURL: string) {
-    this.api = new AxiosConfig(baseURL).api;
+  constructor() {
+    this.api = new AxiosConfig(false).api;
   }
 
   codeverify = async () => {

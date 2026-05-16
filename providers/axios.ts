@@ -3,9 +3,12 @@ import axios, { AxiosError, AxiosInstance, AxiosResponse } from "axios";
 
 export default class AxiosConfig {
   public api: AxiosInstance;
-  constructor(baseURL: string) {
+   baseURL = process.env.NEXT_PUBLIC_API_BASE_URL || "";
+   baseURL2 = process.env.NEXT_PUBLIC_API_BASE_URL2 || "";
+
+  constructor(api : boolean = false) {
     this.api = axios.create({
-      baseURL,
+      baseURL: api ? this.baseURL2 : this.baseURL,
       timeout: 10000,
       headers: {
         "Content-Type": "application/json",

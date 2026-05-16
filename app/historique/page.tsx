@@ -9,19 +9,16 @@ import { ArrowLeft } from "lucide-react";
 import { redirect, useRouter } from "next/navigation";
 import { useEffect, useState, useTransition } from "react";
 import Loading from "../loading";
-import { useAppContext } from "@/providers/appContext";
 import TownQuery from "@/queries/townQuery";
 import HistoryBooking from "@/components/Historique/HistoryBooking";
 import ReservationQuery from "@/queries/bookingsQuery";
 
 const Page = () => {
-  const { baseURL } = useAppContext();
-  const baseURL2 = process.env.NEXT_PUBLIC_API_BASE_URL2;
   const { user, token } = useStore();
   const router = useRouter();
-  const userLogIn = new UserQuery(baseURL2 || '');
-  const reservation = new ReservationQuery(baseURL2 || '');
-  const lieu = new TownQuery(baseURL || '');
+  const userLogIn = new UserQuery();
+  const reservation = new ReservationQuery();
+  const lieu = new TownQuery();
   const [tab, setTab] = useState("commande");
 
   const userData = useQuery({

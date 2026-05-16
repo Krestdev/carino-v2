@@ -26,10 +26,9 @@ function Transaction() {
   const [paymentStatus, setPaymentStatus] = useState<
     "pending" | "success" | "failed" | "error" | "hide"
   >("pending");
-  const { baseURL } = useAppContext();
-  const userQuery = new UserQuery(baseURL);
+  const userQuery = new UserQuery();
 
-  const producQuery = new ProductQuery(baseURL);
+  const producQuery = new ProductQuery();
 
   const sendReceipt = useMutation({
     mutationFn: (props: ReceiptProps) => producQuery.postTicket(props),

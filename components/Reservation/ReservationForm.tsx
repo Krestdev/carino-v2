@@ -101,8 +101,6 @@ const ReservationForm = () => {
   const [confirm, setConfirm] = useState(false);
   const { setOpenLogSign, } = useStore();
 
-  const baseURL = process.env.NEXT_PUBLIC_API_BASE_URL2 || "";
-
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -115,7 +113,7 @@ const ReservationForm = () => {
     },
   });
 
-  const reservation = new ReservationQuery(baseURL)
+  const reservation = new ReservationQuery()
   const reservationData = useMutation({
     mutationKey: ["reservations"],
     mutationFn: (data: z.infer<typeof formSchema>) =>

@@ -39,7 +39,7 @@ const ProductCart = ({ produit, options, mandatoryTag }: Props) => {
           <Tooltip>
             <TooltipTrigger asChild>
               <Button className="w-10 h-10 p-0 bg-gray-300 hover:bg-gray-300 cursor-not-allowed">
-                <LuPlus className="w-6 h-6 text-white" />
+                <LuPlus className="w-6 h-6 text-black" />
               </Button>
             </TooltipTrigger>
             <TooltipContent>
@@ -65,7 +65,7 @@ const ProductCart = ({ produit, options, mandatoryTag }: Props) => {
           <AddDialog options={options} product={produit}>
             {/* Je veux que le bouton soit disabled si le produit n'a pas MANDATORY_TAG */}
             <Button disabled={produit.disable} className={`w-10 h-10 p-0`}>
-              <LuPlus className="w-6 h-6 text-black" />
+              <LuPlus className="w-6 h-6 text-white" />
             </Button>
           </AddDialog>
         )}

@@ -54,10 +54,9 @@ const HistoryBooking = ({ title, data }: Props) => {
     });
 
     const { user } = useStore();
-    const baseURL = process.env.NEXT_PUBLIC_API_BASE_URL2 || "http://localhost:3000/api/";
     const queryClient = useQueryClient();
 
-    const bookingQuery = new ReservationQuery(baseURL);
+    const bookingQuery = new ReservationQuery();
     const validate = useMutation({
         mutationKey: ["validate-bookings"],
         mutationFn: (id: string) => bookingQuery.confirmReservation(id),

@@ -32,8 +32,7 @@ const ViewOrderDialog = ({
 }: ViewOrderDialogProps) => {
   const [showPdf, setShowPdf] = useState(false);
 
-  const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL2;
-  const orders = new UserQuery(baseUrl || "");
+  const orders = new UserQuery();
 
   const orderData = useQuery({
     queryKey: ["order", order?.uuid],
