@@ -17,6 +17,7 @@ import { useOptions } from "@/hooks/useOptions";
 import { ProductOption } from "@/types/types";
 
 export default function Home() {
+  const MANDATORY_TAG = 316504; // ID de la catégorie "Suggestion du Chef"
   // Utilisation des hooks personnalisés
   const {
     data: productsData,
@@ -78,7 +79,7 @@ export default function Home() {
     <div className="overflow-clip">
       <Hero />
       {dailyProducts.length > 0 && safeOptions.length > 0 && (
-        <Suggestion products={dailyProducts} options={safeOptions} />
+        <Suggestion products={dailyProducts} options={safeOptions} mandatoryTag={MANDATORY_TAG} />
       )}
       <About />
       <Promo />

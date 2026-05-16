@@ -274,7 +274,7 @@ const Page = () => {
                         }
                     </div>
                     {/* ProductsGrid - reste scrollable normalement */}
-                    <ProductsGrid products={filterProducts} options={safeOptions} />
+                    <ProductsGrid products={filterProducts} options={safeOptions} mandatoryTag={MANDATORY_TAG} />
 
                     {/* CartItems sticky - se fixe à 96px du haut (top-24) */}
                     <div className="lg:sticky lg:top-24 self-start hidden md:flex flex-col gap-3 p-3 max-w-[260px] w-full">

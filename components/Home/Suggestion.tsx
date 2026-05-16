@@ -9,9 +9,10 @@ import { useRouter } from "next/navigation";
 type Props = {
     products: ProdData[];
     options: ProductOption[];
+    mandatoryTag: number;
 };
 
-const Suggestion = ({ products, options }: Props) => {
+const Suggestion = ({ products, options, mandatoryTag }: Props) => {
     const router = useRouter();
     return (
         <div className="max-w-[1280px] w-full mx-auto flex flex-col items-center gap-7 md:gap-12 px-7 py-12 md:py-24">
@@ -22,7 +23,7 @@ const Suggestion = ({ products, options }: Props) => {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 w-full">
                 {products.slice(0, 4).map((product, index) => (
                     <div key={index}>
-                        <ProductCart produit={product} options={options} />
+                        <ProductCart produit={product} options={options} mandatoryTag={mandatoryTag} />
                     </div>
                 ))}
 
