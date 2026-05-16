@@ -1,5 +1,5 @@
-import AxiosConfig from "@/providers/axios";
-import { checkTransactionStatus, MyOrdersResponse, Order, OrdersData, Retry, User, UserLogin, UserOrdersResponse, UserRegistration } from "@/types/types";
+import { api2 } from "@/providers/axios";
+import { checkTransactionStatus, MyOrdersResponse, Order, OrdersData, Retry, User, UserOrdersResponse, UserRegistration } from "@/types/types";
 import { AxiosInstance } from "axios";
 
 export default class UserQuery {
@@ -9,7 +9,7 @@ export default class UserQuery {
   api: AxiosInstance;
 
   constructor() {
-    this.api = new AxiosConfig(true).api;
+    this.api = api2;
   }
 
   login = async (data: any): Promise<any> => {

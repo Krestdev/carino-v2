@@ -60,10 +60,6 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  // Définition de l'URL de base
-  // const baseURL = process.env.NEXT_PUBLIC_API_BASE_URL ?? "https://www.le-carino.com/api/";
-  // const baseURL = process.env.NEXT_PUBLIC_API_BASE_URL ?? "";
-  // console.log(baseURL);
   return (
     <html lang="fr" suppressHydrationWarning>
       <body

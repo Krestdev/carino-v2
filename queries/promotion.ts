@@ -1,5 +1,4 @@
-import AxiosConfig from "@/providers/axios";
-import api from "@/providers/axios";
+import { api1 } from "@/providers/axios";
 import { AxiosInstance } from "axios";
 
 export default class PromotionQuery {
@@ -7,7 +6,7 @@ export default class PromotionQuery {
   api: AxiosInstance;
 
   constructor() {
-    this.api = new AxiosConfig(false).api;
+    this.api = api1;
   }
 
   codeverify = async () => {

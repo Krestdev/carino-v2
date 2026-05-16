@@ -1,6 +1,6 @@
 // queries/productQuery.ts
-import AxiosConfig from "@/providers/axios";
-import { CategoriesData, CategoryResponse, OptionValue, ProdData, ProductOption, ProductsData, ProductsResponse, ReceiptProps } from "@/types/types";
+import { api1 } from "@/providers/axios";
+import { CategoriesData, OptionValue, ProdData, ProductOption, ProductsResponse, ReceiptProps } from "@/types/types";
 import type { AxiosInstance } from "axios";
 
 export default class ProductQuery {
@@ -10,7 +10,7 @@ export default class ProductQuery {
   private api: AxiosInstance;
 
   constructor() {
-    this.api = new AxiosConfig(false).api;
+    this.api = api1;
   }
 
   getProductByName = async (product: string): Promise<ProductsResponse> => {
