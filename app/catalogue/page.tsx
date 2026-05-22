@@ -326,7 +326,7 @@ const Page = () => {
                   {"Vider le panier"}
                 </Button>
               </>
-            )}
+            }
           </div>
         </div>
       </div>
