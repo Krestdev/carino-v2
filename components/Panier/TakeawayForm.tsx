@@ -48,24 +48,6 @@ const formSchema = z
       message: "Le numéro de téléphone doit comporter 9 chiffres",
     }),
     operator: z.enum(["MTN_CM", "ORANGE_CM"]),
-    takeDate: z
-      .date()
-      .refine((date) => !!date, { message: "Veuillez choisir une date" })
-      .refine(
-        (date) => {
-          const today = new Date();
-          today.setHours(0, 0, 0, 0);
-
-          const maxDate = new Date(today);
-          maxDate.setDate(today.getDate() + 2); // Max 2 days from today
-
-          return date >= today && date <= maxDate;
-        },
-        {
-          message:
-            "La date doit être entre aujourd'hui et les 2 prochains jours",
-        }
-      ),
     time: z
       .string()
       .nonempty({ message: "Selectionnez une heure" })
@@ -91,18 +73,15 @@ const formSchema = z
     (data) => {
       const [hours, mins] = data.time.split(":");
       const today = new Date();
-      if (today.getDay() === data.takeDate.getDay()) {
-        if (
-          Number(hours) >= today.getHours() + 2 ||
-          (Number(hours) >= today.getHours() + 1 &&
-            Number(mins) >= today.getMinutes())
-        ) {
-          return true;
-        } else {
-          return false;
-        }
+      if (
+        Number(hours) >= today.getHours() + 2 ||
+        (Number(hours) >= today.getHours() + 1 &&
+          Number(mins) >= today.getMinutes())
+      ) {
+        return true;
+      } else {
+        return false;
       }
-      return true;
     },
     {
       message:
@@ -388,7 +367,7 @@ const TakeawayForm = ({
   // });
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    const dueDate = new Date(values.takeDate);
+    const dueDate = new Date();
     dueDate.setHours(
       Number(values.time.split(":")[0]),
       Number(values.time.split(":")[1]),
@@ -404,7 +383,14 @@ const TakeawayForm = ({
           },
           total: CartTotal(cart),
           first_name: user.name,
-          items: ApplyPromotions(cart),
+          // items: ApplyPromotions(cart),
+          items: cart.map((item) => ({
+            item_id: Number(item.id),
+            quantity: item.quantity,
+            price: item.price,
+            type: "dish",
+            name: item.name,
+          })),
           due_date: dueDate.toISOString(),
           mode: deliveryMode,
         });
@@ -497,7 +483,7 @@ const TakeawayForm = ({
                   <SelectValue placeholder="Selectionner un mode" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="takeAway">
+                  <SelectItem value="takeaway">
                     <NewTag endNew={new Date(2025, 2, 31)}>{"À Emporter"}</NewTag>
                   </SelectItem>
                   <SelectItem value="delivery">
@@ -506,7 +492,7 @@ const TakeawayForm = ({
                 </SelectContent>
               </Select>
             </div>
-            <FormField
+            {/* <FormField
               control={form.control}
               name="takeDate"
               render={({ field }) => (
@@ -518,8 +504,8 @@ const TakeawayForm = ({
                         <Button
                           // variant={"outline"}
                           className={cn(
-                            "w-full pl-3 border-b border-[#4B5563] hover:border-[#4B5563] bg-[#F3F4F6] hover:bg-[#F3F4F6] text-left font-normal",
-                            !field.value && "text-muted-foreground"
+                            "w-full pl-3 border-b border-[#4B5563] hover:border-[#4B5563] bg-[#F3F4F6] hover:bg-[#F3F4F6] text-left font-normal text-black",
+                            !field.value ? "text-muted-foreground" : "text-black"
                           )}
                         >
                           {field.value ? (
@@ -559,7 +545,7 @@ const TakeawayForm = ({
                   <FormMessage />
                 </FormItem>
               )}
-            />
+            /> */}
             <FormField
               control={form.control}
               name="time"

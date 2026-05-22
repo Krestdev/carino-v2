@@ -67,7 +67,47 @@ const formSchema = z.object({
     message: "Le numéro de téléphone doit comporter 9 chiffres",
   }),
   operator: z.enum(["MTN_CM", "ORANGE_CM"]),
-});
+  time: z
+    .string()
+    .nonempty({ message: "Selectionnez une heure" })
+    .refine(
+      (value) => {
+        const time = value.split(":");
+        const open = (process.env.NEXT_PUBLIC_OPENTIME || "11:00").split(":");
+        const close = (process.env.NEXT_PUBLIC_CLOSETIME || "22:00").split(
+          ":"
+        );
+        return (
+          Number(time[0]) >= Number(open[0]) &&
+          Number(time[0]) < Number(close[0])
+        );
+      },
+      {
+        message: `Uniquement entre ${process.env.NEXT_PUBLIC_OPENTIME || "11:00"
+          } et ${process.env.NEXT_PUBLIC_CLOSETIME || "22:00"}`,
+      }
+    ),
+})
+  .refine(
+    (data) => {
+      const [hours, mins] = data.time.split(":");
+      const today = new Date();
+      if (
+        Number(hours) >= today.getHours() + 2 ||
+        (Number(hours) >= today.getHours() + 1 &&
+          Number(mins) >= today.getMinutes())
+      ) {
+        return true;
+      } else {
+        return false;
+      }
+    },
+    {
+      message:
+        "Veuillez définir une heure au moins une heure plus tard que l'heure actuelle",
+      path: ["time"],
+    }
+  )
 
 const DelieveryForm = ({
   deliveryMode,
@@ -114,6 +154,9 @@ const DelieveryForm = ({
       deliveryNumber:
         user?.phone.slice(user?.phone.length - 9, user?.phone.length) ?? "",
       operator: "ORANGE_CM",
+      time: `${String(new Date().getHours())}:${String(
+        new Date().getMinutes()
+      )}`,
     },
   });
 
@@ -344,6 +387,14 @@ const DelieveryForm = ({
   });
 
   function onSubmit(values: z.infer<typeof formSchema>) {
+    const dueDate = new Date();
+    dueDate.setHours(
+      Number(values.time.split(":")[0]),
+      Number(values.time.split(":")[1]),
+      0,
+      0
+    );
+
     const realFees = Number(
       addresses.find((x) => x.quartier === values.district)?.prix ?? "0"
     );
@@ -367,6 +418,7 @@ const DelieveryForm = ({
             prix: address?.prix!,
             id_zelty: address?.id_zelty!,
           },
+          // items: ApplyPromotions(cart),
           items: cart.map((item) => ({
             item_id: Number(item.id),
             quantity: item.quantity,
@@ -374,6 +426,7 @@ const DelieveryForm = ({
             type: "dish",
             name: item.name,
           })),
+          due_date: dueDate.toISOString(),
           mode: deliveryMode,
         });
         setReceiptData({
@@ -454,7 +507,7 @@ const DelieveryForm = ({
                   <SelectValue placeholder="Selectionner un mode" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="takeAway">
+                  <SelectItem value="takeaway">
                     <NewTag endNew={new Date(2025, 2, 31)}>À Emporter</NewTag>
                   </SelectItem>
                   <SelectItem value="delivery">Livraison à domicile</SelectItem>
@@ -477,7 +530,7 @@ const DelieveryForm = ({
                         <Button
                           className={cn(
                             "w-full pl-3 flex justify-between border-b border-[#4B5563] hover:border-[#4B5563] bg-[#F3F4F6] hover:bg-[#F3F4F6] text-left font-normal",
-                            !field.value && "text-muted-foreground"
+                            !field.value ? "text-muted-foreground" : "text-black"
                           )}
                         >
                           {field.value
@@ -551,6 +604,19 @@ const DelieveryForm = ({
                       placeholder="ex. Rue de la paix"
                     />
                   </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            {/* Heure */}
+            <FormField
+              control={form.control}
+              name="time"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{"Heure"}</FormLabel>
+                  <Input type="time" {...field} />
                   <FormMessage />
                 </FormItem>
               )}

@@ -36,8 +36,8 @@ const formSchema = z
             message: "Le numéro de téléphone doit comporter 9 chiffres",
         }),
         username: z.string().min(3, { message: "Le nom doit contenir au moins 3 caractères" }),
-        password: z.string().refine((value) => /^\d{6}$/.test(value), {
-            message: "Le mot de passe doit comporter 6 chiffres",
+        password: z.string().refine((value) => /^\d{4}$/.test(value), {
+            message: "Le mot de passe doit comporter 4 chiffres",
         }),
         confirmPassword: z.string(),
     })

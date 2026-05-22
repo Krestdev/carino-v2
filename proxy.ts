@@ -2,15 +2,21 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
 export function proxy(req: NextRequest) {
-  const isMaintenanceMode = process.env.NEXT_PUBLIC_MAINTENANCE_MODE === "true";
+  const isMaintenanceMode =
+    process.env.NEXT_PUBLIC_MAINTENANCE_MODE === "true";
+
   const { pathname } = req.nextUrl;
 
-  // Vérifier si l'utilisateur tente d'accéder à /maintenance
-  const isAccessingMaintenancePage = pathname.startsWith("/maintenance");
+  const isAccessingMaintenancePage =
+    pathname.startsWith("/maintenance");
 
-  // Si mode maintenance ACTIVÉ
+  let response: NextResponse;
+
+  // =========================
+  // MAINTENANCE
+  // =========================
+
   if (isMaintenanceMode) {
-    // Autoriser l'accès à la page maintenance et aux assets statiques
     if (
       isAccessingMaintenancePage ||
       pathname.startsWith("/_next/") ||
@@ -22,26 +28,44 @@ export function proxy(req: NextRequest) {
       pathname.endsWith(".jpeg") ||
       pathname.endsWith(".svg")
     ) {
-      return NextResponse.next();
+      response = NextResponse.next();
+    } else {
+      response = NextResponse.redirect(
+        new URL("/maintenance", req.url)
+      );
     }
-
-    // Rediriger toutes les autres pages vers /maintenance
-    return NextResponse.redirect(new URL("/maintenance", req.url));
-  }
-
-  // Si mode maintenance DÉSACTIVÉ
-  else {
-    // Bloquer l'accès à /maintenance et rediriger vers la racine
+  } else {
     if (isAccessingMaintenancePage) {
-      return NextResponse.redirect(new URL("/", req.url));
+      response = NextResponse.redirect(
+        new URL("/", req.url)
+      );
+    } else {
+      response = NextResponse.next();
     }
-
-    // Autoriser toutes les autres pages
-    return NextResponse.next();
   }
+
+  // =========================
+  // CORS
+  // =========================
+
+  response.headers.set(
+    "Access-Control-Allow-Origin",
+    "*"
+  );
+
+  response.headers.set(
+    "Access-Control-Allow-Methods",
+    "GET, POST, PUT, DELETE, OPTIONS"
+  );
+
+  response.headers.set(
+    "Access-Control-Allow-Headers",
+    "Content-Type, Authorization"
+  );
+
+  return response;
 }
 
-// Appliquer le middleware à toutes les routes
 export const config = {
-  matcher: ["/((?!api|_next/static|_next/image|favicon.ico).*)"],
+  matcher: ["/((?!_next/static|_next/image|favicon.ico).*)"],
 };

@@ -45,9 +45,9 @@ const CartItems = ({ items, width = "", products = [], options = [], title = tru
                                         <div className="flex flex-col gap-1 py-1 w-full">
                                             <div className="flex flex-row items-center justify-between w-full">
                                                 <p className="text-[14px] font-semibold uppercase">{item.name}</p>
-                                                <Button size={"icon"} className="w-6 h-6" variant={"default"} >
+                                                {/* <Button size={"icon"} className="w-6 h-6" variant={"default"} >
                                                     <Edit size={16} />
-                                                </Button>
+                                                </Button> */}
                                             </div>
                                             <div className="flex flex-row items-center justify-between w-full">
                                                 <p className="text-[14px] font-bold">{XAF.format(item.price)}</p>

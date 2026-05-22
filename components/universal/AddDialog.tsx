@@ -756,6 +756,14 @@ function AddDialog({ children, options, product }: DialogProps) {
               loading="lazy"
             />
             <span className="px-4 text-white font-sans">{product.name}</span>
+            {product.disable && (
+              <Badge
+                variant={"destructive"}
+                className="absolute bottom-2 left-2 z-10"
+              >
+                {"Indisponible"}
+              </Badge>
+            )}
           </DialogTitle>
           <DialogDescription className="text-black text-[16px] text-center line-clamp-3">
             {product.description}
@@ -790,7 +798,7 @@ function AddDialog({ children, options, product }: DialogProps) {
               </div>
             )}
 
-            <div className="flex items-center gap-4 p-4 border-t bg-white sticky bottom-0">
+            <div className="w-full flex items-center justify-end gap-4 p-4 border-t bg-white sticky bottom-0">
               <div className="flex items-center gap-3 bg-gray-100 p-1">
                 <Button
                   type="button"
@@ -812,7 +820,7 @@ function AddDialog({ children, options, product }: DialogProps) {
                   <Plus size={18} />
                 </Button>
               </div>
-              <Button type="submit" size="lg" className="flex-1 bg-[#29235C] hover:bg-[#1e1a44] text-white font-bold h-12 flex justify-between px-6">
+              <Button disabled={product.disable} type="submit" size="lg" className="bg-[#29235C] hover:bg-[#1e1a44] text-white font-bold h-12 flex justify-between px-6">
                 <span>Ajouter</span>
                 <span>{currentPrice}</span>
               </Button>

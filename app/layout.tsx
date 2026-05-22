@@ -16,6 +16,8 @@ import { UseOnTheme } from "@/hooks/useOnTheme";
 import Auth from "./Auth";
 import { ToastContainer } from "react-toastify";
 import { RouteGuard } from "@/providers/RouteGuard";
+import Pupop from "@/components/universal/pupop";
+import Pop from "@/components/universal/Pop";
 
 // Police principale
 const openSans = Open_Sans({
@@ -84,6 +86,7 @@ export default function RootLayout({
               <Footer />
               <Toaster />
               <ToastContainer />
+              {/* <Pop /> */}
             </QueryProvider>
           </AppProvider>
         </ThemeProvider>

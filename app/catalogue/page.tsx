@@ -87,7 +87,7 @@ const Page = () => {
       rawProducts = anyResponse || [];
     }
     return rawProducts;
-  }, [productsResponse]);
+  }, [productsResponse]).filter(p => p.tags.includes(MANDATORY_TAG));
 
   const allCategories = useMemo(() => {
     let rawCategories: CategoriesData[] = [];
@@ -217,7 +217,7 @@ const Page = () => {
         </div>
 
         {/* Categories et produits avec sticky */}
-        <div className="flex flex-col md:flex-row items-start justify-between gap-10">
+        <div className="flex flex-col md:flex-row items-start justify-between gap-5 md:gap-0">
           {/* Categories sticky - se fixe à 96px du haut (top-24) */}
           <div className="lg:sticky lg:top-24 self-start md:max-w-[260px] w-full">
             <Categories
@@ -274,8 +274,8 @@ const Page = () => {
           <ProductsGrid products={filterProducts} options={safeOptions} mandatoryTag={MANDATORY_TAG} />
 
           {/* CartItems sticky - se fixe à 96px du haut (top-24) */}
-          <div className="lg:sticky lg:top-24 self-start hidden md:flex flex-col gap-3 p-3 max-w-[260px] w-full">
-            <CartItems items={cart} width="max-w-[260px] w-full" />
+          <div className="lg:sticky lg:top-24 self-start hidden md:flex flex-col gap-3 p-3 max-w-[300px] w-full">
+            <CartItems items={cart} width="max-w-[300px] w-full" />
             {
               cart.length > 0 &&
               <>
