@@ -1,5 +1,4 @@
-import AxiosConfig from "@/providers/axios";
-import api from "@/providers/axios";
+import { api2 } from "@/providers/axios";
 import { ReservationData, ReservationResponse } from "@/types/types";
 import { AxiosInstance } from "axios";
 
@@ -8,7 +7,7 @@ export default class ReservationQuery {
   api: AxiosInstance;
 
   constructor() {
-    this.api = new AxiosConfig(true).api;
+    this.api = api2;
   }
 
   // Get all reservations

@@ -1,6 +1,10 @@
-
 import type { Metadata } from "next";
-import { Open_Sans, Oleo_Script_Swash_Caps, Playfair_Display, Plus_Jakarta_Sans } from "next/font/google";
+import {
+  Open_Sans,
+  Oleo_Script_Swash_Caps,
+  Playfair_Display,
+  Plus_Jakarta_Sans,
+} from "next/font/google";
 import "./globals.css";
 import { config } from "../data/config";
 import Footer from "../components/footer";
@@ -58,20 +62,19 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  // Définition de l'URL de base
-  // const baseURL = process.env.NEXT_PUBLIC_API_BASE_URL ?? "https://www.le-carino.com/api/";
-  const baseURL = process.env.NEXT_PUBLIC_API_BASE_URL ?? "";
-  console.log(baseURL);
   return (
     <html lang="fr" suppressHydrationWarning>
-      <body className={`${openSans.variable} ${oleo.variable} ${playfair.variable} ${generalSansVariable.variable} antialiased`}>
+      <body
+        className={`${openSans.variable} ${oleo.variable} ${playfair.variable} ${generalSansVariable.variable} antialiased`}
+      >
         <ThemeProvider
           attribute={"class"}
           defaultTheme="default"
           enableSystem
           disableTransitionOnChange
-          themes={["default", "christmas", "newyear"]}>
-          <AppProvider baseURL={baseURL ?? ""}>
+          themes={["default", "christmas", "newyear"]}
+        >
+          <AppProvider>
             <QueryProvider>
               <ThemeActivator />
               <UseOnTheme selectedTheme="christmas">
