@@ -1,4 +1,4 @@
-import { api2 } from "@/providers/axios";
+import { api1, api2 } from "@/providers/axios";
 import { AddtressData } from "@/types/types";
 import { AxiosInstance } from "axios";
 
@@ -7,7 +7,7 @@ export default class TownQuery {
   api: AxiosInstance;
 
   constructor() {
-    this.api = api2;
+    this.api = api1;
   }
   getTowns = async (): Promise<AddtressData[]> => {
     return this.api.get(`${this.route}/`).then((res) => res.data);

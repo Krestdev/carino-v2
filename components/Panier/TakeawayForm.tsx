@@ -21,7 +21,6 @@ import {
   FormMessage,
 } from "../ui/form";
 import { Input } from "../ui/input";
-import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import {
   Select,
   SelectContent,
@@ -30,7 +29,6 @@ import {
   SelectValue,
 } from "../ui/select";
 import { toast } from "../ui/use-toast";
-import { ApplyPromotions } from "../universal/promotions";
 import NewTag from "../newTag";
 import PaiementStatus, { PaymentStatus } from "./PaiementStatus";
 
@@ -218,7 +216,7 @@ const TakeawayForm = ({
 
   const extractPaymentStatus = (
     payload: any
-  ): "COMPLETED" | "FAILED" | "PENDING" | null => {
+  ): "SUCCESS" | "FAILED" | "PENDING" | null => {
     const rawStatus =
       payload?.status ??
       payload?.payment_status ??
@@ -245,7 +243,7 @@ const TakeawayForm = ({
     if (!rawStatus) return null;
 
     const normalizedStatus = String(rawStatus).toUpperCase();
-    if (normalizedStatus.includes("COMPLETED")) return "COMPLETED";
+    if (normalizedStatus.includes("SUCCESS")) return "SUCCESS";
     if (
       normalizedStatus.includes("FAILED") ||
       normalizedStatus.includes("NOT_FOUND")
@@ -259,15 +257,16 @@ const TakeawayForm = ({
     mutationFn: async (ref: string) => userQuery.status(ref),
     onSuccess: (data) => {
       const status = extractPaymentStatus(data);
-      if (status === "COMPLETED") {
-        setPaymentStatus("COMPLETED");
+      if (status === "SUCCESS") {
+        setPaymentStatus("SUCCESS");
       } else if (status === "FAILED") {
         setPaymentStatus("FAILED");
-        emptyCart();
+        setSourceError("payment");
       } else {
         const nextVendorReference = extractVendorReference(data);
         if (!nextVendorReference) {
           setPaymentStatus("FAILED");
+          setSourceError("payment");
           return;
         }
         setTimeout(() => {
@@ -336,8 +335,8 @@ const TakeawayForm = ({
       }
 
       const status = extractPaymentStatus(data);
-      if (status === "COMPLETED") {
-        setPaymentStatus("COMPLETED");
+      if (status === "SUCCESS") {
+        setPaymentStatus("SUCCESS");
       } else if (status === "FAILED") {
         setPaymentStatus("FAILED");
       }
@@ -443,7 +442,7 @@ const TakeawayForm = ({
 
   function handleCloseStatus() {
     setPaymentStatus(null);
-    if (paymentStatus === "COMPLETED") {
+    if (paymentStatus === "SUCCESS") {
       router.push("/commande");
     }
   }

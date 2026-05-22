@@ -13,7 +13,7 @@ import { checkTransactionStatus, Retry } from "@/types/types";
 import { UseMutationResult } from "@tanstack/react-query";
 import { CheckCircle2, Loader2, RefreshCw, XCircle } from "lucide-react";
 
-export type PaymentStatus = "PENDING" | "FAILED" | "COMPLETED" | null;
+export type PaymentStatus = "PENDING" | "FAILED" | "SUCCESS" | null;
 
 interface PaiementStatusProps {
   status: PaymentStatus;
@@ -41,7 +41,7 @@ const statusConfig = {
     badge: "En attente",
     badgeClass: "bg-orange-100 text-orange-700",
   },
-  COMPLETED: {
+  SUCCESS: {
     icon: CheckCircle2,
     iconClass: "text-emerald-500",
     bgClass: "bg-emerald-50",
@@ -79,7 +79,7 @@ export default function PaiementStatus({
   const Icon = config.icon;
   const isPending = status === "PENDING";
   const isFailed = status === "FAILED";
-  const isCompleted = status === "COMPLETED";
+  const isCompleted = status === "SUCCESS";
   const handleRetry = (data: Retry | undefined) => {
     if (!data) return;
     retryPayment.mutate(data);

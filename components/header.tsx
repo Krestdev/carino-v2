@@ -16,7 +16,7 @@ import {
   DrawerTitle,
   DrawerTrigger,
 } from "./ui/drawer";
-import { ChevronDown, LucideMenu } from "lucide-react";
+import { ChevronDown, LucideMenu, Star } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -26,12 +26,23 @@ import {
 } from "./ui/dropdown-menu";
 import ReservationQuery from "@/queries/bookingsQuery";
 import { useQuery } from "@tanstack/react-query";
+import UserQuery from "@/queries/userQueries";
+import Loading from "@/app/loading";
+import Error from "./universal/error";
 
 const Header = () => {
   const { setOpenLogSign, user } = useStore();
   const router = useRouter();
   const { token, cart } = useStore();
   const path = usePathname();
+
+  // Récupérer le profil complet de l'utilisateur depuis le serveur
+  const userLogIn = new UserQuery();
+  const userData = useQuery({
+    queryKey: ["userInfo", user?.id],
+    queryFn: () => userLogIn.profile(),
+    enabled: !!user,
+  });
 
   const reservation = new ReservationQuery();
   const bookingsQuery = useQuery({
@@ -40,6 +51,15 @@ const Header = () => {
     // Ne pas exécuter la requête si l'utilisateur n'est pas admin
     enabled: !!token && (user?.role === "ADMIN" || user?.role === "MANAGER"),
   });
+
+  // Vérification
+  if (userData.isLoading || bookingsQuery.isLoading) {
+    return <Loading />;
+  }
+
+  if (userData.isError || bookingsQuery.isError) {
+    return <Error />;
+  }
 
   const pendingBookings = bookingsQuery.data?.filter((booking) => booking.status === "Pending") || [];
 
@@ -150,6 +170,16 @@ const Header = () => {
             </span>
           )}
         </Link>
+        {/* Je vais afficher les point de fidélité bien stylé */}
+        <div className="flex items-center gap-2 cursor-pointer group">
+          <div className="rounded-full bg-[#FFC336]/10 p-2 group-hover:bg-[#FFC336]/20 transition-colors duration-300">
+            <Star className="h-5 w-5 text-[#FFC336]" />
+          </div>
+          <div className="flex flex-col">
+            <p className="text-xs text-muted-foreground">Points de fidélité</p>
+            <p className="text-sm font-medium text-white">{`${userData.data?.loyalty ?? 0} Pts`}</p>
+          </div>
+        </div>
       </div>
 
       <div className="md:hidden w-full flex gap-7">

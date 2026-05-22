@@ -15,7 +15,7 @@ export const yaoundeAddresses: AddressData[] = [
         id_zelty: 1001,
         ville: 'Yaoundé',
         quartier: 'Bastos',
-        prix: '2500',
+        prix: '50',
         created_at: new Date('2024-01-15'),
         updated_at: new Date('2024-12-01'),
     },

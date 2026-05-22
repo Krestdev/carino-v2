@@ -255,7 +255,7 @@ const DelieveryForm = ({
 
   const extractPaymentStatus = (
     payload: any
-  ): "COMPLETED" | "FAILED" | "PENDING" | null => {
+  ): "SUCCESS" | "FAILED" | "PENDING" | null => {
     const rawStatus =
       payload?.status ??
       payload?.payment_status ??
@@ -282,8 +282,8 @@ const DelieveryForm = ({
     if (!rawStatus) return null;
 
     const normalizedStatus = String(rawStatus).toUpperCase();
-    const parsedStatus = normalizedStatus.includes("COMPLETED")
-      ? "COMPLETED"
+    const parsedStatus = normalizedStatus.includes("SUCCESS")
+      ? "SUCCESS"
       : normalizedStatus.includes("FAILED") ||
         normalizedStatus.includes("NOT_FOUND")
         ? "FAILED"
@@ -297,15 +297,17 @@ const DelieveryForm = ({
     mutationFn: async (ref: string) => userQuery.status(ref),
     onSuccess: (data) => {
       const status = extractPaymentStatus(data);
-      if (status === "COMPLETED") {
-        setPaymentStatus("COMPLETED");
+      if (status === "SUCCESS") {
+        setPaymentStatus("SUCCESS");
         emptyCart();
       } else if (status === "FAILED") {
         setPaymentStatus("FAILED");
+        setSourceError("payment");
       } else {
         const nextVendorReference = extractVendorReference(data);
         if (!nextVendorReference) {
           setPaymentStatus("FAILED");
+          setSourceError("payment");
           return;
         }
         setTimeout(() => {
@@ -374,8 +376,8 @@ const DelieveryForm = ({
       }
 
       const status = extractPaymentStatus(data);
-      if (status === "COMPLETED") {
-        setPaymentStatus("COMPLETED");
+      if (status === "SUCCESS") {
+        setPaymentStatus("SUCCESS");
       } else if (status === "FAILED") {
         setPaymentStatus("FAILED");
       }
@@ -478,7 +480,7 @@ const DelieveryForm = ({
   // ── Handlers for PaiementStatus ──
   function handleCloseStatus() {
     setPaymentStatus(null);
-    if (paymentStatus === "COMPLETED") {
+    if (paymentStatus === "SUCCESS") {
       router.push("/commande");
     }
   }
