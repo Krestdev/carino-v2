@@ -244,14 +244,6 @@ const LoginDialog = ({ open, onOpenChange, setOpenLogSign, setOpenSignup }: Logi
                 )}
               />
               <div className="ml-auto w-full flex items-center justify-end">
-                {/* S'inscrire */}
-                <Button
-                  variant="link"
-                  onClick={switchToSignup}
-                  className="border-gray-250 hover:bg-gray-50 dark:border-slate-700 dark:hover:bg-slate-800 text-gray-700 dark:text-white"
-                >
-                  S'inscrire
-                </Button>
                 {/* FORGOT PASSWORD */}
                 <Link href="/recuperation-mot-de-passe" className="text-xs text-primary hover:underline font-semibold mx-0">
                   Mot de passe oublié ?
@@ -264,21 +256,33 @@ const LoginDialog = ({ open, onOpenChange, setOpenLogSign, setOpenSignup }: Logi
               )}
 
               {/* ACTIONS */}
-              <div className="flex justify-end gap-3 pt-4 border-t border-gray-100 dark:border-slate-800 mt-6">
+              <div className="flex w-full items justify-between pt-4 border-t border-gray-100 dark:border-slate-800 mt-6">
+                <div className="flex flex-row items-center gap-2">
+                  <Button
+                    variant="outline"
+                    type="button"
+                    onClick={() => onOpenChange(false)}
+                    className="border-gray-250 hover:bg-gray-50 dark:border-slate-700 dark:hover:bg-slate-800 text-gray-700 dark:text-white"
+                  >
+                    Fermer
+                  </Button>
+
+                  <Button
+                    type="submit"
+                    disabled={mutation.isPending}
+                    className="bg-primary hover:bg-primary/95 text-white"
+                  >
+                    {mutation.isPending ? "Connexion..." : "Se connecter"}
+                  </Button>
+                </div>
+
+                {/* S'inscrire */}
                 <Button
-                  variant="outline"
-                  onClick={() => onOpenChange(false)}
+                  variant="link"
+                  onClick={switchToSignup}
                   className="border-gray-250 hover:bg-gray-50 dark:border-slate-700 dark:hover:bg-slate-800 text-gray-700 dark:text-white"
                 >
-                  Fermer
-                </Button>
-
-                <Button
-                  type="submit"
-                  disabled={mutation.isPending}
-                  className="bg-primary hover:bg-primary/95 text-white"
-                >
-                  {mutation.isPending ? "Connexion..." : "Se connecter"}
+                  S'inscrire
                 </Button>
               </div>
 
