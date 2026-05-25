@@ -27,7 +27,7 @@ import {
     FormMessage,
 } from "../ui/form";
 import { Input } from "../ui/input";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, LogIn, UserPlus } from "lucide-react";
 
 const formSchema = z
     .object({
@@ -50,9 +50,10 @@ interface SignupDialogProps {
     open: boolean;
     onOpenChange: (open: boolean) => void;
     setOpenLogSign: (open: boolean) => void;
+    setOpenLogin: (open: boolean) => void;
 }
 
-const SignupDialog = ({ open, onOpenChange, setOpenLogSign }: SignupDialogProps) => {
+const SignupDialog = ({ open, onOpenChange, setOpenLogSign, setOpenLogin }: SignupDialogProps) => {
     const userQuery = new UserQuery();
 
     const { mutate, isError, isSuccess, error, isPending } = useMutation({
@@ -99,127 +100,193 @@ const SignupDialog = ({ open, onOpenChange, setOpenLogSign }: SignupDialogProps)
         }
     }, [isSuccess, onOpenChange, form]);
 
+    const switchToLogin = () => {
+        onOpenChange(false);
+        setOpenLogSign(false);
+        setOpenLogin(true);
+    };
+
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="sm:max-w-[520px] max-h-[90vh] overflow-y-auto">
-                <DialogHeader>
-                    <DialogTitle>{"connexion / inscription"}</DialogTitle>
-                    <DialogDescription>
-                        {"Créez votre compte pour profiter de toutes nos services."}
-                    </DialogDescription>
-                </DialogHeader>
+            <DialogContent className="sm:max-w-[480px] max-h-[80vh] overflow-hidden p-8 bg-white dark:bg-slate-900 border border-gray-150 dark:border-slate-800 rounded-2xl shadow-2xl">
+                {/* Decorative background gradients */}
+                <div className="absolute -top-24 -left-24 w-48 h-48 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
+                <div className="absolute -bottom-24 -right-24 w-48 h-48 bg-primary/20 rounded-full blur-3xl pointer-events-none" />
+                <div className="z-10 flex flex-col">
+                    {/* Header Row with Back Button */}
+                    <div className="flex justify-between items-center mb-4">
+                        <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => {
+                                onOpenChange(false);
+                                setOpenLogSign(true);
+                            }}
+                            className="text-gray-500 hover:text-gray-800 hover:bg-gray-100 dark:hover:bg-slate-800 px-2 h-8"
+                        >
+                            <ArrowLeft className="mr-1.5 h-4 w-4" />
+                            Précédent
+                        </Button>
+                    </div>
 
-                <Button onClick={() => {
-                    onOpenChange(false);
-                    setOpenLogSign(true);
-                }} variant={"outline"} className="w-fit">
-                    <ArrowLeft />
-                    {"Précédent"}
-                </Button>
+                    {/* Icon & Dialog Header */}
+                    <div className="flex flex-col items-center text-center sm:text-left mb-6">
+                        <div className="inline-flex items-center justify-center w-12 h-12 bg-amber-500/10 text-amber-500 rounded-xl mb-3 shadow-sm">
+                            <UserPlus className="h-6 w-6" />
+                        </div>
+                        <DialogHeader className="text-center sm:text-left p-0">
+                            <DialogTitle className="text-xl md:text-2xl font-bold text-center text-gray-950 dark:text-white font-serif uppercase tracking-wide">
+                                Inscription
+                            </DialogTitle>
+                            <DialogDescription className="text-gray-500 dark:text-gray-400 text-sm text-center">
+                                Créez votre compte pour profiter de tous nos services
+                            </DialogDescription>
+                        </DialogHeader>
+                    </div>
 
-                <Form {...form}>
-                    <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-6">
-                        {isError && (
-                            <div className="p-3 rounded-md bg-red-50 text-red-500 text-sm">
-                                {error?.message === "Request failed with status code 400"
-                                    ? "Cette adresse mail est déjà utilisée"
-                                    : "Une erreur est survenue lors de l'inscription"}
-                            </div>
-                        )}
-                        <div className="flex flex-col gap-5 max-w-[360px] w-full">
+                    <Form {...form}>
+                        <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-4">
+                            {isError && (
+                                <div className="p-3 rounded-md bg-red-50 dark:bg-red-950/20 text-red-500 dark:text-red-400 text-sm font-medium">
+                                    {error?.message === "Request failed with status code 400"
+                                        ? "Cette adresse mail est déjà utilisée"
+                                        : "Une erreur est survenue lors de l'inscription"}
+                                </div>
+                            )}
+                            <div className="flex flex-col gap-4 w-full">
 
-                            <FormField
-                                control={form.control}
-                                name="mail"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Adresse mail</FormLabel>
-                                        <FormControl>
-                                            <Input placeholder="exemple@mail.com" {...field} />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-
-                            <FormField
-                                control={form.control}
-                                name="username"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Nom complet</FormLabel>
-                                        <FormControl>
-                                            <Input placeholder="Jean Dupont" {...field} />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-
-                            <FormField
-                                control={form.control}
-                                name="password"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Mot de passe</FormLabel>
-                                        <FormControl>
-                                            <Input type="password" placeholder="6 chiffres" {...field} />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-
-                            <FormField
-                                control={form.control}
-                                name="confirmPassword"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Confirmer le mot de passe</FormLabel>
-                                        <FormControl>
-                                            <Input
-                                                type="password"
-                                                placeholder="Confirmez votre mot de passe"
-                                                {...field}
-                                            />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-
-                            <FormField
-                                control={form.control}
-                                name="phoneNumber"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Numéro de téléphone</FormLabel>
-                                        <div className="relative">
-                                            <span className="absolute left-0 top-0 px-3 h-full inline-flex items-center rounded-l-md bg-muted text-sm border border-r-0 border-input">
-                                                +237
-                                            </span>
+                                <FormField
+                                    control={form.control}
+                                    name="mail"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel className="text-gray-700 dark:text-gray-300">Adresse mail</FormLabel>
                                             <FormControl>
-                                                <Input placeholder="699999999" {...field} className="pl-16" />
+                                                <Input
+                                                    placeholder="exemple@mail.com"
+                                                    {...field}
+                                                    className="bg-gray-50/50 dark:bg-slate-800/50 border-gray-200 dark:border-slate-700 focus:bg-white dark:focus:bg-slate-800 rounded-lg transition-colors"
+                                                />
                                             </FormControl>
-                                        </div>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
 
-                        </div>
-                        <div className="flex flex-row gap-2 items-center ml-auto">
-                            <Button
-                                type="submit"
-                                disabled={isPending}
-                                className="w-fit"
-                            >
-                                {isPending ? "Inscription en cours..." : "S'inscrire"}
-                            </Button>
-                            <Button type="button" variant={"outline"} onClick={() => onOpenChange(false)} className="w-fit">{"Fermer"}</Button>
-                        </div>
-                    </form>
-                </Form>
+                                <FormField
+                                    control={form.control}
+                                    name="username"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel className="text-gray-700 dark:text-gray-300">Nom complet</FormLabel>
+                                            <FormControl>
+                                                <Input
+                                                    placeholder="Jean Dupont"
+                                                    {...field}
+                                                    className="bg-gray-50/50 dark:bg-slate-800/50 border-gray-200 dark:border-slate-700 focus:bg-white dark:focus:bg-slate-800 rounded-lg transition-colors"
+                                                />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+
+                                <FormField
+                                    control={form.control}
+                                    name="password"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel className="text-gray-700 dark:text-gray-300">Mot de passe</FormLabel>
+                                            <FormControl>
+                                                <Input
+                                                    type="password"
+                                                    placeholder="4 chiffres"
+                                                    {...field}
+                                                    className="bg-gray-50/50 dark:bg-slate-800/50 border-gray-200 dark:border-slate-700 focus:bg-white dark:focus:bg-slate-800 rounded-lg transition-colors"
+                                                />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+
+                                <FormField
+                                    control={form.control}
+                                    name="confirmPassword"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel className="text-gray-700 dark:text-gray-300">Confirmer le mot de passe</FormLabel>
+                                            <FormControl>
+                                                <Input
+                                                    type="password"
+                                                    placeholder="Confirmez votre mot de passe"
+                                                    {...field}
+                                                    className="bg-gray-50/50 dark:bg-slate-800/50 border-gray-200 dark:border-slate-700 focus:bg-white dark:focus:bg-slate-800 rounded-lg transition-colors"
+                                                />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+
+                                <FormField
+                                    control={form.control}
+                                    name="phoneNumber"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel className="text-gray-700 dark:text-gray-300">Numéro de téléphone</FormLabel>
+                                            <div className="relative">
+                                                <span className="absolute left-0 top-0 px-3 h-full inline-flex items-center rounded-l-md bg-muted text-sm border border-r-0 border-input select-none">
+                                                    +237
+                                                </span>
+                                                <FormControl>
+                                                    <Input
+                                                        placeholder="699999999"
+                                                        {...field}
+                                                        className="pl-16 bg-gray-50/50 dark:bg-slate-800/50 border-gray-200 dark:border-slate-700 focus:bg-white dark:focus:bg-slate-800 rounded-lg transition-colors"
+                                                    />
+                                                </FormControl>
+                                            </div>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+
+                            </div>
+
+
+                            <div className="flex justify-end w-full items-center">
+                                <Button
+                                    variant="link"
+                                    onClick={switchToLogin}
+                                    className="border-gray-250 hover:bg-gray-50 dark:border-slate-700 dark:hover:bg-slate-800 text-gray-700 dark:text-white"
+                                >
+                                    J'ai déjà un compte, se connecter
+                                </Button>
+                            </div>
+
+                            {/* ACTIONS */}
+                            <div className="flex justify-end gap-3 pt-4 border-t border-gray-100 dark:border-slate-800 mt-6">
+                                <Button
+                                    type="button"
+                                    variant="outline"
+                                    onClick={() => onOpenChange(false)}
+                                    className="border-gray-250 hover:bg-gray-50 dark:border-slate-700 dark:hover:bg-slate-800 text-gray-700 dark:text-white"
+                                >
+                                    Fermer
+                                </Button>
+
+                                <Button
+                                    type="submit"
+                                    disabled={isPending}
+                                    className="bg-primary hover:bg-primary/95 text-white"
+                                >
+                                    {isPending ? "Inscription en cours..." : "S'inscrire"}
+                                </Button>
+                            </div>
+                        </form>
+                    </Form>
+                </div>
             </DialogContent>
         </Dialog>
     );

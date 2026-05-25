@@ -116,3 +116,36 @@ export function CartTotal(cart: Array<cartItem>):number{
   return cart.reduce((accumulator, item) => accumulator + item.price * item.quantity,
           0)
 }
+
+export const zoneLivraisons = [
+  {
+    id: 1149650,
+    name: "Livraison 1 Yde",
+    price: 1000,
+  },
+  {
+    id: 1149651,
+    name: "Livraison 2 Yde",
+    price: 1500,
+  },
+  {
+    id: 1149652,
+    name: "Livraison 3 Yde",
+    price: 2000,
+  },
+  {
+    id: 1149653,
+    name: "Livraison 4 Yde",
+    price: 2500,
+  },
+  {
+    id: 1149654,
+    name: "Livraison 5 Yde",
+    price: 3000,
+  },
+  {
+    id: 1256901,
+    name: "Livraison 6 Yde",
+    price: 0,
+  },
+]

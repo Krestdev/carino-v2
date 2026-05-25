@@ -26,7 +26,7 @@ import {
   FormMessage,
 } from "../ui/form";
 import { Input } from "../ui/input";
-import { ArrowLeft, Eye, EyeOff } from "lucide-react";
+import { ArrowLeft, Eye, EyeOff, LogIn } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { jwtDecode } from "jwt-decode";
@@ -50,9 +50,10 @@ interface LoginDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   setOpenLogSign: (open: boolean) => void;
+  setOpenSignup: (open: boolean) => void;
 }
 
-const LoginDialog = ({ open, onOpenChange, setOpenLogSign }: LoginDialogProps) => {
+const LoginDialog = ({ open, onOpenChange, setOpenLogSign, setOpenSignup }: LoginDialogProps) => {
   const [errorValue, setErrorValue] = useState<string>();
   const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
@@ -144,36 +145,53 @@ const LoginDialog = ({ open, onOpenChange, setOpenLogSign }: LoginDialogProps) =
     mutation.mutate(values);
   };
 
+  const switchToSignup = () => {
+    onOpenChange(false);
+    setOpenLogSign(false);
+    setOpenSignup(true);
+  };
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[520px] p-0">
+      <DialogContent className="sm:max-w-[480px] overflow-hidden p-8 bg-white dark:bg-slate-900 border border-gray-150 dark:border-slate-800 rounded-2xl shadow-2xl">
+        {/* Decorative background gradients */}
+        <div className="absolute -top-24 -left-24 w-48 h-48 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute -bottom-24 -right-24 w-48 h-48 bg-primary/20 rounded-full blur-3xl pointer-events-none" />
 
-        {/* HEADER */}
-        <div className="bg-primary p-6 text-white">
-          <DialogHeader>
-            <DialogTitle className="text-2xl font-bold">Connexion</DialogTitle>
-            <DialogDescription className="text-white/80">
-              Accédez à votre compte
-            </DialogDescription>
-          </DialogHeader>
-        </div>
+        <div className="relative z-10 flex flex-col w-full">
+          {/* Header Row with Back Button */}
+          <div className="flex justify-between items-center mb-4">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => {
+                onOpenChange(false);
+                setOpenSignup(true);
+              }}
+              className="text-gray-500 hover:text-gray-800 hover:bg-gray-100 dark:hover:bg-slate-800 px-2 h-8"
+            >
+              <ArrowLeft className="mr-1.5 h-4 w-4" />
+              Retour
+            </Button>
+          </div>
 
-        {/* BODY */}
-        <div className="p-6 space-y-6">
-
-          <Button
-            variant="outline"
-            onClick={() => {
-              onOpenChange(false);
-              setOpenLogSign(true);
-            }}
-          >
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Retour
-          </Button>
+          {/* Icon & Dialog Header */}
+          <div className="flex flex-col items-center text-center sm:text-left mb-6">
+            <div className="inline-flex items-center justify-center w-12 h-12 bg-amber-500/10 text-amber-500 rounded-xl mb-3 shadow-sm">
+              <LogIn className="h-6 w-6" />
+            </div>
+            <DialogHeader className="text-center sm:text-left p-0">
+              <DialogTitle className="text-xl md:text-2xl font-bold text-gray-950 dark:text-white font-serif uppercase tracking-wide">
+                Connexion
+              </DialogTitle>
+              <DialogDescription className="text-gray-500 dark:text-gray-400 text-sm">
+                Accédez à votre compte
+              </DialogDescription>
+            </DialogHeader>
+          </div>
 
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
 
               {/* EMAIL */}
               <FormField
@@ -181,9 +199,14 @@ const LoginDialog = ({ open, onOpenChange, setOpenLogSign }: LoginDialogProps) =
                 name="email"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Email</FormLabel>
+                    <FormLabel className="text-gray-700 dark:text-gray-300">Email</FormLabel>
                     <FormControl>
-                      <Input {...field} type="email" disabled={mutation.isPending} />
+                      <Input
+                        {...field}
+                        type="email"
+                        disabled={mutation.isPending}
+                        className="bg-gray-50/50 dark:bg-slate-800/50 border-gray-200 dark:border-slate-700 focus:bg-white dark:focus:bg-slate-800 rounded-lg transition-colors"
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -196,17 +219,20 @@ const LoginDialog = ({ open, onOpenChange, setOpenLogSign }: LoginDialogProps) =
                 name="password"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Mot de passe</FormLabel>
+                    <div className="flex items-center justify-between">
+                      <FormLabel className="text-gray-700 dark:text-gray-300">Mot de passe</FormLabel>
+                    </div>
                     <FormControl>
                       <div className="relative">
                         <Input
                           {...field}
                           type={showPassword ? "text" : "password"}
                           disabled={mutation.isPending}
+                          className="bg-gray-50/50 dark:bg-slate-800/50 border-gray-200 dark:border-slate-700 focus:bg-white dark:focus:bg-slate-800 rounded-lg transition-colors pr-10"
                         />
                         <button
                           type="button"
-                          className="absolute right-2 top-2"
+                          className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
                           onClick={() => setShowPassword(!showPassword)}
                         >
                           {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
@@ -217,25 +243,42 @@ const LoginDialog = ({ open, onOpenChange, setOpenLogSign }: LoginDialogProps) =
                   </FormItem>
                 )}
               />
-
-              {/* FORGOT PASSWORD */}
-              <Link href="/mot-de-passe-oublie" className="text-sm text-primary">
-                Mot de passe oublié ?
-              </Link>
+              <div className="ml-auto w-full flex items-center justify-end">
+                {/* S'inscrire */}
+                <Button
+                  variant="link"
+                  onClick={switchToSignup}
+                  className="border-gray-250 hover:bg-gray-50 dark:border-slate-700 dark:hover:bg-slate-800 text-gray-700 dark:text-white"
+                >
+                  S'inscrire
+                </Button>
+                {/* FORGOT PASSWORD */}
+                <Link href="/recuperation-mot-de-passe" className="text-xs text-primary hover:underline font-semibold mx-0">
+                  Mot de passe oublié ?
+                </Link>
+              </div>
 
               {/* ERROR */}
               {errorValue && (
-                <p className="text-red-500 text-sm">{errorValue}</p>
+                <p className="text-red-500 text-sm font-medium">{errorValue}</p>
               )}
 
               {/* ACTIONS */}
-              <div className="flex justify-end gap-2">
-                <Button type="submit" disabled={mutation.isPending}>
-                  {mutation.isPending ? "Connexion..." : "Se connecter"}
+              <div className="flex justify-end gap-3 pt-4 border-t border-gray-100 dark:border-slate-800 mt-6">
+                <Button
+                  variant="outline"
+                  onClick={() => onOpenChange(false)}
+                  className="border-gray-250 hover:bg-gray-50 dark:border-slate-700 dark:hover:bg-slate-800 text-gray-700 dark:text-white"
+                >
+                  Fermer
                 </Button>
 
-                <Button variant="outline" onClick={() => onOpenChange(false)}>
-                  Fermer
+                <Button
+                  type="submit"
+                  disabled={mutation.isPending}
+                  className="bg-primary hover:bg-primary/95 text-white"
+                >
+                  {mutation.isPending ? "Connexion..." : "Se connecter"}
                 </Button>
               </div>
 

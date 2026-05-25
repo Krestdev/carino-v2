@@ -38,81 +38,99 @@ function Error({
     }
 
     return (
-        <div className="bg-gray-50 py-24">
+        <div className="min-h-[85vh] flex items-center justify-center bg-slate-50 dark:bg-slate-950 px-4 py-16">
+            <div className="w-full max-w-xl bg-white dark:bg-slate-900 border border-gray-150 dark:border-slate-800 rounded-2xl shadow-xl p-8 md:p-12 text-center relative overflow-hidden">
+                {/* Decorative gradients */}
+                <div className="absolute -top-24 -left-24 w-48 h-48 bg-red-500/10 rounded-full blur-3xl pointer-events-none" />
+                <div className="absolute -bottom-24 -right-24 w-48 h-48 bg-primary/20 rounded-full blur-3xl pointer-events-none" />
 
-            {/* Contenu en deux colonnes */}
-            <div className="max-w-6xl mx-auto px-4 py-12">
-                <div className="flex flex-col items-center justify-center gap-12">
-                    {/* Colonne gauche - Illustration */}
-                    <div className="order-2 md:order-1">
-                        <div className="px-12 bg-white rounded-2xl shadow-sm border p-8 text-center">
-                            <div className="inline-flex items-center justify-center w-20 h-20 bg-red-50 rounded-2xl mb-6">
-                                <AlertCircle className="h-10 w-10 text-red-500" />
-                            </div>
+                <div className="relative z-10 flex flex-col items-center">
+                    {/* Error Icon */}
+                    <div className="inline-flex items-center justify-center w-20 h-20 bg-red-55 dark:bg-red-500/10 text-red-500 dark:text-red-400 rounded-2xl mb-6 shadow-sm">
+                        <AlertCircle className="h-10 w-10 animate-bounce" />
+                    </div>
 
-                            <h1 className="text-3xl font-bold text-gray-900 mb-3">
-                                {title}
-                            </h1>
+                    {/* Status Code / Title */}
+                    <h1 className="text-2xl md:text-3xl font-bold text-gray-950 dark:text-white mb-2 font-serif">
+                        {title}
+                    </h1>
 
-                            <p className="text-gray-600 mb-8">
-                                {message}
-                            </p>
+                    {statusCode && (
+                        <span className="inline-block text-xs font-semibold px-2.5 py-0.5 rounded bg-red-100 dark:bg-red-950/40 text-red-700 dark:text-red-400 mb-4">
+                            Erreur {statusCode}
+                        </span>
+                    )}
 
-                            <div className="space-y-3">
-                                {reset ? (
-                                    <Button onClick={reset} className="w-full">
-                                        <RefreshCw className="h-4 w-4 mr-2" />
-                                        Réessayer
-                                    </Button>
-                                ) : (
-                                    <Button onClick={() => window.location.reload()} className="w-full">
-                                        <RefreshCw className="h-4 w-4 mr-2" />
-                                        Recharger la page
-                                    </Button>
-                                )}
+                    {/* Message */}
+                    <p className="text-gray-500 dark:text-gray-400 text-sm md:text-base mb-8 max-w-sm">
+                        {message}
+                    </p>
 
-                                <Link href="/">
-                                    <Button variant="outline" className="w-full">
-                                        <Home className="h-4 w-4 mr-2" />
-                                        Page d'accueil
-                                    </Button>
-                                </Link>
-                            </div>
+                    {/* Actions */}
+                    <div className="flex flex-col sm:flex-row gap-3 w-full justify-center mb-8">
+                        {reset ? (
+                            <Button
+                                onClick={reset}
+                                className="w-full sm:w-auto bg-primary hover:bg-primary/95 text-white flex items-center justify-center gap-2 px-6"
+                            >
+                                <RefreshCw className="h-4 w-4 shrink-0" />
+                                Réessayer
+                            </Button>
+                        ) : (
+                            <Button
+                                onClick={() => window.location.reload()}
+                                className="w-full sm:w-auto bg-primary hover:bg-primary/95 text-white flex items-center justify-center gap-2 px-6"
+                            >
+                                <RefreshCw className="h-4 w-4 shrink-0" />
+                                Recharger la page
+                            </Button>
+                        )}
 
-                            <div className="space-y-3 mt-3 text-sm flex flex-col items-center justify-center">
-                                <p className="text-gray-600">
-                                    Vous pouvez passer votre commande au
-                                </p>
-                                <div className="pt-2 space-y-2">
-                                    <p className="flex items-center gap-2">
-                                        <span className="text-gray-400">📞</span>
-                                        <a href="tel:+237696541055" className="text-blue-600 hover:underline">
-                                            +237 696 54 10 55
-                                        </a>
-                                    </p>
-                                    <p className="flex items-center gap-2">
-                                        <span className="text-gray-400">✉️</span>
-                                        <a href="mailto:info@le-carino.com" className="text-blue-600 hover:underline">
-                                            info@le-carino.com
-                                        </a>
-                                    </p>
-                                </div>
-                            </div>
+                        <Link href="/" passHref className="w-full sm:w-auto">
+                            <Button
+                                variant="outline"
+                                className="w-full border-gray-250 hover:bg-gray-50 dark:border-slate-700 dark:hover:bg-slate-800 text-gray-700 dark:text-white flex items-center justify-center gap-2 px-6"
+                            >
+                                <Home className="h-4 w-4 shrink-0" />
+                                Page d'accueil
+                            </Button>
+                        </Link>
+                    </div>
 
-                            {process.env.NODE_ENV === "development" && error && (
-                                <div className="mt-6 pt-6 border-t text-left">
-                                    <details className="text-sm">
-                                        <summary className="text-gray-500 cursor-pointer">
-                                            Détails techniques
-                                        </summary>
-                                        <pre className="mt-2 text-xs bg-gray-50 p-3 rounded overflow-auto">
-                                            {error.message}
-                                        </pre>
-                                    </details>
-                                </div>
-                            )}
+                    {/* Contact details */}
+                    <div className="w-full pt-6 border-t border-gray-100 dark:border-slate-800 text-center">
+                        <p className="text-xs text-gray-450 uppercase font-bold tracking-wider mb-3">
+                            Assistance Clientèle
+                        </p>
+                        <div className="flex flex-col sm:flex-row justify-center items-center gap-4 text-sm font-semibold">
+                            <a
+                                href="tel:+237696541055"
+                                className="flex items-center gap-1.5 text-primary hover:text-primary/90 dark:text-amber-500 dark:hover:text-amber-400 transition-colors"
+                            >
+                                <span>📞</span> +237 696 54 10 55
+                            </a>
+                            <a
+                                href="mailto:info@le-carino.com"
+                                className="flex items-center gap-1.5 text-primary hover:text-primary/90 dark:text-amber-500 dark:hover:text-amber-400 transition-colors"
+                            >
+                                <span>✉️</span> info@le-carino.com
+                            </a>
                         </div>
                     </div>
+
+                    {/* Technical developer details */}
+                    {process.env.NODE_ENV === "development" && error && (
+                        <div className="w-full mt-6 pt-6 border-t border-gray-100 dark:border-slate-800 text-left">
+                            <details className="text-xs group">
+                                <summary className="text-gray-450 hover:text-gray-650 cursor-pointer font-medium select-none">
+                                    Détails techniques
+                                </summary>
+                                <pre className="mt-2 text-[10px] bg-slate-50 dark:bg-slate-950 p-4 rounded-lg overflow-auto max-h-40 font-mono text-red-600 dark:text-red-400 border border-red-50/50 dark:border-red-950/20">
+                                    {error.stack || error.message}
+                                </pre>
+                            </details>
+                        </div>
+                    )}
                 </div>
             </div>
         </div>

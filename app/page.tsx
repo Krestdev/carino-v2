@@ -17,8 +17,7 @@ import { useOptions } from "@/hooks/useOptions";
 import { ProductOption } from "@/types/types";
 
 export default function Home() {
-  const MANDATORY_TAG = 316504; // ID de la catégorie "Suggestion du Chef"
-  // Utilisation des hooks personnalisés
+  const MANDATORY_TAG = 316504; 
   const {
     data: productsData,
     isLoading: isLoadingProducts,

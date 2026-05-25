@@ -7,7 +7,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { XAF } from "@/lib/functions";
-import { AddtressData, OrdersData } from "@/types/types";
+import { AddressData, OrdersData } from "@/types/types";
 import { useState } from "react";
 import { LuEye } from "react-icons/lu";
 import { Button } from "../ui/button";
@@ -19,7 +19,7 @@ import { fr } from "date-fns/locale";
 interface Props {
   title: string;
   data: OrdersData[];
-  towns: AddtressData[] | undefined;
+  towns: AddressData[] | undefined;
 }
 
 const HistoryTable = ({ title, data, towns }: Props) => {
@@ -52,14 +52,14 @@ const HistoryTable = ({ title, data, towns }: Props) => {
           </TableRow>
         </TableHeader>
         <TableBody className="divide-y divide-gray-200">
-          {data.length === 0 ? (
+          { data && data.length === 0 ? (
             <TableRow className="divide-x divide-gray-200">
               <TableCell colSpan={7} className="text-center h-24">
                 {"Aucune donnée à afficher."}
               </TableCell>
             </TableRow>
           ) : (
-            data.toReversed().map((order, id) => {
+            data?.toReversed().map((order, id) => {
               return (
                 <TableRow key={id} className={`divide-x divide-gray-200 ${id % 2 === 0 ? "bg-gray-100" : ""}`}>
                   <TableCell className={`font-medium text-center`}>

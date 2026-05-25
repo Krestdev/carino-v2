@@ -8,7 +8,7 @@ import {
   Font,
 } from "@react-pdf/renderer";
 
-import { MyOrdersResponse, AddtressData } from "@/types/types";
+import { MyOrdersResponse, AddressData } from "@/types/types";
 import { XAF } from "@/lib/functions";
 
 // Enregistrer une police
@@ -178,7 +178,7 @@ const styles = StyleSheet.create({
 
 interface OrderPDFProps {
   order: MyOrdersResponse;
-  deliveryAddress: AddtressData | undefined;
+  deliveryAddress: AddressData | undefined;
   orderDate: string;
 }
 
@@ -192,7 +192,7 @@ const OrderPDF = ({
     total: Number(item.price) * Number(item.quantity),
   }));
 
-  const deliveryPrice = Number(deliveryAddress?.prix || 0);
+  const deliveryPrice = Number(deliveryAddress?.price || 0);
 
   const subTotal = Number(order.total) - deliveryPrice;
 
@@ -269,7 +269,7 @@ const OrderPDF = ({
                   </Text>
 
                   <Text style={styles.infoValue}>
-                    {deliveryAddress.ville}
+                    {deliveryAddress.name}
                   </Text>
                 </View>
 

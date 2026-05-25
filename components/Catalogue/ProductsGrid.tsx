@@ -18,7 +18,7 @@ const ProductsGrid = ({ products, options, mandatoryTag }: ProductGridProps) => 
                     sm:grid-cols-2 
                     lg:grid-cols-3
                     xl:grid-cols-4
-                    gap-4 sm:gap-5 lg:gap-6
+                    gap-4 sm:gap-5 lg:gap-10
                     auto-rows-fr">
                     {products.map((product, ind) => (
                         <div key={ind} className="h-full">

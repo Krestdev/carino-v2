@@ -22,9 +22,10 @@ import { useCallback, useMemo, useState } from "react";
 import Loading from "../loading";
 
 const MANDATORY_TAG = 316504;
+const FIRST_TAG_ID = 253199;
 
 const Page = () => {
-  const [activeTab, setActiveTab] = useState<number>(0);
+  const [activeTab, setActiveTab] = useState<number>(FIRST_TAG_ID);
   const [searchTerm, setSearchTerm] = useState("");
   const [openCart, setOpenCart] = useState(false);
   const { cart, emptyCart } = useStore();
@@ -190,6 +191,35 @@ const Page = () => {
       .filter((item) => item.total > 0);
   }, [parentCategories, getCategoryFamilyIds, products, allCategories]);
 
+  // Total product per tag
+  const totalProductPerTag = useMemo<
+    { category: CategoriesData; total: number }[]
+  >(() => {
+    return parentCategories
+      .filter((x) => x.id !== 316504)
+      .map((category) => {
+        const familyIds = getCategoryFamilyIds(category.id);
+
+        const total = products.filter((product: ProdData) => {
+          // Exclure le tag MANDATORY_TAG et vérifier que les tags sont des catégories valides
+          const validCategoryTags =
+            product.tags?.filter(
+              (tagId) =>
+                tagId !== MANDATORY_TAG &&
+                allCategories.some((cat) => cat.id === tagId),
+            ) || [];
+
+          return validCategoryTags.some((tagId) => familyIds.includes(tagId));
+        }).length;
+
+        return {
+          category: category,
+          total,
+        };
+      })
+      .filter((item) => item.total > 0);
+  }, [parentCategories, getCategoryFamilyIds, products, allCategories]);
+
   // Gestion de la recherche avec debounce
   const handleSearch = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
@@ -227,10 +257,10 @@ const Page = () => {
         title="Catalogue"
         subTitle={"livraison & à emporter"}
       />
-      <div className="flex flex-col gap-7 md:gap-12 px-7 py-12 md:py-24 max-w-[1440px] mx-auto">
+      <div className="flex flex-col gap-7 md:gap-12 px-7 pb-12 md:pb-24 py-5 max-w-[1440px] mx-auto">
         {/* Barre de recherche */}
-        <div className="flex flex-col gap-1 max-w-[360px] w-full">
-          <p className="font-semibold text-[14px]">Recherche</p>
+        <div className="flex flex-col gap-1 max-w-[360px] w-full ml-auto">
+          <p className="text-[14px]">Recherche</p>
           <Input
             placeholder="Ex. Burger, Pizza, Cocktail..."
             value={searchTerm}
@@ -254,6 +284,8 @@ const Page = () => {
               categories={totalProductPerCategory}
               activeTab={activeTab}
               setActiveTab={setActiveTab}
+              totalProductPerTag={totalProductPerTag}
+              firstTagId={FIRST_TAG_ID}
             />
           </div>
           <div className="flex md:hidden flex-col gap-3 w-full">
@@ -319,12 +351,12 @@ const Page = () => {
               cart.length > 0 &&
               <>
                 <Button onClick={() => router.push("/panier")}>
-                  {"Continuer"}
+                  {"Procéder au paiement"}
                   <ArrowRight className="w-4 h-4" />
                 </Button>
-                <Button variant={"outline"} onClick={emptyCart}>
+                {/* <Button variant={"outline"} onClick={emptyCart}>
                   {"Vider le panier"}
-                </Button>
+                </Button> */}
               </>
             }
           </div>

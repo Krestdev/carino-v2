@@ -27,15 +27,15 @@ const ProductCart = ({ produit, options, mandatoryTag }: Props) => {
         <img
           src={produit.image ? produit.image : "/images/imagePlaceholder.svg"}
           alt={produit.name}
-          className="md:max-w-[300px] w-full aspect-square h-auto object-cover cursor-pointer"
+          className="md:max-w-[300px] w-full aspect-video h-auto object-cover cursor-pointer border border-muted rounded-sm"
         />
       </div>
       <div className="col-span-3 flex flex-row items-start md:max-w-[300px]">
         <div className="flex flex-1 flex-col">
-          <p className="text-[16px] font-semibold lowercase first-letter:uppercase line-clamp-2">
+          <p className="text-[12px] font-medium lowercase first-letter:uppercase line-clamp-2">
             {produit.name}
           </p>
-          <p className="text-[14px] text-[#89590C] font-semibold">{`${produit.price} FCFA`}</p>
+          <p className="text-[12px] text-[#89590C] font-semibold">{`${produit.price} FCFA`}</p>
         </div>
         {produit.disable ? (
           <Tooltip>
@@ -66,7 +66,7 @@ const ProductCart = ({ produit, options, mandatoryTag }: Props) => {
         ) : (
           <AddDialog options={options} product={produit}>
             {/* Je veux que le bouton soit disabled si le produit n'a pas MANDATORY_TAG */}
-            <Button disabled={produit.disable} className={`w-10 h-10 p-0`}>
+            <Button disabled={produit.disable} className={`h-6 w-6 p-0 bg-primary opacity-90 hover:bg-accent hover:text-black`}>
               <LuPlus className="w-6 h-6 text-white" />
             </Button>
           </AddDialog>

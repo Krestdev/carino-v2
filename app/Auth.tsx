@@ -19,8 +19,22 @@ const Auth = () => {
                 setOpenSignup={setOpenSignup}
             />}
             {/* Je vais mettre aussi les dialogues de login et signUp */}
-            {!!openLogin && <LoginDialog open={openLogin} onOpenChange={setOpenLogin} setOpenLogSign={setOpenLogSign} />}
-            {!!openSignup && <SignupDialog open={openSignup} onOpenChange={setOpenSignup} setOpenLogSign={setOpenLogSign} />}
+            {!!openLogin && (
+                <LoginDialog
+                    open={openLogin}
+                    onOpenChange={setOpenLogin}
+                    setOpenLogSign={setOpenLogSign}
+                    setOpenSignup={setOpenSignup}
+                />
+            )}
+            {!!openSignup && (
+                <SignupDialog
+                    open={openSignup}
+                    onOpenChange={setOpenSignup}
+                    setOpenLogSign={setOpenLogSign}
+                    setOpenLogin={setOpenLogin}
+                />
+            )}
         </div>
     );
 };

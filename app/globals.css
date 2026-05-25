@@ -327,3 +327,42 @@ body {
   scrollbar-width: thin;
   scrollbar-color: #888 transparent;
 }
+
+/* ===== Scrollbar Moderne et Élégante ===== */
+
+/* ===== Modern Floating Scrollbar ===== */
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+  margin-block: 6px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(247, 147, 29, 0.35);
+  border-radius: 999px;
+  border: 1px solid transparent;
+  backdrop-filter: blur(10px);
+  transition:
+    background 0.25s ease,
+    width 0.25s ease,
+    opacity 0.25s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgb(104, 109, 155);
+}
+
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+/* Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgb(104, 109, 155) transparent;
+}

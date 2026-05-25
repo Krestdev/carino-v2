@@ -2,12 +2,12 @@
 
 import { ApplyDeliveryPromo } from "@/app/panier/fees-promotion";
 import useStore from "@/context/store";
-import { CartTotal, cn, isDeliveryOpen } from "@/lib/utils";
+import { CartTotal, cn, isDeliveryOpen, zoneLivraisons } from "@/lib/utils";
 import { useAppContext } from "@/providers/appContext";
 import TownQuery from "@/queries/townQuery";
 import UserQuery from "@/queries/userQueries";
 import {
-  AddtressData,
+  AddressData,
   cartItem,
   City,
   deliveryMode,
@@ -19,7 +19,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { Check, ChevronsUpDown } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import z from "zod";
 import { Button } from "../ui/button";
@@ -50,6 +50,7 @@ import {
 import { toast } from "../ui/use-toast";
 import NewTag from "../newTag";
 import PaiementStatus, { PaymentStatus } from "./PaiementStatus";
+import ProductQuery from "@/queries/productQuery";
 
 interface DelieveryProps {
   deliveryMode: deliveryMode;
@@ -107,7 +108,7 @@ const formSchema = z.object({
         "Veuillez définir une heure au moins une heure plus tard que l'heure actuelle",
       path: ["time"],
     }
-  )
+  );
 
 const DelieveryForm = ({
   deliveryMode,
@@ -121,17 +122,21 @@ const DelieveryForm = ({
 
   // Store
   const { user, emptyCart } = useStore();
+  const baseURL = process.env.NEXT_PUBLIC_API_BASE_URL || "";
   const transactionRef = useStore((s) => s.transactionRef);
   const setReceiptData = useStore((s) => s.setReceiptData);
 
-  const [addresses, setAddresses] = useState<AddtressData[]>([]);
+  const [addresses, setAddresses] = useState<AddressData[]>([]);
   const [viewAddresses, setViewAddresses] = useState(false);
   const [retryData, setRetryData] = useState<Retry>();
+  const [zoneId, setZoneId] = useState<number>(0);
+
+  const productZone = zoneLivraisons.find(x => x.id === zoneId);
 
   // ── Payment status state ──
   const [paymentStatus, setPaymentStatus] = useState<PaymentStatus>(null);
   const [sourceError, setSourceError] = useState<string | null>(null);
-
+  const productService = useMemo(() => new ProductQuery(), [baseURL]);
 
   const townQuery = new TownQuery();
   const { data, isSuccess } = useQuery({
@@ -398,7 +403,7 @@ const DelieveryForm = ({
     );
 
     const realFees = Number(
-      addresses.find((x) => x.quartier === values.district)?.prix ?? "0"
+      addresses.find((x) => x.quartier === values.district)?.price ?? "0"
     );
     setFees(ApplyDeliveryPromo(realFees, values.district, cart));
 
@@ -415,19 +420,34 @@ const DelieveryForm = ({
             ApplyDeliveryPromo(realFees, values.district, cart),
           first_name: user.name,
           address: {
-            ville: address?.ville!,
-            quartier: address?.quartier!,
-            prix: address?.prix!,
-            id_zelty: address?.id_zelty!,
+            ville_id: address?.id!,
+            street: values.locality,
+            phone: values.deliveryNumber,
           },
-          // items: ApplyPromotions(cart),
-          items: cart.map((item) => ({
+          items: [...cart.map((item) => ({
             item_id: Number(item.id),
             quantity: item.quantity,
             price: item.price,
             type: "dish",
             name: item.name,
-          })),
+            modifiers: item.options && item.options.length > 0 ? item.options.map((optionGroup) => ({
+              name: optionGroup.name,
+              id_zelty: optionGroup.id_zelty,
+              details: optionGroup.details.map((detail) => ({
+                id: detail.id,
+                name: detail.name,
+                qte: detail.qte,
+                price: detail.price,
+              })),
+            })) : [],
+          })), ...productZone ? [{
+            item_id: Number(productZone.id),
+            quantity: 1,
+            name: productZone.name,
+            price: productZone.price,
+            type: "dish",
+            modifiers: [],
+          }] : []],
           due_date: dueDate.toISOString(),
           mode: deliveryMode,
         });
@@ -557,11 +577,12 @@ const DelieveryForm = ({
                                 onSelect={() => {
                                   field.onChange(item.quartier);
 
+                                  setZoneId(item.id_delivery_zone);
                                   form.trigger("district");
 
                                   setFees(
                                     ApplyDeliveryPromo(
-                                      Number(item.prix),
+                                      Number(item.price),
                                       item.quartier,
                                       cart
                                     )
@@ -696,16 +717,16 @@ const DelieveryForm = ({
 
           {/* Submit */}
           <div className="flex flex-col items-start w-full gap-2">
-            <div className="flex gap-2 items-center flex-wrap">
-              <Button disabled={isDisable()} size="lg" type="submit">
+            <div className="flex gap-2 items-center flex-wrap w-full">
+              <Button className="ml-auto" disabled={isDisable()} size="lg" type="submit">
                 Procéder au paiement
               </Button>
             </div>
-            {CartTotal(cart) < 5000 && (
+            {/* {CartTotal(cart) < 5000 && (
               <p className="text-[14px] text-red-500">
                 Le montant minimum pour soumettre une commande est de 5000 Fcfa
               </p>
-            )}
+            )} */}
           </div>
         </form>
       </Form>

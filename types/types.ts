@@ -224,15 +224,15 @@ export interface City {
 export interface AddressResponse {
   message: string;
   statusCode: number;
-  data: AddtressData[];
+  data: AddressData[];
 }
 
-export interface AddtressData {
+export interface AddressData {
   id: number;
-  id_zelty: number;
-  ville: string;
+  id_delivery_zone: number;
+  name: string;
   quartier: string;
-  prix: string;
+  price: string;
   created_at: Date;
   updated_at: Date;
 }
@@ -555,7 +555,11 @@ export type Retry = {
 export type Order = {
   total: number;
   first_name: string;
-  address?: Omit<AddtressData, 'id' | 'created_at' | 'updated_at'>;
+  address?: {
+    ville_id: number;
+    street: string;
+    phone: string;
+  };
   items: Omit<cartItem, 'id' | 'options' | 'image' | 'tags' | 'name'>[];
   payment: {
     network: 'MTN_CM' | 'ORANGE_CM';

@@ -86,7 +86,7 @@ export default function PaiementStatus({
   };
 
   return (
-    <Dialog open={!!status} onOpenChange={isPending ? undefined : onClose}>
+    <Dialog open={!!status} onOpenChange={onClose}>
       <DialogContent
         className={cn(
           "sm:max-w-md rounded-2xl border p-0 overflow-hidden",

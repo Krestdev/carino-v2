@@ -97,8 +97,6 @@ const TakeawayForm = ({
   setDeliveryMode,
 }: OrderTypeProps & TakeawayProps & { cart: Array<cartItem> }) => {
   const router = useRouter();
-  // const axiosClient = axiosConfig();
-  //const { cart, user, setTransaction, transactionRef, setReceiptData } = useStore();
   const { user, emptyCart } = useStore();
   const setTransaction = useStore(s => s.setTransaction);
   const transactionRef = useStore(s => s.transactionRef);
@@ -259,6 +257,7 @@ const TakeawayForm = ({
       const status = extractPaymentStatus(data);
       if (status === "SUCCESS") {
         setPaymentStatus("SUCCESS");
+        emptyCart(); // Vide le panier après paiement réussi
       } else if (status === "FAILED") {
         setPaymentStatus("FAILED");
         setSourceError("payment");
@@ -294,8 +293,7 @@ const TakeawayForm = ({
     },
     onSuccess: (data) => {
       const payload = data;
-      const orderUuid =
-        payload?.order?.uuid
+      const orderUuid = payload?.order?.uuid;
       if (orderUuid) {
         setRetryData({
           orderUuid,
@@ -337,6 +335,7 @@ const TakeawayForm = ({
       const status = extractPaymentStatus(data);
       if (status === "SUCCESS") {
         setPaymentStatus("SUCCESS");
+        emptyCart();
       } else if (status === "FAILED") {
         setPaymentStatus("FAILED");
       }
@@ -346,24 +345,6 @@ const TakeawayForm = ({
       setSourceError("payment");
     },
   });
-
-  // const postOrder = useMutation({
-  //   mutationFn: ({
-  //     phone,
-  //     total_amount,
-  //     user,
-  //     commande,
-  //     due_date,
-  //   }: PostTakeAwayOrderProps) => {
-  //     return axiosClient.post<orderMutation>("/auth/orders", {
-  //       phone,
-  //       total_amount,
-  //       user,
-  //       commande,
-  //       due_date,
-  //     });
-  //   },
-  // });
 
   function onSubmit(values: z.infer<typeof formSchema>) {
     const dueDate = new Date();
@@ -382,18 +363,27 @@ const TakeawayForm = ({
           },
           total: CartTotal(cart),
           first_name: user.name,
-          // items: ApplyPromotions(cart),
           items: cart.map((item) => ({
             item_id: Number(item.id),
             quantity: item.quantity,
             price: item.price,
             type: "dish",
             name: item.name,
+            modifiers: item.options && item.options.length > 0 ? item.options.map((optionGroup) => ({
+              name: optionGroup.name,
+              id_zelty: optionGroup.id_zelty,
+              details: optionGroup.details.map((detail) => ({
+                id: detail.id,
+                name: detail.name,
+                qte: detail.qte,
+                price: detail.price,
+              })),
+            })) : [],
           })),
           due_date: dueDate.toISOString(),
           mode: deliveryMode,
         });
-        //receipt here !
+        // receipt here !
         setReceiptData({
           fees: fees,
           commande: cart,
@@ -403,7 +393,7 @@ const TakeawayForm = ({
         });
       } else {
         toast({
-          title: "Livraison  fermée.",
+          title: "Livraison fermée.",
           description:
             "La livraison est disponible uniquement entre 10h30 et 20h30.",
           variant: "info",
@@ -418,6 +408,7 @@ const TakeawayForm = ({
       });
     }
   }
+
   useEffect(() => {
     setFees(0);
   }, [setFees]);
@@ -455,8 +446,6 @@ const TakeawayForm = ({
   function isDisable() {
     if (
       cart.length === 0 ||
-      // totalPrice() + fees <
-      // Number(process.env.NEXT_PUBLIC_MINIMUM_AMOUNT || 4999) ||
       postOrder.isPending ||
       !!transactionRef
     ) {
@@ -471,7 +460,6 @@ const TakeawayForm = ({
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
-          // className="grid gap-y-7 gap-x-2 grid-cols-1 md:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2 max-w-2xl items-baseline"
           className="flex flex-col gap-5 w-full items-end"
         >
           <div className="w-full grid grid-cols-1 @min-[460px]:grid-cols-2 gap-4">
@@ -491,60 +479,7 @@ const TakeawayForm = ({
                 </SelectContent>
               </Select>
             </div>
-            {/* <FormField
-              control={form.control}
-              name="takeDate"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{"Date de collecte"}</FormLabel>
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <FormControl className="flex justify-end">
-                        <Button
-                          // variant={"outline"}
-                          className={cn(
-                            "w-full pl-3 border-b border-[#4B5563] hover:border-[#4B5563] bg-[#F3F4F6] hover:bg-[#F3F4F6] text-left font-normal text-black",
-                            !field.value ? "text-muted-foreground" : "text-black"
-                          )}
-                        >
-                          {field.value ? (
-                            field.value.toLocaleDateString("fr-FR", {
-                              year: "numeric",
-                              month: "long",
 
-                              day: "numeric",
-                            })
-                          ) : (
-                            <span>{"Choisir une date"}</span>
-                          )}
-                          <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                        </Button>
-                      </FormControl>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0" align="start">
-                      <Calendar
-                        mode="single"
-                        selected={field.value}
-                        onSelect={field.onChange}
-                        disabled={
-                          (date) => {
-                            const today = new Date(
-                              new Date().setHours(0, 0, 0, 0)
-                            );
-                            const maxDate = new Date();
-                            maxDate.setDate(today.getDate() + 3);
-                            return date < today || date > maxDate;
-                          }
-                          //date < new Date(new Date().setDate(new Date().getDate() + 14))
-                        }
-                        initialFocus
-                      />
-                    </PopoverContent>
-                  </Popover>
-                  <FormMessage />
-                </FormItem>
-              )}
-            /> */}
             <FormField
               control={form.control}
               name="time"
@@ -556,6 +491,7 @@ const TakeawayForm = ({
                 </FormItem>
               )}
             />
+
             <FormField
               control={form.control}
               name="operator"
@@ -581,13 +517,14 @@ const TakeawayForm = ({
                 </FormItem>
               )}
             />
+
             <FormField
               control={form.control}
               name="deliveryNumber"
               render={({ field }) => (
                 <FormItem className="flex flex-col gap-1 w-full">
                   <FormLabel className="customFormLabel">
-                    {"Numéro de payement"}
+                    {"Numéro de paiement"}
                   </FormLabel>
                   <FormControl>
                     <Input
@@ -600,6 +537,7 @@ const TakeawayForm = ({
                 </FormItem>
               )}
             />
+
             <FormField
               control={form.control}
               name="phoneNumber"
@@ -620,10 +558,11 @@ const TakeawayForm = ({
               )}
             />
           </div>
+
           <div className="flex flex-col gap-2 w-full">
-            <div className="flex gap-2 items-center">
-              <Button type="submit" disabled={isDisable()}>
-                {"Proceder au paiement"}
+            <div className="flex gap-2 items-center w-full">
+              <Button className="ml-auto" type="submit" disabled={isDisable()}>
+                {"Procéder au paiement"}
               </Button>
             </div>
             {CartTotal(cart) < 5000 && (

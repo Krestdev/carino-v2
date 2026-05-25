@@ -11,11 +11,15 @@ import { AnimatePresence } from "framer-motion";
 import { useEffect, useState, useTransition } from "react";
 import { XAF } from "@/lib/functions";
 import Error from "@/components/universal/error";
+import ViewOrderDialog from "@/components/Historique/ViewOrderDialog";
+import TownQuery from "@/queries/townQuery";
+import { OrdersData } from "@/types/types";
 
 const Page = () => {
   const { user, token } = useStore();
   const router = useRouter();
   const userLogIn = new UserQuery();
+  const lieu = new TownQuery();
 
   // Récupérer le profil complet de l'utilisateur depuis le serveur
   const userData = useQuery({
@@ -29,6 +33,24 @@ const Page = () => {
     queryFn: () => userLogIn.getMine(),
     enabled: !!user,
   });
+
+  const townData = useQuery({
+    queryKey: ["towns"],
+    queryFn: () => lieu.getTowns(),
+  });
+
+  const [selectedOrder, setSelectedOrder] = useState<OrdersData | null>(null);
+  const [dialogOpen, setDialogOpen] = useState(false);
+
+  const handleViewOrder = (order: OrdersData) => {
+    setSelectedOrder(order);
+    setDialogOpen(true);
+  };
+
+  const handleCloseDialog = () => {
+    setDialogOpen(false);
+    setSelectedOrder(null);
+  };
 
   const [isHydrated, setIsHydrated] = useState(false);
   const [isPending, startTransition] = useTransition();
@@ -137,8 +159,10 @@ const Page = () => {
                           <div className="flex flex-col gap-0.5">
                             <p className="text-[#111827] text-[14px]">{XAF.format(order.total)}</p>
                           </div>
-                          <div className="flex flex-col gap-0.5">
-                            <Button variant={"outline"}>{"Voir la commande"}</Button>
+                           <div className="flex flex-col gap-0.5">
+                            <Button variant="outline" onClick={() => handleViewOrder(order)}>
+                              {"Voir la commande"}
+                            </Button>
                           </div>
                         </div>
                       )
@@ -150,6 +174,14 @@ const Page = () => {
           </div>
         )}
       </AnimatePresence>
+      {selectedOrder && (
+        <ViewOrderDialog
+          open={dialogOpen}
+          onClose={handleCloseDialog}
+          order={selectedOrder}
+          towns={townData.data}
+        />
+      )}
     </div>
   );
 };

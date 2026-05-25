@@ -13,9 +13,11 @@ interface CartItemsProps {
     products?: ProdData[]
     options?: ProductOption[]
     title?: boolean
+    showTotal?: boolean
+    isCart?: boolean
 }
 
-const CartItems = ({ items, width = "", products = [], options = [], title = true }: CartItemsProps) => {
+const CartItems = ({ items, width = "", products = [], options = [], title = true, showTotal = true, isCart = true }: CartItemsProps) => {
     const { updateQuantity, removeFromCart } = useStore();
     const increase = (itemId: number, qte: number) => {
         if (qte === 0) {
@@ -30,9 +32,14 @@ const CartItems = ({ items, width = "", products = [], options = [], title = tru
         updateQuantity(itemId, qte - 1)
     }
 
+    const cartTotal = items.reduce((acc, item) => acc + item.price * item.quantity, 0)
+
     return (
         <div className={`flex flex-col gap-3 ${width}`} >
-            {title ? <p className="text-[20px] text-[#29235C] font-semibold font-general">{"Panier"}</p> : null}
+            <div className="flex flex-row items-center justify-between">
+                <p className={`text-[#29235C] font-semibold font-general ${isCart ? "text-[17px]" : "text-[15px]"}`}>{"Panier"}</p>
+                <p className="text-[15px] text-[#29235C] font-semibold font-general">{showTotal ? `${XAF.format(cartTotal)}` : ""}</p>
+            </div>
             {
                 items.length > 0 ?
                     <div className="flex flex-col gap-2">
@@ -40,24 +47,27 @@ const CartItems = ({ items, width = "", products = [], options = [], title = tru
                             items.map((item, ind) => {
                                 const product = products.find(p => p.id === Number(item.id));
                                 return (
-                                    <div key={ind} className="flex flex-row items-center gap-2 w-full">
-                                        <img src={item.image} alt={item.name} className="w-12 h-12 object-cover rounded-[2px]" />
-                                        <div className="flex flex-col gap-1 py-1 w-full">
-                                            <div className="flex flex-row items-center justify-between w-full">
-                                                <p className="text-[14px] font-semibold uppercase">{item.name}</p>
-                                                {/* <Button size={"icon"} className="w-6 h-6" variant={"default"} >
-                                                    <Edit size={16} />
-                                                </Button> */}
+                                    <div key={ind} className="flex flex-row items-start gap-2 w-full">
+                                        <img src={item.image} alt={item.name} className={` ${isCart ? "w-18 h-18" : "w-12 h-12"} object-cover rounded-[2px]"`} />
+                                        <div className="flex flex-col w-full">
+                                            <div className="flex flex-row items-start justify-between w-full">
+                                                <p className={`font-semibold first-letter:uppercase lowercase ${isCart ? "text-[14px]" : "text-[12px]"}`}>{item.name}</p>
+                                                {!isCart && <Button onClick={() => removeFromCart(item.item_id)} size={"icon"} className="w-6 h-6 mb-1 text-red-500 hover:bg-red-500 hover:text-white" variant={"ghost"} >
+                                                    <Trash size={16} />
+                                                </Button>}
                                             </div>
                                             <div className="flex flex-row items-center justify-between w-full">
-                                                <p className="text-[14px] font-bold">{XAF.format(item.price)}</p>
+                                                <p className={`font-bold ${isCart ? "text-primary text-[14px]" : "text-[12px]"}`}>{XAF.format(item.price)}</p>
                                                 <div className="flex flex-row gap-2">
                                                     <Button disabled={item.quantity === 0} onClick={() => decrease(item.item_id, item.quantity)} variant={"outline"} className="px-0 w-6 h-6 hover:bg-transparent">
-                                                        {item.quantity === 1 ? <Trash /> : <Minus />}
+                                                        <Minus />
                                                     </Button>
                                                     <p>{item.quantity}</p>
                                                     <Button disabled={item.quantity === 0} onClick={() => increase(item.item_id, item.quantity)} variant={"secondary"} className="px-0 w-6 h-6 bg-[#FFC336] hover:bg-[#FFC336]/90 ">
                                                         <Plus />
+                                                    </Button>
+                                                    <Button onClick={() => removeFromCart(item.item_id)} size={"icon"} className="w-6 h-6 mb-1 text-red-500 hover:bg-red-500 hover:text-white" variant={"ghost"} >
+                                                        <Trash size={16} />
                                                     </Button>
                                                 </div>
                                             </div>
