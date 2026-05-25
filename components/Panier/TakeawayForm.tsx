@@ -257,7 +257,6 @@ const TakeawayForm = ({
       const status = extractPaymentStatus(data);
       if (status === "SUCCESS") {
         setPaymentStatus("SUCCESS");
-        emptyCart(); // Vide le panier après paiement réussi
       } else if (status === "FAILED") {
         setPaymentStatus("FAILED");
         setSourceError("payment");
@@ -335,7 +334,6 @@ const TakeawayForm = ({
       const status = extractPaymentStatus(data);
       if (status === "SUCCESS") {
         setPaymentStatus("SUCCESS");
-        emptyCart();
       } else if (status === "FAILED") {
         setPaymentStatus("FAILED");
       }
@@ -432,9 +430,11 @@ const TakeawayForm = ({
   ]);
 
   function handleCloseStatus() {
-    setPaymentStatus(null);
     if (paymentStatus === "SUCCESS") {
-      router.push("/commande");
+      emptyCart();
+      router.push("/historique");
+    } else {
+      setPaymentStatus(null);
     }
   }
 

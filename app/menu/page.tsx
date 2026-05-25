@@ -28,9 +28,10 @@ import {
 } from "@/components/ui/collapsible";
 
 const MANDATORY_TAG = 316504;
+const FIRST_TAG_ID = 253199;
 
 const Page = () => {
-  const [activeTab, setActiveTab] = useState<number>(0);
+  const [activeTab, setActiveTab] = useState<number>(FIRST_TAG_ID);
   const [searchTerm, setSearchTerm] = useState("");
   const [openCart, setOpenCart] = useState(false);
   const { cart, emptyCart } = useStore();
@@ -198,6 +199,13 @@ const Page = () => {
       .filter((item) => item.total > 0);
   }, [parentCategories, getCategoryFamilyIds, products, allCategories]);
 
+  const totalProductPerTag = useMemo(() => {
+    return totalProductPerCategory.map(x => ({
+      category: x.categories,
+      total: x.total
+    }));
+  }, [totalProductPerCategory]);
+
   // Gestion de la recherche avec debounce
   const handleSearch = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
@@ -262,6 +270,8 @@ const Page = () => {
               categories={totalProductPerCategory}
               activeTab={activeTab}
               setActiveTab={setActiveTab}
+              totalProductPerTag={totalProductPerTag}
+              firstTagId={FIRST_TAG_ID}
             />
           </div>
           <div className="flex md:hidden flex-col gap-3 w-full">

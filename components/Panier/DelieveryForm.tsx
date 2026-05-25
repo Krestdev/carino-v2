@@ -304,7 +304,6 @@ const DelieveryForm = ({
       const status = extractPaymentStatus(data);
       if (status === "SUCCESS") {
         setPaymentStatus("SUCCESS");
-        emptyCart();
       } else if (status === "FAILED") {
         setPaymentStatus("FAILED");
         setSourceError("payment");
@@ -499,9 +498,11 @@ const DelieveryForm = ({
 
   // ── Handlers for PaiementStatus ──
   function handleCloseStatus() {
-    setPaymentStatus(null);
     if (paymentStatus === "SUCCESS") {
-      router.push("/commande");
+      emptyCart();
+      router.push("/historique");
+    } else {
+      setPaymentStatus(null);
     }
   }
 
