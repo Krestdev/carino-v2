@@ -4,7 +4,7 @@ import { Star } from "lucide-react"
 
 const Reviews = () => {
     const stars = (x: number) => Array.from({ length: 5 }).map((_, index) => (
-        <img key={index} src={index < x ? "/starOn.png" : "/starOff.png"} alt="" />
+        <img key={index} src={index < x ? "/StarOn.png" : "/StarOff.png"} alt="" />
     ))
     return (
         <div className="flex mx-auto gap-10 py-10 md:py-12">
@@ -22,7 +22,7 @@ const Reviews = () => {
                         <div className="flex flex-row gap-1">
                             {stars(5)}
                         </div>
-                        <p className="w-[250px] md:w-[372px]">{"La cuisine est raffinée, les assiettes sont généreuses et bien présentées . Le coulis de tomates on le sent jusque dans les papilles."}</p>
+                        <p className="w-62.5 md:w-93">{"La cuisine est raffinée, les assiettes sont généreuses et bien présentées . Le coulis de tomates on le sent jusque dans les papilles."}</p>
                     </div>
                     <img src="google-2.png" alt="" />
                 </div>

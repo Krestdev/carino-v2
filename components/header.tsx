@@ -129,7 +129,7 @@ const Header = () => {
         height={64}
         width={64}
         loading="eager"
-        className="hidden md:flex w-13 h-13 md:w-16 md:h-16 cursor-pointer"
+        className="hidden md:flex w-13 h-13 md:w-16 md:h-16 cursor-pointer object-contain"
         onClick={() => router.push("/")}
       />
 
