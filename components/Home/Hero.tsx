@@ -7,7 +7,7 @@ const Hero = () => {
   const router = useRouter();
   const randomImage = ["burger.webp", "pizza.webp", "salad.webp", "ramen.webp"];
   const randomIndex = Math.floor(Math.random() * randomImage.length);
-  const selectedImage = randomImage[randomIndex];
+  const selectedImage = randomImage[0];
   return (
     <div>
       <div

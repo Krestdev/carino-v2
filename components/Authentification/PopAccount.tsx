@@ -6,6 +6,7 @@ import {
 } from "@/components/ui/popover"
 import useStore from "@/context/store"
 import Link from "next/link"
+import { User, History, LogOut } from "lucide-react"
 
 interface Props {
     children: React.JSX.Element
@@ -13,27 +14,54 @@ interface Props {
 
 const PopAccount = ({ children }: Props) => {
     const { logout, user } = useStore()
+    
     return (
         <Popover>
             <PopoverTrigger asChild>
                 {children}
             </PopoverTrigger>
-            <PopoverContent className="w-fit px-0">
-                <div className="grid gap-4">
-                    <div className="w-full flex flex-col gap-2 border-b border-black pb-1 px-4">
-                        <h4 className="leading-none font-medium">Mon Compte</h4>
-                        {/* <p className="px-0 justify-start text-[14px] text-primary">{`Points de fidélité: ${user?.loyalty} pts`}</p> */}
+            <PopoverContent 
+                className="w-56 p-0 rounded-lg shadow-lg border border-gray-200"
+                sideOffset={5}
+            >
+                <div className="py-1">
+                    {/* Email utilisateur */}
+                    <div className="px-3 py-2 border-b border-gray-100">
+                        <p className="text-xs text-gray-500 truncate">
+                            {user?.email || "Mon compte"}
+                        </p>
                     </div>
-                    <div className="flex flex-col gap-2 px-4">
-                        <Link href={"/profil"} className="border px-2">
-                            <Button className="px-0" variant={"link"}>{"Profil"}</Button>
+
+                    {/* Menu items */}
+                    <div className="py-1">
+                        <Link href="/profil">
+                            <Button 
+                                variant="ghost" 
+                                className="w-full justify-start gap-2 rounded-none px-3 py-2 h-auto text-sm font-normal"
+                            >
+                                <User className="w-4 h-4" />
+                                Profil
+                            </Button>
                         </Link>
-                        <Link href={"/historique"} className="border px-2">
-                            <Button className="px-0" variant={"link"}>{"Historique"}</Button>
+
+                        <Link href="/historique">
+                            <Button 
+                                variant="ghost" 
+                                className="w-full justify-start gap-2 rounded-none px-3 py-2 h-auto text-sm font-normal"
+                            >
+                                <History className="w-4 h-4" />
+                                Historique
+                            </Button>
                         </Link>
-                        <div className="border px-2">
-                            <Button onClick={logout} className="pl-0 justify-start" variant={"link"}>{"Déconnexion"}</Button>
-                        </div>
+
+                        <Button 
+                            onClick={logout}
+                            variant="ghost" 
+                            className="w-full justify-start gap-2 rounded-none px-3 py-2 h-auto text-sm font-normal text-red-600 hover:text-red-700 hover:bg-red-50"
+                        >
+                            <LogOut className="w-4 h-4" />
+                            Déconnexion
+                        </Button>
                     </div>
                 </div>
             </PopoverContent>

@@ -61,7 +61,8 @@ const Header = () => {
     return <Error />;
   }
 
-  const pendingBookings = bookingsQuery.data?.filter((booking) => booking.status === "Pending") || [];
+  const pendingBookings =
+    bookingsQuery.data?.filter((booking) => booking.status === "Pending") || [];
 
   const links = [
     { name: "Accueil", href: "/" },
@@ -83,10 +84,15 @@ const Header = () => {
             href={"/admin"}
             className={cn(
               "h-10 w-fit flex px-3 py-1 text-white relative",
-              path === "/admin" && "text-[#FFC336]"
+              path === "/admin" && "text-[#FFC336]",
             )}
           >
-            <span className={cn("text-white", path === "/admin" && "text-[#FFC336]")}>
+            <span
+              className={cn(
+                "text-white",
+                path === "/admin" && "text-[#FFC336]",
+              )}
+            >
               {"Admin"}
             </span>
             {pendingBookings.length > 0 && (
@@ -99,7 +105,10 @@ const Header = () => {
 
         <Link
           href={"/catalogue"}
-          className={cn("h-10 w-fit flex px-3 py-1 text-white", path === "/catalogue" && "text-[#FFC336]")}
+          className={cn(
+            "h-10 w-fit flex px-3 py-1 text-white",
+            path === "/catalogue" && "text-[#FFC336]",
+          )}
         >
           {"Catalogue"}
         </Link>
@@ -128,7 +137,7 @@ const Header = () => {
           href={"/reservation"}
           className={cn(
             "h-10 w-fit flex px-3 py-1 text-white",
-            path === "/reservation" && "text-[#FFC336]"
+            path === "/reservation" && "text-[#FFC336]",
           )}
         >
           {"Réserver"}
@@ -136,7 +145,11 @@ const Header = () => {
 
         {!!token ? (
           <PopAccount>
-            <Button className="text-white hover:bg-transparent hover:text-white" variant={"ghost"} size={"lg"}>
+            <Button
+              className="text-white hover:bg-transparent hover:text-white"
+              variant={"ghost"}
+              size={"lg"}
+            >
               <LuCircleUser />
               {"Compte"}
             </Button>
@@ -147,7 +160,7 @@ const Header = () => {
             onClick={() => setOpenLogSign(true)}
             className={cn(
               "h-10 w-fit flex px-3 py-1 text-white",
-              path === "/connexion" && "text-[#FFC336]"
+              path === "/connexion" && "text-[#FFC336]",
             )}
           >
             {"Connexion"}
@@ -158,10 +171,12 @@ const Header = () => {
           href={"/panier"}
           className={cn(
             "h-10 w-fit flex px-3 py-1 text-white relative",
-            path === "/panier" && "text-[#FFC336]"
+            path === "/panier" && "text-[#FFC336]",
           )}
         >
-          <span className={cn("text-white", path === "/panier" && "text-[#FFC336]")}>
+          <span
+            className={cn("text-white", path === "/panier" && "text-[#FFC336]")}
+          >
             {"Panier"}
           </span>
           {cart.length > 0 && (
@@ -171,15 +186,19 @@ const Header = () => {
           )}
         </Link>
         {/* Je vais afficher les point de fidélité bien stylé */}
-        <div className="flex items-center gap-2 cursor-pointer group">
-          <div className="rounded-full bg-[#FFC336]/10 p-2 group-hover:bg-[#FFC336]/20 transition-colors duration-300">
-            <Star className="h-5 w-5 text-[#FFC336]" />
+        {token && (
+          <div className="flex items-center gap-2 cursor-pointer group">
+            <div className="rounded-full bg-[#FFC336]/10 p-2 group-hover:bg-[#FFC336]/20 transition-colors duration-300">
+              <Star className="h-5 w-5 text-[#FFC336]" />
+            </div>
+            <div className="flex flex-col">
+              <p className="text-xs text-muted-foreground">
+                Points de fidélité
+              </p>
+              <p className="text-sm font-medium text-white">{`${userData.data?.loyalty ?? 0} Pts`}</p>
+            </div>
           </div>
-          <div className="flex flex-col">
-            <p className="text-xs text-muted-foreground">Points de fidélité</p>
-            <p className="text-sm font-medium text-white">{`${userData.data?.loyalty ?? 0} Pts`}</p>
-          </div>
-        </div>
+        )}
       </div>
 
       <div className="md:hidden w-full flex gap-7">
@@ -221,7 +240,7 @@ const Header = () => {
                       href={link.href}
                       className={cn(
                         "h-13 w-fit flex px-3 py-1 text-white",
-                        path === link.href && "text-[#FFC336]"
+                        path === link.href && "text-[#FFC336]",
                       )}
                       onClick={() => {
                         if (link.name === "Se connecter") {
@@ -240,7 +259,7 @@ const Header = () => {
                       href={"/admin"}
                       className={cn(
                         "h-13 w-fit flex px-3 py-1 text-white relative",
-                        path === "/admin" && "text-[#FFC336]"
+                        path === "/admin" && "text-[#FFC336]",
                       )}
                     >
                       {"Admin"}

@@ -53,7 +53,12 @@ interface LoginDialogProps {
   setOpenSignup: (open: boolean) => void;
 }
 
-const LoginDialog = ({ open, onOpenChange, setOpenLogSign, setOpenSignup }: LoginDialogProps) => {
+const LoginDialog = ({
+  open,
+  onOpenChange,
+  setOpenLogSign,
+  setOpenSignup,
+}: LoginDialogProps) => {
   const [errorValue, setErrorValue] = useState<string>();
   const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
@@ -100,12 +105,18 @@ const LoginDialog = ({ open, onOpenChange, setOpenLogSign, setOpenSignup }: Logi
         const user = {
           id: Number(userData.id),
           email: userData.mail,
-          name: userData.fname || userData.name || form.getValues("email").split("@")[0],
+          name:
+            userData.fname ||
+            userData.name ||
+            form.getValues("email").split("@")[0],
           isFirstOrder: userData.isFirstOrder,
           phone: userData.phone,
           loyalty: userData.loyalty,
           role: userData.role,
-          require_password_change: userData.require_password_change || decodedToken?.require_password_change || false,
+          require_password_change:
+            userData.require_password_change ||
+            decodedToken?.require_password_change ||
+            false,
         };
 
         // Vérifier si c'est un admin avec require_password_change = true
@@ -122,7 +133,6 @@ const LoginDialog = ({ open, onOpenChange, setOpenLogSign, setOpenSignup }: Logi
 
         toast.success(`Bienvenue ${user.name}`);
         onOpenChange(false);
-
       } catch (error) {
         console.error("Erreur lors du traitement du profil:", error);
         setErrorValue("Erreur lors de la récupération de votre profil");
@@ -166,7 +176,7 @@ const LoginDialog = ({ open, onOpenChange, setOpenLogSign, setOpenSignup }: Logi
               size="sm"
               onClick={() => {
                 onOpenChange(false);
-                setOpenSignup(true);
+                setOpenLogSign(true);
               }}
               className="text-gray-500 hover:text-gray-800 hover:bg-gray-100 dark:hover:bg-slate-800 px-2 h-8"
             >
@@ -192,14 +202,15 @@ const LoginDialog = ({ open, onOpenChange, setOpenLogSign, setOpenSignup }: Logi
 
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-
               {/* EMAIL */}
               <FormField
                 control={form.control}
                 name="email"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-gray-700 dark:text-gray-300">Email</FormLabel>
+                    <FormLabel className="text-gray-700 dark:text-gray-300">
+                      Email
+                    </FormLabel>
                     <FormControl>
                       <Input
                         {...field}
@@ -220,7 +231,9 @@ const LoginDialog = ({ open, onOpenChange, setOpenLogSign, setOpenSignup }: Logi
                 render={({ field }) => (
                   <FormItem>
                     <div className="flex items-center justify-between">
-                      <FormLabel className="text-gray-700 dark:text-gray-300">Mot de passe</FormLabel>
+                      <FormLabel className="text-gray-700 dark:text-gray-300">
+                        Mot de passe
+                      </FormLabel>
                     </div>
                     <FormControl>
                       <div className="relative">
@@ -235,7 +248,11 @@ const LoginDialog = ({ open, onOpenChange, setOpenLogSign, setOpenSignup }: Logi
                           className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
                           onClick={() => setShowPassword(!showPassword)}
                         >
-                          {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                          {showPassword ? (
+                            <EyeOff size={16} />
+                          ) : (
+                            <Eye size={16} />
+                          )}
                         </button>
                       </div>
                     </FormControl>
@@ -245,7 +262,10 @@ const LoginDialog = ({ open, onOpenChange, setOpenLogSign, setOpenSignup }: Logi
               />
               <div className="ml-auto w-full flex items-center justify-end">
                 {/* FORGOT PASSWORD */}
-                <Link href="/recuperation-mot-de-passe" className="text-xs text-primary hover:underline font-semibold mx-0">
+                <Link
+                  href="/recuperation-mot-de-passe"
+                  className="text-xs text-primary hover:underline font-semibold mx-0"
+                >
                   Mot de passe oublié ?
                 </Link>
               </div>
@@ -257,24 +277,14 @@ const LoginDialog = ({ open, onOpenChange, setOpenLogSign, setOpenSignup }: Logi
 
               {/* ACTIONS */}
               <div className="flex w-full items justify-between pt-4 border-t border-gray-100 dark:border-slate-800 mt-6">
-                <div className="flex flex-row items-center gap-2">
-                  <Button
-                    variant="outline"
-                    type="button"
-                    onClick={() => onOpenChange(false)}
-                    className="border-gray-250 hover:bg-gray-50 dark:border-slate-700 dark:hover:bg-slate-800 text-gray-700 dark:text-white"
-                  >
-                    Fermer
-                  </Button>
-
-                  <Button
-                    type="submit"
-                    disabled={mutation.isPending}
-                    className="bg-primary hover:bg-primary/95 text-white"
-                  >
-                    {mutation.isPending ? "Connexion..." : "Se connecter"}
-                  </Button>
-                </div>
+                {/* SE CONNECTER */}
+                <Button
+                  type="submit"
+                  disabled={mutation.isPending}
+                  className="bg-primary hover:bg-primary/95 text-white"
+                >
+                  {mutation.isPending ? "Connexion..." : "Se connecter"}
+                </Button>
 
                 {/* S'inscrire */}
                 <Button
@@ -285,7 +295,6 @@ const LoginDialog = ({ open, onOpenChange, setOpenLogSign, setOpenSignup }: Logi
                   S'inscrire
                 </Button>
               </div>
-
             </form>
           </Form>
         </div>
