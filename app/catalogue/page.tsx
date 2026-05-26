@@ -16,10 +16,17 @@ import { XAF } from "@/lib/functions";
 import ProductQuery from "@/queries/productQuery";
 import { CategoriesData, ProdData, ProductOption } from "@/types/types";
 import { useQuery } from "@tanstack/react-query";
-import { ArrowRight, ChevronDown, ChevronUp } from "lucide-react";
+import {
+  ArrowRight,
+  ChevronDown,
+  ChevronUp,
+  Search,
+  SearchIcon,
+} from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useCallback, useMemo, useState } from "react";
 import Loading from "../loading";
+import Link from "next/link";
 
 const MANDATORY_TAG = 316504;
 const FIRST_TAG_ID = 253199;
@@ -95,7 +102,7 @@ const Page = () => {
       rawProducts = anyResponse || [];
     }
     return rawProducts;
-  }, [productsResponse]).filter(p => p.tags.includes(MANDATORY_TAG));
+  }, [productsResponse]).filter((p) => p.tags.includes(MANDATORY_TAG));
 
   const allCategories = useMemo(() => {
     let rawCategories: CategoriesData[] = [];
@@ -244,29 +251,32 @@ const Page = () => {
   // Vérification des données
   if (!products.length && !isLoadingProducts) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[400px]">
+      <div className="flex flex-col items-center justify-center min-h-100">
         <p className="text-gray-500">Aucun produit disponible</p>
       </div>
     );
   }
 
   return (
-    <>
+    <div className="relative">
       <Head
         image="/catalog/catalog.webp"
         title="Catalogue"
         subTitle={"livraison & à emporter"}
       />
-      <div className="flex flex-col gap-7 md:gap-12 px-7 pb-12 md:pb-24 py-5 max-w-[1440px] mx-auto">
+      <div className="flex flex-col gap-5 md:gap-12 px-7 pb-12 md:pb-24 py-5 max-w-360 mx-auto">
         {/* Barre de recherche */}
-        <div className="flex flex-col gap-1 max-w-[360px] w-full ml-auto">
-          <p className="text-[14px]">Recherche</p>
-          <Input
-            placeholder="Ex. Burger, Pizza, Cocktail..."
-            value={searchTerm}
-            onChange={handleSearch}
-            className="focus:ring-2 focus:ring-primary"
-          />
+        <div className="flex flex-col gap-1 max-w-90 w-full ml-auto">
+          <p className="hidden md:flex text-[14px]">Recherche</p>
+          <div className="relative">
+            <Input
+              placeholder="Ex. Burger, Pizza, Cocktail..."
+              value={searchTerm}
+              onChange={handleSearch}
+              className="focus:ring-2 focus:ring-primary"
+            />
+            <SearchIcon className="w-4 h-4 text-gray-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+          </div>
           {searchTerm && (
             <p className="text-sm text-gray-500 mt-1">
               {filterProducts.length} résultat
@@ -279,7 +289,7 @@ const Page = () => {
         {/* Categories et produits avec sticky */}
         <div className="flex flex-col md:flex-row items-start justify-between gap-5 md:gap-0">
           {/* Categories sticky - se fixe à 96px du haut (top-24) */}
-          <div className="lg:sticky lg:top-24 self-start md:max-w-[260px] w-full">
+          <div className="lg:sticky lg:top-24 self-start md:max-w-65 w-full">
             <Categories
               categories={totalProductPerCategory}
               activeTab={activeTab}
@@ -288,17 +298,14 @@ const Page = () => {
               firstTagId={FIRST_TAG_ID}
             />
           </div>
-          <div className="flex md:hidden flex-col gap-3 w-full">
-            <p className="font-semibold font-general text-[20px] text-primary">
-              Panier
-            </p>
+          {/* <div className="flex md:hidden flex-col gap-3 w-full">
+            
 
             <Collapsible
               open={openCart}
               onOpenChange={setOpenCart}
               className="w-full space-y-2"
             >
-              {/* Le Trigger agit comme la barre d'un Select */}
               <CollapsibleTrigger asChild>
                 <div className="h-12 w-full flex flex-row items-center gap-2.5 px-4 bg-[#F3F4F6] border-b border-[#4B5563] cursor-pointer active:bg-gray-200 transition-colors">
                   <p className="text-[#111827] text-[14px] font-medium flex-1">
@@ -318,7 +325,6 @@ const Page = () => {
                 </div>
               </CollapsibleTrigger>
 
-              {/* Le contenu qui "s'ouvre" comme une liste de Select */}
               <CollapsibleContent className="overflow-hidden data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down">
                 <div className="bg-white rounded-b-lg p-2">
                   <CartItems items={cart} title={false} />
@@ -336,7 +342,7 @@ const Page = () => {
                 </Button>
               </>
             )}
-          </div>
+          </div> */}
           {/* ProductsGrid - reste scrollable normalement */}
           <ProductsGrid
             products={filterProducts}
@@ -345,11 +351,10 @@ const Page = () => {
           />
 
           {/* CartItems sticky - se fixe à 96px du haut (top-24) */}
-          <div className="lg:sticky lg:top-24 self-start hidden md:flex flex-col gap-3 p-3 max-w-[300px] w-full">
+          <div className="lg:sticky lg:top-24 self-start hidden md:flex flex-col gap-3 p-3 max-w-75 w-full">
             <CartItems items={cart} width="max-w-[300px] w-full" />
-            {
-              cart.length > 0 &&
-              <>
+            {cart.length > 0 && (
+              <div>
                 <Button onClick={() => router.push("/panier")}>
                   {"Procéder au paiement"}
                   <ArrowRight className="w-4 h-4" />
@@ -357,12 +362,32 @@ const Page = () => {
                 {/* <Button variant={"outline"} onClick={emptyCart}>
                   {"Vider le panier"}
                 </Button> */}
-              </>
-            }
+              </div>
+            )}
           </div>
         </div>
       </div>
-    </>
+        {cart.length > 0 && (
+          <Link href={"/panier"} className="sticky bottom-2 ml-auto mr-2 bg-accent shadow-lg rounded-md max-w-50 w-full p-3 flex flex-col">
+            <p className="font-semibold font-general text-[14px] text-primary">
+              {"Aller au panier"}
+            </p>
+            <div className="flex items-center justify-between">
+              <p>
+                {cart.length} Produit{cart.length > 1 ? "s" : ""}
+              </p>
+              <p className="text-[14px] font-medium">
+                {XAF.format(
+                  cart.reduce(
+                    (acc, item) => acc + item.price * item.quantity,
+                    0,
+                  ),
+                )}
+              </p>
+            </div>
+          </Link>
+        )}
+    </div>
   );
 };
 

@@ -24,11 +24,13 @@ const ProductCart = ({ produit, options, mandatoryTag }: Props) => {
           </Badge>
         )}
 
-        <img
-          src={produit.image ? produit.image : "/images/imagePlaceholder.svg"}
-          alt={produit.name}
-          className="md:max-w-[300px] w-full aspect-video h-auto object-cover cursor-pointer border border-muted rounded-sm"
-        />
+        <AddDialog options={options} product={produit}>
+          <img
+            src={produit.image ? produit.image : "/images/imagePlaceholder.svg"}
+            alt={produit.name}
+            className="md:max-w-[300px] w-full aspect-video h-auto object-cover cursor-pointer border border-muted rounded-sm"
+          />
+        </AddDialog>
       </div>
       <div className="col-span-3 flex flex-row items-start md:max-w-[300px]">
         <div className="flex flex-1 flex-col">
@@ -66,7 +68,10 @@ const ProductCart = ({ produit, options, mandatoryTag }: Props) => {
         ) : (
           <AddDialog options={options} product={produit}>
             {/* Je veux que le bouton soit disabled si le produit n'a pas MANDATORY_TAG */}
-            <Button disabled={produit.disable} className={`h-6 w-6 p-0 bg-primary opacity-90 hover:bg-accent hover:text-black`}>
+            <Button
+              disabled={produit.disable}
+              className={`h-6 w-6 p-0 bg-primary opacity-90 hover:bg-accent hover:text-black`}
+            >
               <LuPlus className="w-6 h-6 text-white" />
             </Button>
           </AddDialog>

@@ -462,9 +462,9 @@ const TakeawayForm = ({
           onSubmit={form.handleSubmit(onSubmit)}
           className="flex flex-col gap-5 w-full items-end"
         >
-          <div className="w-full grid grid-cols-1 @min-[460px]:grid-cols-2 gap-4">
+          <div className="w-full grid grid-cols-2 md:grid-cols-1 @min-[460px]:grid-cols-2 gap-4">
             <div className="flex flex-col gap-2">
-              <label className="text-sm font-medium">{"Mode de livraison"}</label>
+              <label className="text-sm font-medium text-[12px] md:text-[14px]">{"Mode de livraison"}</label>
               <Select value={deliveryMode} onValueChange={(e: deliveryMode) => setDeliveryMode(e)}>
                 <SelectTrigger className="w-full h-[60px]">
                   <SelectValue placeholder="Selectionner un mode" />
@@ -485,7 +485,9 @@ const TakeawayForm = ({
               name="time"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{"Heure"}</FormLabel>
+                  <FormLabel className="customFormLabel text-[12px] md:text-[14px]">
+                    {"Heure"}
+                  </FormLabel>
                   <Input type="time" {...field} />
                   <FormMessage />
                 </FormItem>
@@ -497,7 +499,7 @@ const TakeawayForm = ({
               name="operator"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="customFormLabel">
+                  <FormLabel className="customFormLabel text-[12px] md:text-[14px]">
                     {"Opérateur de Paiement"}
                   </FormLabel>
                   <Select
@@ -523,7 +525,7 @@ const TakeawayForm = ({
               name="deliveryNumber"
               render={({ field }) => (
                 <FormItem className="flex flex-col gap-1 w-full">
-                  <FormLabel className="customFormLabel">
+                  <FormLabel className="customFormLabel text-[12px] md:text-[14px]">
                     {"Numéro de paiement"}
                   </FormLabel>
                   <FormControl>
@@ -543,7 +545,7 @@ const TakeawayForm = ({
               name="phoneNumber"
               render={({ field }) => (
                 <FormItem className="flex flex-col gap-1 w-full">
-                  <FormLabel className="customFormLabel">
+                  <FormLabel className="customFormLabel text-[12px] md:text-[14px]">
                     {"Numéro à appeler"}
                   </FormLabel>
                   <FormControl>

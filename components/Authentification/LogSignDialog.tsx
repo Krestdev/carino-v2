@@ -45,7 +45,7 @@ const LogSignDialog = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[500px] overflow-hidden p-8 bg-white dark:bg-slate-900 border border-gray-150 dark:border-slate-800 rounded-2xl shadow-2xl">
+      <DialogContent className="sm:max-w-125 overflow-hidden p-8 bg-white dark:bg-slate-900 border border-gray-150 dark:border-slate-800 rounded-2xl shadow-2xl">
         {/* Decorative background gradients */}
         <div className="absolute -top-24 -left-24 w-48 h-48 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
         <div className="absolute -bottom-24 -right-24 w-48 h-48 bg-primary/20 rounded-full blur-3xl pointer-events-none" />
@@ -61,7 +61,7 @@ const LogSignDialog = ({
             <DialogTitle className="text-xl md:text-2xl font-bold text-gray-950 dark:text-white mb-2 font-serif text-center uppercase tracking-wide">
               Connexion / Inscription
             </DialogTitle>
-            <DialogDescription className="text-gray-500 dark:text-gray-400 text-sm max-w-[340px] text-center">
+            <DialogDescription className="text-gray-500 dark:text-gray-400 text-sm max-w-85 text-center">
               Créez un compte ou connectez-vous pour accéder à tous nos services
             </DialogDescription>
           </DialogHeader>

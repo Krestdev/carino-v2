@@ -15,8 +15,8 @@ type Props = {
 const Suggestion = ({ products, options, mandatoryTag }: Props) => {
     const router = useRouter();
     return (
-        <div className="max-w-[1280px] w-full mx-auto flex flex-col items-center gap-7 md:gap-12 px-7 py-12 md:py-24">
-            <div className="flex flex-col items-center gap-1 max-w-[768px] w-full">
+        <div className="max-w-7xl w-full mx-auto flex flex-col items-center gap-7 md:gap-12 px-7 pt-20 md:py-24">
+            <div className="flex flex-col items-center gap-1 max-w-3xl w-full">
                 <h4 className="uppercase">{"Le goût du jour"}</h4>
                 <h2>{"Suggestions du Chef"}</h2>
             </div>

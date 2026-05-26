@@ -73,7 +73,7 @@ const Panier = () => {
   }
 
   return cart.length > 0 ? (
-    <div className="w-full grid grid-cols-1 @min-[760px]:grid-cols-3 gap-10 py-10 sm:py-14 lg:py-10">
+    <div className="w-full grid grid-cols-1 @min-[760px]:grid-cols-3 gap-10 py-5 sm:py-14 lg:py-10">
       <div className="col-span-2 flex flex-col gap-10">
         {deliveryMode === "takeaway" ? (
           <TakeawayForm
@@ -95,9 +95,9 @@ const Panier = () => {
           />
         )}
       </div>
-      <div className="flex flex-col gap-1">
-        <div className=" border border-gray-200 rounded-2xl p-4 shadow-md">
-          <CartItems products={produits} items={cart} options={safeOptions} showTotal={false} isCart={true} />
+      <div className="flex flex-col justify-center gap-1 w-full">
+        <div className="border border-gray-200 rounded-2xl p-4 shadow-md max-w-90 w-full mx-auto">
+          <CartItems products={produits} items={cart} options={safeOptions} showTotal={false} isCart={true} width="max-w-[300px] w-full" />
           {/* <div className="flex flex-col mt-3">
           <p className="text-[12px] text-[#4B5563]">{"Sous-total"}</p>
           <p className="text-[14px] text-primary font-medium font-general">{XAF.format(CartTotal(cart))}</p>

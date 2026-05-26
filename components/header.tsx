@@ -29,12 +29,14 @@ import { useQuery } from "@tanstack/react-query";
 import UserQuery from "@/queries/userQueries";
 import Loading from "@/app/loading";
 import Error from "./universal/error";
+import { useState } from "react";
 
 const Header = () => {
   const { setOpenLogSign, user } = useStore();
   const router = useRouter();
   const { token, cart } = useStore();
   const path = usePathname();
+  const [open, setOpen] = useState(false);
 
   // Récupérer le profil complet de l'utilisateur depuis le serveur
   const userLogIn = new UserQuery();
@@ -67,7 +69,6 @@ const Header = () => {
   const links = [
     { name: "Accueil", href: "/" },
     { name: "Catalogue", href: "/catalogue" },
-    { name: "Menus", href: "/menu" },
     { name: "La carte", href: "/telechargement/catalogue.pdf" },
     !!token
       ? { name: "Profil", href: "/profil" }
@@ -209,48 +210,52 @@ const Header = () => {
             height={64}
             width={64}
             loading="eager"
-            className="w-13 h-13 md:w-16 md:h-16 cursor-pointer"
+            className="w-13 h-13 md:w-16 md:h-16 cursor-pointer object-contain"
             onClick={() => router.push("/")}
           />
 
           {/* Drawer */}
-          <Drawer direction="left">
+          <Drawer open={open} onOpenChange={setOpen} direction="left">
             <DrawerTrigger>
               <LucideMenu className="text-white" />
             </DrawerTrigger>
-            <DrawerContent>
-              <DrawerHeader className="flex flex-row w-full items-center justify-between">
-                <img
-                  src="/Logo.png"
-                  alt="logo"
-                  height={64}
-                  width={64}
-                  loading="eager"
-                  className="w-13 h-13 md:w-16 md:h-16 cursor-pointer"
-                  onClick={() => router.push("/")}
-                />
-                <DrawerClose className="w-fit">
-                  <LuX className="text-white" />
-                </DrawerClose>
+            <DrawerContent className="max-w-[50vw]">
+              <DrawerHeader>
+                <DrawerTitle className="flex flex-row w-full items-center justify-between">
+                  <img
+                    src="/Logo.png"
+                    alt="logo"
+                    height={64}
+                    width={64}
+                    loading="eager"
+                    className="w-13 h-13 md:w-16 md:h-16 cursor-pointer object-contain"
+                    onClick={() => router.push("/")}
+                  />
+                  <DrawerClose className="w-fit">
+                    <LuX className="text-white" />
+                  </DrawerClose>
+                </DrawerTitle>
               </DrawerHeader>
               <div className="flex flex-col">
                 {links.map((link) => (
-                  <DrawerClose key={link.name}>
-                    <Link
-                      href={link.href}
-                      className={cn(
-                        "h-13 w-fit flex px-3 py-1 text-white",
-                        path === link.href && "text-[#FFC336]",
-                      )}
-                      onClick={() => {
-                        if (link.name === "Se connecter") {
-                          setOpenLogSign(true);
-                        }
-                      }}
-                    >
-                      {link.name}
-                    </Link>
-                  </DrawerClose>
+                  <Button
+                    key={link.name}
+                    variant="ghost"
+                    size="lg"
+                    className={cn(
+                      "h-13 w-fit flex px-3 py-1 text-white",
+                      path === link.href && "text-[#FFC336]",
+                    )}
+                    onClick={() => {
+                      setOpen(false);
+                      router.push(link.href);
+                      if (link.name === "Se connecter") {
+                        setOpenLogSign(true);
+                      }
+                    }}
+                  >
+                    {link.name}
+                  </Button>
                 ))}
                 {/* Ajout du lien Admin dans le drawer pour les admins */}
                 {(user?.role === "ADMIN" || user?.role === "MANAGER") && (
