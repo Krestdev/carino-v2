@@ -29,10 +29,10 @@ import { useQuery } from "@tanstack/react-query";
 import UserQuery from "@/queries/userQueries";
 import Loading from "@/app/loading";
 import Error from "./universal/error";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 const Header = () => {
-  const { setOpenLogSign, user } = useStore();
+  const { setOpenLogSign, user, logout } = useStore();
   const router = useRouter();
   const { token, cart } = useStore();
   const path = usePathname();
@@ -45,6 +45,12 @@ const Header = () => {
     queryFn: () => userLogIn.profile(),
     enabled: !!user,
   });
+
+  useEffect(() => {
+    if (userData.isError) {
+      logout();
+    }
+  }, [userData.isError, logout]);
 
   const reservation = new ReservationQuery();
   const bookingsQuery = useQuery({
@@ -73,6 +79,7 @@ const Header = () => {
     !!token
       ? { name: "Profil", href: "/profil" }
       : { name: "Se connecter", href: "#" },
+    { name: "Historique", href: "/historique" },
     { name: "Panier", href: "/panier" },
   ];
 

@@ -262,12 +262,16 @@ const LoginDialog = ({
               />
               <div className="ml-auto w-full flex items-center justify-end">
                 {/* FORGOT PASSWORD */}
-                <Link
-                  href="/recuperation-mot-de-passe"
+                <Button
+                  variant="link"
+                  onClick={() => {
+                    onOpenChange(false);
+                    router.push("/mot-de-passe-ouble");
+                  }}
                   className="text-xs text-primary hover:underline font-semibold mx-0"
                 >
                   Mot de passe oublié ?
-                </Link>
+                </Button>
               </div>
 
               {/* ERROR */}
@@ -299,7 +303,7 @@ const LoginDialog = ({
           </Form>
         </div>
       </DialogContent>
-    </Dialog>
+    </Dialog >
   );
 };
 

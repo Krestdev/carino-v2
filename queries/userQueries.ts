@@ -26,11 +26,14 @@ export default class UserQuery {
   profile = async (): Promise<User> => {
     return this.api.get(`${this.route}/profile`).then((res) => res.data);
   };
+  forgotPassword = async (data: { email: string }): Promise<void> => {
+    return this.api.post(`${this.route}/forgot-password`, data).then((res) => res.data);
+  };
+  resetPassword = async (data: { token: string, newPassword: string }): Promise<{ message: string; mail: string }> => {
+    return this.api.post(`${this.route}/reset-password`, data).then((res) => res.data);
+  };
   changePassword = async (data: { oldPassword: string, newPassword: string }): Promise<void> => {
     return this.api.post(`${this.route}/change-password`, data).then((res) => res.data);
-  };
-  resetInitialPassword = async (data: { identifier: string, oldPassword: string, newPassword: string }): Promise<void> => {
-    return this.api.post(`${this.route}/reset-initial-password`, data).then((res) => res.data);
   };
 
   // orders

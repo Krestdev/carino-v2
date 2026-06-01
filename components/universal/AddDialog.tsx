@@ -355,7 +355,7 @@ function AddDialog({ children, options, product }: DialogProps) {
                           <Label
                             htmlFor={`${option.id}-${value.id}`}
                             className={cn(
-                              "text-[15px] font-normal cursor-pointer",
+                              "md:text-[15px] text-[12px] font-normal cursor-pointer",
                               isSelected ? "text-gray-900 font-medium" : "text-gray-600"
                             )}
                           >
@@ -491,7 +491,7 @@ function AddDialog({ children, options, product }: DialogProps) {
                           />
                         </FormControl>
                         <FormLabel className={cn(
-                          "text-[15px] font-normal cursor-pointer",
+                          "text-[12px] md:text-[15px] font-normal cursor-pointer",
                           isChecked ? "text-gray-900 font-medium" : "text-gray-600"
                         )}>
                           {value.name}
@@ -546,7 +546,7 @@ function AddDialog({ children, options, product }: DialogProps) {
       <AccordionItem value={fieldName} className="border-b-0">
         <AccordionTrigger className="hover:no-underline py-4">
           <div className="flex flex-col items-start gap-1">
-            <span className="font-bold text-base text-gray-900">{option.name}</span>
+            <span className="font-bold text-[12px] md:text-[15px] text-gray-900">{option.name}</span>
             <span className="text-sm text-gray-500 font-normal">
               {selectedSummary || "Ajoutez un ou plusieurs"}
             </span>
@@ -569,7 +569,7 @@ function AddDialog({ children, options, product }: DialogProps) {
             {option.values.map((value) => (
               <div
                 key={value.id}
-                className="flex w-full justify-between items-center py-3 px-4 rounded-lg hover:bg-gray-50 transition-colors group"
+                className="flex w-full justify-between items-center py-3 px-1 md:px-4 rounded-lg hover:bg-gray-50 transition-colors group"
               >
                 <FormField
                   control={form.control}
@@ -602,7 +602,7 @@ function AddDialog({ children, options, product }: DialogProps) {
                               type="button"
                               variant="outline"
                               size="icon"
-                              className="h-8 w-8 rounded-full border-gray-200"
+                              className="md:h-8 md:w-8 h-6 w-6 rounded-full border-gray-200"
                               onClick={(e) => {
                                 e.preventDefault();
                                 if (detailIndex !== -1 && optionIndex !== -1) {
@@ -626,7 +626,7 @@ function AddDialog({ children, options, product }: DialogProps) {
                             <Button
                               type="button"
                               size="icon"
-                              className="h-8 w-8 rounded-full"
+                              className="md:h-8 md:w-8 h-6 w-6 rounded-full"
                               disabled={!canAdd()}
                               onClick={(e) => {
                                 e.preventDefault();
@@ -662,11 +662,11 @@ function AddDialog({ children, options, product }: DialogProps) {
                                 }
                               }}
                             >
-                              <Plus size={14} />
+                              <Plus />
                             </Button>
                           </div>
                           <span className={cn(
-                            "text-[15px] font-normal",
+                            "text-[12px] md:text-[15px] font-normal",
                             currentQuantity > 0 ? "text-gray-900 font-medium" : "text-gray-600"
                           )}>
                             {value.name}
@@ -745,7 +745,7 @@ function AddDialog({ children, options, product }: DialogProps) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>{children}</DialogTrigger>
-      <DialogContent className="max-h-[85vh] flex flex-col">
+      <DialogContent className="max-h-[85vh] flex flex-col rounded-2xl">
         <DialogHeader className="sticky top-0 bg-white z-20 pb-2">
           <DialogTitle className="relative py-5 min-h-[144px] flex items-center">
             <div className="absolute w-full h-full bg-linear-to-t from-black/40 to-black/80 -z-10" />
