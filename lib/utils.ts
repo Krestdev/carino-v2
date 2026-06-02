@@ -30,10 +30,15 @@ export function isPromotion(start: Date, end: Date) {
   return (maintenant >= start && maintenant <= end);
 }
 
-export function isDeliveryOpen(startTime=process.env.NEXT_PUBLIC_OPENTIME||"10:30" , endTime=process.env.NEXT_PUBLIC_CLOSETIME ||"20:30"): boolean {
+export function isDeliveryOpen(currentDate: Date): boolean {
+
+  console.log(currentDate);
+
   // Get the current time in UTC and adjust for UTC+1
-  const currentDate = new Date();
-  const utcHours = currentDate.getUTCHours() + 1; // Add 1 hour for UTC+1
+  const startTime = process.env.NEXT_PUBLIC_OPENTIME || "10:30"
+  const endTime = process.env.NEXT_PUBLIC_CLOSETIME || "20:30"
+
+  const utcHours = currentDate.getUTCHours() + 1;
   const currentTime = utcHours * 100 + currentDate.getUTCMinutes();
 
   // Helper function to convert "HH:MM" to HHMM format
@@ -112,9 +117,9 @@ export function normalizeText(text: string): string {
   return cleaned.charAt(0).toUpperCase() + cleaned.slice(1);
 }
 
-export function CartTotal(cart: Array<cartItem>):number{
+export function CartTotal(cart: Array<cartItem>): number {
   return cart.reduce((accumulator, item) => accumulator + item.price * item.quantity,
-          0)
+    0)
 }
 
 export const zoneLivraisons = [

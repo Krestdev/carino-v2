@@ -58,7 +58,6 @@ interface DelieveryProps {
 }
 
 const formSchema = z.object({
-  city: z.string().min(3, { message: "Selectionnez une ville" }),
   locality: z.string().min(3, { message: "Entrez une adresse valide" }),
   district: z.string().min(3, { message: "Selectionnez un quartier" }),
   phoneNumber: z.string().refine((value) => /^\d{9}$/.test(value), {
@@ -151,7 +150,7 @@ const DelieveryForm = ({
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      city: "yaounde",
+      // city: "yaounde",
       locality: "",
       district: "",
       phoneNumber:
@@ -415,7 +414,7 @@ const DelieveryForm = ({
     if (user !== null) {
       console.log("Utilisateur", user);
 
-      if (isDeliveryOpen()) {
+      if (isDeliveryOpen(new Date(values.time))) {
         console.log("Livraison ouvert");
 
         const address = addresses.find((x) => x.quartier === values.district);
