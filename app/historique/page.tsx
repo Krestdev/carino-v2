@@ -12,6 +12,7 @@ import Loading from "../loading";
 import TownQuery from "@/queries/townQuery";
 import HistoryBooking from "@/components/Historique/HistoryBooking";
 import ReservationQuery from "@/queries/bookingsQuery";
+import Error from "@/components/universal/error";
 
 const Page = () => {
   const { user, token } = useStore();
@@ -54,11 +55,13 @@ const Page = () => {
     }
   }, [userData.isSuccess, reservationData.isSuccess]);
 
-  if (!isHydrated || isPending || !showContent) {
+  if (userData.isLoading || townData.isLoading || reservationData.isLoading) {
     return <Loading />;
   }
 
-  console.log(reservationData.data);
+  if (userData.isError || townData.isError || reservationData.isError) {
+    return <Error />;
+  }
 
   if (!token) {
     router.push("/");
