@@ -150,7 +150,7 @@ const ViewOrderDialog = ({
 
                     <div className="flex items-center justify-between">
                       <span className="font-medium text-gray-500">Téléphone:</span>
-                      <span className="font-semibold text-gray-800">{currentOrder.phone || "-"}</span>
+                      <span className="font-semibold text-gray-800">{currentOrder.address?.phone || "-"}</span>
                     </div>
 
                     <div className="flex items-center justify-between">
