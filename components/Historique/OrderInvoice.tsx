@@ -283,7 +283,7 @@ const OrderPDF = ({
                   </Text>
                 </View>
 
-                <View style={styles.infoRow}>
+                {/* <View style={styles.infoRow}>
                   <Text style={styles.infoLabel}>
                     Livraison:
                   </Text>
@@ -291,7 +291,7 @@ const OrderPDF = ({
                   <Text style={styles.infoValue}>
                     {XAF.format(deliveryPrice)}
                   </Text>
-                </View>
+                </View> */}
               </>
             )}
           </View>
@@ -352,7 +352,7 @@ const OrderPDF = ({
               </Text>
             </View>
 
-            <View style={styles.totalRow}>
+            {/* <View style={styles.totalRow}>
               <Text style={styles.totalLabel}>
                 Livraison
               </Text>
@@ -360,7 +360,7 @@ const OrderPDF = ({
               <Text style={styles.totalValue}>
                 {XAF.format(deliveryPrice)}
               </Text>
-            </View>
+            </View> */}
 
             <View style={styles.totalRow}>
               <Text style={styles.totalLabel}>
@@ -387,7 +387,7 @@ const OrderPDF = ({
               </Text>
 
               <Text style={styles.statusValue}>
-                {order.status === "PAID" ? "Payé" : "Non payé"}
+                {order.status === "PAID" || order.status === "CONFIRMED" ? "Payé" : "Non payé"}
               </Text>
             </View>
 

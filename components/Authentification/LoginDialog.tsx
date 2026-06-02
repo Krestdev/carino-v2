@@ -94,7 +94,6 @@ const LoginDialog = ({
         let decodedToken: JwtPayload | null = null;
         try {
           decodedToken = jwtDecode<JwtPayload>(data.access_token);
-          console.log("Token décodé:", decodedToken);
         } catch (error) {
           console.error("Erreur lors du décodage du token:", error);
         }

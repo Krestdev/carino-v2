@@ -49,7 +49,7 @@ const HistoryTable = ({ title, data, towns }: Props) => {
             <TableHead className="font-bold text-white">{"References"}</TableHead>
             {/* <TableHead className="font-bold text-white">{"Statuts"}</TableHead> */}
             <TableHead className="font-bold text-white">{"Etats de paiement"}</TableHead>
-            <TableHead className="font-bold text-white">{"Commande"}</TableHead>
+            {/* <TableHead className="font-bold text-white">{"Commande"}</TableHead> */}
             <TableHead className="font-bold text-white">{"Prix"}</TableHead>
             <TableHead className="font-bold text-white">{"Date"}</TableHead>
             <TableHead className="font-bold text-white">{"Actions"}</TableHead>
@@ -63,7 +63,7 @@ const HistoryTable = ({ title, data, towns }: Props) => {
               </TableCell>
             </TableRow>
           ) : (
-            data?.toReversed().map((order, id) => {
+            data?.reverse().map((order, id) => {
 
               const orderData = useQuery({
                 queryKey: ["order", order?.uuid],
@@ -72,48 +72,27 @@ const HistoryTable = ({ title, data, towns }: Props) => {
               });
 
               const currentOrder = orderData.data;
+
+              console.log(currentOrder);
+
               return (
                 <TableRow key={id} className={`divide-x divide-gray-200 ${id % 2 === 0 ? "bg-gray-100" : ""}`}>
                   <TableCell className={`font-medium text-center`}>
                     {`Ref-${currentOrder?.uuid?.slice(0, 15)}...`}
                   </TableCell>
-                  {/* <TableCell>
-                    {!currentOrder?.is_delivred ? (
-                      currentOrder?.status == "CANCELLED" ? (
-                        <div className="flex gap-1 items-center">
-                          <span className="bg-orange-600 h-2 w-2 rounded-full" />
-                          {"En cours"}
-                        </div>
-                      ) : (
-                        <div className="flex gap-1 items-center">{"---"}</div>
-                      )
-                    ) : (
-                      <div className="flex gap-1 items-center">
-                        <span className="bg-green-600 h-2 w-2 rounded-full" />
-                        {"Livré"}
-                      </div>
-                    )}
-                  </TableCell> */}
                   <TableCell>{
-                    currentOrder?.status === "PAID" ?
-                      <div>
-                        <span className="bg-green-600 h-2 w-2 rounded-full" />
+                    currentOrder?.status === "PAID" || currentOrder?.status === "CONFIRMED" ?
+                      <div className="flex flex-row items-center gap-1">
+                        <div className="bg-green-600 h-2 w-2 rounded-full" />
                         {"Payé"}
                       </div>
                       :
-                      "Non payé"
+                      <div className="flex flex-row items-center gap-1">
+                        <div className="bg-red-600 h-2 w-2 rounded-full" />
+                        {"Non payé"}
+                      </div>
                   }
                   </TableCell>
-                  <TableCell className="truncate max-w-[200px]">
-                    <div className="flex flex-col gap-1">
-                      {order.items ? order.items.map((item, id) =>
-                        <div key={id} className="w-full text-sm font-medium text-gray-900 flex items-center gap-2">
-                          <span>{normalizeText(item.name ?? "---")}</span>
-                        </div>
-                      ) : "---"}
-                    </div>
-                  </TableCell>
-
                   <TableCell>{XAF.format(Number(order.total))}</TableCell>
                   <TableCell>
                     {formatRelative(order.registration, new Date(), { locale: fr })}

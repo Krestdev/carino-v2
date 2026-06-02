@@ -88,6 +88,8 @@ const ViewOrderDialog = ({
   const frais =
     towns?.find((town) => town.quartier === livraison)?.price ?? 0;
 
+  const isPaid = currentOrder.status === "PAID" || currentOrder.status === "CONFIRMED"
+
   return (
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-2xl max-w-lg max-h-[85vh] overflow-y-auto w-full p-0 bg-white dark:bg-slate-950">
@@ -97,8 +99,8 @@ const ViewOrderDialog = ({
           </DialogTitle>
 
           <div className="flex flex-col">
-            <DialogDescription className="text-white/80">
-              {`Statut : ${currentOrder.status === "PAID" ? "Payé" : "Non payé"}`}
+            <DialogDescription className={`${isPaid ? "text-green-600" : "text-red-600"}`}>
+              {`Statut : ${isPaid ? "Payé" : "Non payé"}`}
             </DialogDescription>
           </div>
         </DialogHeader>

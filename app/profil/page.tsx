@@ -14,6 +14,7 @@ import Error from "@/components/universal/error";
 import ViewOrderDialog from "@/components/Historique/ViewOrderDialog";
 import TownQuery from "@/queries/townQuery";
 import { OrdersData } from "@/types/types";
+import HistoryTable from "@/components/Historique/HistoryTable";
 
 const Page = () => {
   const { user, token } = useStore();
@@ -92,7 +93,7 @@ const Page = () => {
             </Button>
             <div className="flex flex-col gap-7 px-7 py-12">
               <div className="flex flex-col gap-7">
-                <p className="text-[24px] font-semibold font-general">{"Informations personnelles"}</p>
+                <h3 className="text-xl font-bold">{"Informations personnelles"}</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 px-5 py-8 bg-[#FFFBF3]">
                   <div className="flex flex-col gap-1">
                     <p className="text-[14px] text-[#4B5563] uppercase">{"Nom"}</p>
@@ -106,10 +107,6 @@ const Page = () => {
                     <p className="text-[14px] text-[#4B5563] uppercase">{"Téléphone"}</p>
                     <p className="text-[#111827] font-semibold">{userData.data.phone ?? "N/A"}</p>
                   </div>
-                  {/* <div className="flex flex-col gap-1">
-                    <p className="text-[14px] text-[#4B5563] uppercase">{"Né le"}</p>
-                    <p className="text-[#111827] font-semibold">{userData.data.birthday ?? "N/A"}</p>
-                  </div> */}
                   {orderData.data?.data && orderData.data.data.length > 0 &&
                     <div className="flex flex-col gap-1">
                       <p className="text-[14px] text-[#4B5563] uppercase">{"Derniere commande"}</p>
@@ -129,47 +126,7 @@ const Page = () => {
                   </div>
                 </div>
               </div>
-              <div className="flex flex-col gap-7">
-                <p className="text-[24px] font-semibold font-general">{"Historique des commandes"}</p>
-                <div className="grid grid-cols-1 overflow-auto w-full">
-                  <div className="grid grid-cols-4 px-5 py-2">
-                    <div className="flex flex-col gap-0.5">
-                      <p className="text-[#111827] text-[14px] font-semibold max-w-[200px] truncate">{"Référence"}</p>
-                    </div>
-                    <div className="flex flex-col gap-0.5">
-                      <p className="text-[#111827] text-[14px] font-semibold">{"Date"}</p>
-                    </div>
-                    <div className="flex flex-col gap-0.5">
-                      <p className="text-[#111827] text-[14px] font-semibold">{"Total"}</p>
-                    </div>
-                    <div className="flex flex-col gap-0.5">
-                      <p className="text-[#111827] text-[14px] font-semibold">{"Statut"}</p>
-                    </div>
-                  </div>
-                  {
-                    orderData.data?.data?.map((order, index) => {
-                      return (
-                        <div key={index} className={`grid grid-cols-4 px-5 py-2 ${index % 2 === 0 ? "bg-muted" : ""}`}>
-                          <div className="flex flex-col gap-0.5">
-                            <p className="text-[#111827] text-[14px] max-w-[200px] truncate">{"cmd-" + order.uuid}</p>
-                          </div>
-                          <div className="flex flex-col gap-0.5">
-                            <p className="text-[#111827] text-[14px]">{new Date(order.registration).toLocaleString()}</p>
-                          </div>
-                          <div className="flex flex-col gap-0.5">
-                            <p className="text-[#111827] text-[14px]">{XAF.format(order.total)}</p>
-                          </div>
-                           <div className="flex flex-col gap-0.5">
-                            <Button variant="outline" onClick={() => handleViewOrder(order)}>
-                              {"Voir la commande"}
-                            </Button>
-                          </div>
-                        </div>
-                      )
-                    })
-                  }
-                </div>
-              </div>
+              <HistoryTable title={"Historique des commandes"} data={orderData.data?.data ?? []} towns={townData.data} />
             </div>
           </div>
         )}

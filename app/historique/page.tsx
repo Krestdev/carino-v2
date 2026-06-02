@@ -23,9 +23,8 @@ const Page = () => {
   const [tab, setTab] = useState("commande");
 
   const userData = useQuery({
-    queryKey: ["userInfo", user?.id],
+    queryKey: ["my-orders", user?.id],
     queryFn: () => userLogIn.getMine(),
-    enabled: !!user,
   });
 
   const townData = useQuery({
@@ -92,7 +91,7 @@ const Page = () => {
         {tab === "commande" ?
           <HistoryTable
             title={"Historique des commandes"}
-            data={userData.data?.data}
+            data={userData.data.data}
             towns={townData.data}
           />
           :
