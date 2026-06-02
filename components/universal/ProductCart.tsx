@@ -37,7 +37,7 @@ const ProductCart = ({ produit, options, mandatoryTag }: Props) => {
           <p className="text-[12px] font-medium lowercase first-letter:uppercase line-clamp-2">
             {produit.name}
           </p>
-          <p className="text-[12px] text-[#89590C] font-semibold">{`${produit.price} FCFA`}</p>
+          <p className="text-[12px] text-[#89590C] font-semibold">{`${produit.price_togo} FCFA`}</p>
         </div>
         {produit.disable ? (
           <Tooltip>

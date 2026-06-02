@@ -10,9 +10,11 @@ import {
     FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import useStore from "@/context/store";
 import UserQuery from "@/queries/userQueries";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
+import { jwtDecode, JwtPayload } from "jwt-decode";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
@@ -39,10 +41,11 @@ export default function ResetPasswordPage() {
     const searchParams = useSearchParams();
     const token = searchParams.get("token") ?? "";
     const router = useRouter();
+    const { login } = useStore();
 
     const userQuery = new UserQuery();
 
-    const login = useMutation({
+    const loginUser = useMutation({
         mutationKey: ["login"],
         mutationFn: async (data: {
             mail: string;
@@ -50,9 +53,54 @@ export default function ResetPasswordPage() {
         }) => {
             return userQuery.login(data);
         },
-        onSuccess: () => {
-            router.push("/");
-        }
+        onSuccess: async (data: { access_token: string }) => {
+            try {
+                // Enregistrer le token immédiatement
+                localStorage.setItem("token", data.access_token);
+
+                // Décoder le token pour vérifier require_password_change
+                let decodedToken: JwtPayload | null = null;
+                try {
+                    decodedToken = jwtDecode<JwtPayload>(data.access_token);
+                    console.log("Token décodé:", decodedToken);
+                } catch (error) {
+                    console.error("Erreur lors du décodage du token:", error);
+                }
+
+                // Récupérer le profil complet de l'utilisateur depuis le serveur
+                const userData = await userQuery.profile();
+
+                const user = {
+                    id: Number(userData.id),
+                    email: userData.mail,
+                    name:
+                        userData.fname ||
+                        userData.name,
+                    isFirstOrder: userData.isFirstOrder,
+                    phone: userData.phone,
+                    loyalty: userData.loyalty,
+                    role: userData.role,
+                    require_password_change:
+                        userData.require_password_change ||
+                        false,
+                };
+
+                // Vérifier si c'est un admin avec require_password_change = true
+                const isAdmin = user.role === "MANAGER" || user.role === "ADMIN";
+                const require_password_change = user.require_password_change === false;
+
+                if (isAdmin && require_password_change) {
+                    // Rediriger vers la page edit-password
+                    toast.info("Veuillez changer votre mot de passe avant de continuer");
+                    router.push("/edit-password");
+                }
+
+                login(user, data.access_token);
+                router.push("/");
+            } catch (error) {
+                console.error("Erreur lors du traitement du profil:", error);
+            }
+        },
     });
 
     const resetPassword = useMutation({
@@ -66,7 +114,7 @@ export default function ResetPasswordPage() {
         onSuccess: (data: { message: string, mail: string }) => {
             toast.success("Mot de passe réinitialisé avec succès");
             // login 
-            login.mutate({
+            loginUser.mutate({
                 mail: data.mail,
                 password: form.getValues('confirmPassword'),
             });

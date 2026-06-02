@@ -169,10 +169,11 @@ function AddDialog({ children, options, product }: DialogProps) {
     defaultValues: getDefaultValues(),
   });
 
-  // Calcul du prix total
+  // Calcul du prix total - UTILISE price_togo
   const calculateTotal = useCallback(() => {
     const values = form.getValues();
-    let total = product.price;
+    // Utiliser price_togo au lieu de price
+    let total = product.price_togo || product.price || 0;
 
     const processOptions = (optionGroup: SelectedOptionGroup[] | undefined) => {
       if (!optionGroup || !Array.isArray(optionGroup)) return;
@@ -193,9 +194,9 @@ function AddDialog({ children, options, product }: DialogProps) {
     });
 
     return total;
-  }, [form, product.price]);
+  }, [form, product.price_togo, product.price]);
 
-  const [currentPrice, setCurrentPrice] = useState(XAF.format(product.price));
+  const [currentPrice, setCurrentPrice] = useState(XAF.format(product.price_togo || product.price || 0));
 
   // Mettre à jour le prix quand les options changent
   useEffect(() => {

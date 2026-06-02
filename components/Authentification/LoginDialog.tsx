@@ -264,6 +264,7 @@ const LoginDialog = ({
                 {/* FORGOT PASSWORD */}
                 <Button
                   variant="link"
+                  type="button"
                   onClick={() => {
                     onOpenChange(false);
                     router.push("/mot-de-passe-ouble");

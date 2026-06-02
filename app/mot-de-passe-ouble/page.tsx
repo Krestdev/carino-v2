@@ -68,6 +68,9 @@ function Page() {
     return (
         <div className='py-32'>
             <Form {...form}>
+                <h1 className="text-2xl font-bold mb-10 text-center text-black">
+                    Réinitialisez votre mot de passe
+                </h1>
                 <form onSubmit={form.handleSubmit(onSubmit)} className='flex flex-col gap-3 items-center py-10'>
                     <FormField control={form.control} name="email" render={({ field }) => (
                         <FormItem className='max-w-[290px] w-full'>
