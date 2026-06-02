@@ -98,7 +98,7 @@ const ViewOrderDialog = ({
 
           <div className="flex flex-col">
             <DialogDescription className="text-white/80">
-              {`Statut : ${currentOrder.status}`}
+              {`Statut : ${currentOrder.status === "PAID" ? "Payé" : "Non payé"}`}
             </DialogDescription>
           </div>
         </DialogHeader>

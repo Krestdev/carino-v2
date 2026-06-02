@@ -15,6 +15,8 @@ import ViewOrderDialog from "./ViewOrderDialog";
 import { normalizeText, parseItems } from "@/lib/utils";
 import { formatRelative } from "date-fns";
 import { fr } from "date-fns/locale";
+import { useQuery } from "@tanstack/react-query";
+import UserQuery from "@/queries/userQueries";
 
 interface Props {
   title: string;
@@ -25,6 +27,8 @@ interface Props {
 const HistoryTable = ({ title, data, towns }: Props) => {
   const [selectedOrder, setSelectedOrder] = useState<OrdersData | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
+
+  const orders = new UserQuery();
 
   const handleViewOrder = (order: OrdersData) => {
     setSelectedOrder(order);
@@ -43,7 +47,7 @@ const HistoryTable = ({ title, data, towns }: Props) => {
         <TableHeader className="bg-primary text-white">
           <TableRow className="divide-x divide-gray-300 hover:bg-primary/90">
             <TableHead className="font-bold text-white">{"References"}</TableHead>
-            <TableHead className="font-bold text-white">{"Statuts"}</TableHead>
+            {/* <TableHead className="font-bold text-white">{"Statuts"}</TableHead> */}
             <TableHead className="font-bold text-white">{"Etats de paiement"}</TableHead>
             <TableHead className="font-bold text-white">{"Commande"}</TableHead>
             <TableHead className="font-bold text-white">{"Prix"}</TableHead>
@@ -52,7 +56,7 @@ const HistoryTable = ({ title, data, towns }: Props) => {
           </TableRow>
         </TableHeader>
         <TableBody className="divide-y divide-gray-200">
-          { data && data.length === 0 ? (
+          {data && data.length === 0 ? (
             <TableRow className="divide-x divide-gray-200">
               <TableCell colSpan={7} className="text-center h-24">
                 {"Aucune donnée à afficher."}
@@ -60,14 +64,22 @@ const HistoryTable = ({ title, data, towns }: Props) => {
             </TableRow>
           ) : (
             data?.toReversed().map((order, id) => {
+
+              const orderData = useQuery({
+                queryKey: ["order", order?.uuid],
+                queryFn: () => orders.getOne(order!.uuid!),
+                enabled: !!order?.uuid,
+              });
+
+              const currentOrder = orderData.data;
               return (
                 <TableRow key={id} className={`divide-x divide-gray-200 ${id % 2 === 0 ? "bg-gray-100" : ""}`}>
                   <TableCell className={`font-medium text-center`}>
-                    {`Ref-${order.uuid?.slice(0, 15)}...`}
+                    {`Ref-${currentOrder?.uuid?.slice(0, 15)}...`}
                   </TableCell>
-                  <TableCell>
-                    {!order.is_delivred ? (
-                      order.is_paid ? (
+                  {/* <TableCell>
+                    {!currentOrder?.is_delivred ? (
+                      currentOrder?.status == "CANCELLED" ? (
                         <div className="flex gap-1 items-center">
                           <span className="bg-orange-600 h-2 w-2 rounded-full" />
                           {"En cours"}
@@ -81,9 +93,9 @@ const HistoryTable = ({ title, data, towns }: Props) => {
                         {"Livré"}
                       </div>
                     )}
-                  </TableCell>
+                  </TableCell> */}
                   <TableCell>{
-                    order.is_paid === 1 ?
+                    currentOrder?.status === "PAID" ?
                       <div>
                         <span className="bg-green-600 h-2 w-2 rounded-full" />
                         {"Payé"}

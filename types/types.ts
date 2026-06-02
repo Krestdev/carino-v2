@@ -512,6 +512,8 @@ export interface MyOrdersResponse {
   virtual_brand_name: string | null;
   registration: string;
   updated_at: string;
+  is_delivred: boolean;
+  is_paid: boolean;
 
   address: {
     id: number;
@@ -519,6 +521,7 @@ export interface MyOrdersResponse {
     ville: string;
     quartier: string;
     prix: string;
+    phone: string | null
     created_at: string;
     updated_at: string;
     order_uuid: string;

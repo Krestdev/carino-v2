@@ -334,11 +334,9 @@ const DelieveryForm = ({
   const postOrder = useMutation({
     mutationFn: async (data: Order) => userQuery.createOrder(data),
     onMutate: () => {
-      console.log("Paiement en cours... 1");
       setPaymentStatus("PENDING");
     },
     onSuccess: (data) => {
-      console.log("Paiement en cours... 2");
       const payload = data as any;
       const orderUuid =
         payload?.order?.uuid ?? payload?.data?.uuid ?? payload?.uuid;
@@ -363,7 +361,6 @@ const DelieveryForm = ({
       checkPaymentStatus.mutate(vendorReference);
     },
     onError: (error) => {
-      console.log("Erreur... 1", error);
       setPaymentStatus("FAILED");
       setSourceError("order");
     },
@@ -395,9 +392,6 @@ const DelieveryForm = ({
   });
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-
-    console.log("C'est ici");
-
     const dueDate = new Date();
     dueDate.setHours(
       Number(values.time.split(":")[0]),
@@ -412,13 +406,7 @@ const DelieveryForm = ({
     setFees(ApplyDeliveryPromo(realFees, values.district, cart));
 
     if (user !== null) {
-      console.log("Utilisateur", user);
-      console.log(values.time);
-
-
       if (isDeliveryOpen(values.time)) {
-        console.log("Livraison ouvert");
-
         const address = addresses.find((x) => x.quartier === values.district);
         postOrder.mutate({
           payment: {
@@ -475,7 +463,6 @@ const DelieveryForm = ({
           client_mail: user.email,
         });
       } else {
-        console.log("Livraison fermée");
         toast({
           title: "Livraison fermée.",
           description:
@@ -484,7 +471,6 @@ const DelieveryForm = ({
         });
       }
     } else {
-      console.log("Utilisateur non connecté");
       toast({
         title: "Connectez-vous pour terminer l'opération",
         description:

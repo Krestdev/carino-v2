@@ -247,7 +247,7 @@ const OrderPDF = ({
               </Text>
 
               <Text style={styles.infoValue}>
-                {order.phone || "-"}
+                {order.address?.phone || "-"}
               </Text>
             </View>
 
@@ -257,7 +257,7 @@ const OrderPDF = ({
               </Text>
 
               <Text style={styles.infoValue}>
-                {order.mode}
+                {order.mode === "delivery" ? "Livraison" : order.mode === "takeaway" ? "À emporter" : "Sur place"}
               </Text>
             </View>
 
@@ -387,7 +387,7 @@ const OrderPDF = ({
               </Text>
 
               <Text style={styles.statusValue}>
-                {order.status}
+                {order.status === "PAID" ? "Payé" : "Non payé"}
               </Text>
             </View>
 
