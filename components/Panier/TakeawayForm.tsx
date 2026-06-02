@@ -353,7 +353,7 @@ const TakeawayForm = ({
       0
     );
     if (user !== null) {
-      if (isDeliveryOpen(new Date(values.time))) {
+      if (isDeliveryOpen(values.time)) {
         postOrder.mutate({
           payment: {
             network: values.operator,

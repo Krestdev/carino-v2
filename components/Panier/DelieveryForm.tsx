@@ -413,8 +413,10 @@ const DelieveryForm = ({
 
     if (user !== null) {
       console.log("Utilisateur", user);
+      console.log(values.time);
 
-      if (isDeliveryOpen(new Date(values.time))) {
+
+      if (isDeliveryOpen(values.time)) {
         console.log("Livraison ouvert");
 
         const address = addresses.find((x) => x.quartier === values.district);

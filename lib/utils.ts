@@ -30,16 +30,19 @@ export function isPromotion(start: Date, end: Date) {
   return (maintenant >= start && maintenant <= end);
 }
 
-export function isDeliveryOpen(currentDate: Date): boolean {
+export function isDeliveryOpen(currentDate: string): boolean {
 
-  console.log(currentDate);
+  const [hours, minutes] = currentDate.split(":").map(Number);
+
+  const date = new Date();
+  date.setHours(hours, minutes, 0, 0);
 
   // Get the current time in UTC and adjust for UTC+1
   const startTime = process.env.NEXT_PUBLIC_OPENTIME || "10:30"
   const endTime = process.env.NEXT_PUBLIC_CLOSETIME || "20:30"
 
-  const utcHours = currentDate.getUTCHours() + 1;
-  const currentTime = utcHours * 100 + currentDate.getUTCMinutes();
+  const utcHours = date.getUTCHours() + 1;
+  const currentTime = utcHours * 100 + date.getUTCMinutes();
 
   // Helper function to convert "HH:MM" to HHMM format
   function convertToHHMM(timeStr: string): number {
