@@ -393,6 +393,9 @@ const DelieveryForm = ({
   });
 
   function onSubmit(values: z.infer<typeof formSchema>) {
+
+    console.log("C'est ici");
+
     const dueDate = new Date();
     dueDate.setHours(
       Number(values.time.split(":")[0]),
