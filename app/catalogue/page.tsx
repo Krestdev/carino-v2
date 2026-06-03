@@ -22,6 +22,7 @@ import {
   ChevronUp,
   Search,
   SearchIcon,
+  ShoppingBasket,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useCallback, useMemo, useState } from "react";
@@ -298,51 +299,7 @@ const Page = () => {
               firstTagId={FIRST_TAG_ID}
             />
           </div>
-          {/* <div className="flex md:hidden flex-col gap-3 w-full">
-            
 
-            <Collapsible
-              open={openCart}
-              onOpenChange={setOpenCart}
-              className="w-full space-y-2"
-            >
-              <CollapsibleTrigger asChild>
-                <div className="h-12 w-full flex flex-row items-center gap-2.5 px-4 bg-[#F3F4F6] border-b border-[#4B5563] cursor-pointer active:bg-gray-200 transition-colors">
-                  <p className="text-[#111827] text-[14px] font-medium flex-1">
-                    {cart.length} Produit{cart.length > 1 ? "s" : ""} •{" "}
-                    {XAF.format(
-                      cart.reduce(
-                        (acc, item) => acc + item.price * item.quantity,
-                        0,
-                      ),
-                    )}
-                  </p>
-                  {openCart ? (
-                    <ChevronUp className="w-5 h-5 text-gray-500" />
-                  ) : (
-                    <ChevronDown className="w-5 h-5 text-gray-500" />
-                  )}
-                </div>
-              </CollapsibleTrigger>
-
-              <CollapsibleContent className="overflow-hidden data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down">
-                <div className="bg-white rounded-b-lg p-2">
-                  <CartItems items={cart} title={false} />
-                </div>
-              </CollapsibleContent>
-            </Collapsible>
-            {cart.length > 0 && (
-              <>
-                <Button onClick={() => router.push("/panier")}>
-                  {"Continuer"}
-                  <ArrowRight className="w-4 h-4" />
-                </Button>
-                <Button variant={"outline"} onClick={emptyCart}>
-                  {"Vider le panier"}
-                </Button>
-              </>
-            )}
-          </div> */}
           {/* ProductsGrid - reste scrollable normalement */}
           <ProductsGrid
             products={filterProducts}
@@ -359,34 +316,17 @@ const Page = () => {
                   {"Procéder au paiement"}
                   <ArrowRight className="w-4 h-4" />
                 </Button>
-                {/* <Button variant={"outline"} onClick={emptyCart}>
-                  {"Vider le panier"}
-                </Button> */}
               </div>
             )}
           </div>
         </div>
       </div>
-        {cart.length > 0 && (
-          <Link href={"/panier"} className="sticky bottom-2 ml-auto mr-2 bg-accent shadow-lg rounded-md max-w-50 w-full p-3 flex flex-col">
-            <p className="font-semibold font-general text-[14px] text-primary">
-              {"Aller au panier"}
-            </p>
-            <div className="flex items-center justify-between">
-              <p>
-                {cart.length} Produit{cart.length > 1 ? "s" : ""}
-              </p>
-              <p className="text-[14px] font-medium">
-                {XAF.format(
-                  cart.reduce(
-                    (acc, item) => acc + item.price * item.quantity,
-                    0,
-                  ),
-                )}
-              </p>
-            </div>
-          </Link>
-        )}
+      {cart.length > 0 && (
+        <Link href={"/panier"} className="sticky bottom-2 ml-auto mr-2 bg-accent shadow-lg rounded-full w-fit p-3 flex md:hidden flex-col">
+          <ShoppingBasket className="text-white" />
+          <p className="absolute text-white top-0 right-0 bg-primary rounded-full w-5 h-5 flex items-center justify-center">{cart.length}</p>
+        </Link>
+      )}
     </div>
   );
 };

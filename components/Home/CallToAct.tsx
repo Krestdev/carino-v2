@@ -2,9 +2,10 @@
 
 import { ArrowRight } from "lucide-react"
 import { Button } from "../ui/button"
+import { useRouter } from "next/navigation"
 
 const CallToAct = () => {
-
+    const router = useRouter();
     return (
         <div className=" w-screen">
             <div
@@ -21,7 +22,7 @@ const CallToAct = () => {
                     <h2 className="text-white">{"Réserver une table"}</h2>
                 </div>
                 <p className="mx-auto text-center text-white max-w-[768px] z-10">{"Choisissez votre moment, installez-vous confortablement et laissez-nous nous occuper du reste. Que vous souhaitez réserver une table ou privatiser le restaurant pour votre évènement, nous sommes ouvert."}</p>
-                <Button className="mx-auto text-black hover: bg-[#FFC336]/90 w-fit z-10">{"Réserver une table"}</Button>
+                <Button onClick={() => router.push("/reservation")} className="mx-auto text-black hover: bg-[#FFC336]/90 w-fit z-10">{"Réserver une table"}</Button>
             </div>
         </div>
     )

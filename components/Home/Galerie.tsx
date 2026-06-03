@@ -7,7 +7,16 @@ const Galerie = () => {
         "/galerie/2.webp",
         "/galerie/3.webp",
         "/galerie/4.webp",
-        "/galerie/1.webp",
+        "/galerie/5.webp",
+        "/galerie/6.webp",
+        "/galerie/7.webp",
+        "/galerie/8.webp",
+        "/galerie/9.webp",
+        "/galerie/10.webp",
+        "/galerie/11.webp",
+        "/galerie/12.webp",
+        "/galerie/13.webp",
+        "/galerie/14.webp",
     ]
 
     const containerRef = useRef<HTMLDivElement>(null)

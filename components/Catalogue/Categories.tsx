@@ -11,9 +11,9 @@ import {
 
 interface CategoriesProps {
   categories: Array<{ categories: CategoriesData; total: number }>;
-  totalProductPerTag: Array<{ category: CategoriesData; total: number }>;
   activeTab: number;
   setActiveTab: (tab: number) => void;
+  totalProductPerTag: Array<{ category: CategoriesData; total: number }>;
   firstTagId: number;
 }
 

@@ -10,7 +10,7 @@ const About = () => {
             <div className="px-7 mx-auto max-w-[1280px] w-full grid grid-cols-1 md:grid-cols-2 items-center justify-center gap-12 ">
                 <div className="max-w-[588px] flex flex-col gap-6">
                     <div className="flex flex-col gap-1">
-                        <h4>{"où le goût rencontre la convivialité"}</h4>
+                        <h4>{"Là où le goût rencontre la convivialité"}</h4>
                         <h2>{"Le Carino Pizzeria"}</h2>
                     </div>
                     <p className="text-[18px]">{`
@@ -28,11 +28,11 @@ const About = () => {
 
                     </div>
                     <div>
-                        <p>Ouvert tous les jours de <span className="font-bold">10h à 22h.</span></p>
+                        <p>Ouvert tous les jours de <span className="font-bold">08h à 22h.</span></p>
                         <p>Nous sommes situés à <span className="font-bold">Carrefour PlaYce à Yaoundé, </span>Cameroun.</p>
                     </div>
                 </div>
-                <img src="about.webp" alt="about" />
+                <img src="/about.webp" alt="about" />
             </div>
         </div>
     )
