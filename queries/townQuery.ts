@@ -1,15 +1,16 @@
-import { api2 } from "@/providers/axios";
-import { AddressData } from "@/types/types";
+import AxiosConfig from "@/providers/axios";
+import api from "@/providers/axios";
+import { AddressResponse, AddressData } from "@/types/types";
 import { AxiosInstance } from "axios";
 
 export default class TownQuery {
-  route = "ville";
+  route = "villes";
   api: AxiosInstance;
 
   constructor() {
-    this.api = api2;
+    this.api = new AxiosConfig(false).api;
   }
   getTowns = async (): Promise<AddressData[]> => {
-    return this.api.get(`${this.route}`).then((res) => res.data);
+    return this.api.get(`${this.route}/`).then((res) => res.data);
   };
 }

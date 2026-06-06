@@ -122,11 +122,11 @@ const LoginDialog = ({
         const isAdmin = user.role === "MANAGER" || user.role === "ADMIN";
         const require_password_change = user.require_password_change === false;
 
-        if (isAdmin && require_password_change) {
-          // Rediriger vers la page edit-password
-          toast.info("Veuillez changer votre mot de passe avant de continuer");
-          router.push("/edit-password");
-        }
+        // if (isAdmin && require_password_change) {
+        //   // Rediriger vers la page edit-password
+        //   toast.info("Veuillez changer votre mot de passe avant de continuer");
+        //   router.push("/edit-password");
+        // }
 
         login(user, data.access_token);
 

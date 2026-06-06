@@ -56,6 +56,7 @@ export type UserRegistration = {
   fname: string;
   phone: string;
   password: string;
+  role?: string;
 };
 
 export interface ProductCategory {

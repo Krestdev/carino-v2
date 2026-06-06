@@ -17,10 +17,10 @@ export function RouteGuard({ children }: { children: React.ReactNode }) {
         const require_password_change = user?.require_password_change === true;
         const isOnEditPasswordPage = pathname === '/edit-password';
 
-        if (isAdmin && require_password_change && !isOnEditPasswordPage) {
-            toast.info('Veuillez changer votre mot de passe avant de continuer');
-            router.push('/edit-password');
-        }
+        // if (isAdmin && require_password_change && !isOnEditPasswordPage) {
+        //     toast.info('Veuillez changer votre mot de passe avant de continuer');
+        //     router.push('/edit-password');
+        // }
     }, [user, pathname, router]);
 
     return <>{children}</>;

@@ -5,7 +5,7 @@ import SocialSidebar from "./SocialSideBar";
 const Hero = () => {
 
   const router = useRouter();
-  const randomImage = ["burger.webp", "pizza.webp", "salad.webp", "ramen.webp"];
+  const randomImage = ["burger1.webp", "pizza.webp", "salad.webp", "ramen.webp"];
   const randomIndex = Math.floor(Math.random() * randomImage.length);
   const selectedImage = randomImage[0];
   return (

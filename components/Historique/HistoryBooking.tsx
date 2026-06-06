@@ -31,7 +31,7 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { CheckCheck, MoreVertical } from "lucide-react";
+import { Check, CheckCheck, MoreVertical } from "lucide-react";
 
 interface Props {
     title: string;
@@ -43,7 +43,7 @@ const HistoryBooking = ({ title, data }: Props) => {
     const [dialogOpen, setDialogOpen] = useState(false);
     const [confirmationDialog, setConfirmationDialog] = useState<{
         open: boolean;
-        action: 'validate' | 'reject' | 'cancel' | 'complete' | null;
+        action: 'validate' | 'reject' | 'settle' | 'cancel' | 'complete' | null;
         reservationId: string | null;
         reservationRef: string;
     }>({
@@ -52,6 +52,8 @@ const HistoryBooking = ({ title, data }: Props) => {
         reservationId: null,
         reservationRef: '',
     });
+
+    type StatusCode = "Pending" | "Confirmed" | "Customer Settled" | "Cancelled" | "Complete";
 
     const { user } = useStore();
     const queryClient = useQueryClient();
@@ -70,19 +72,6 @@ const HistoryBooking = ({ title, data }: Props) => {
         }
     })
 
-    const cancel = useMutation({
-        mutationKey: ["cancel-bookings"],
-        mutationFn: (id: string) => bookingQuery.cancelReservation(id),
-        onSuccess: () => {
-            toast.success("Réservation annulée");
-            queryClient.invalidateQueries({ queryKey: ["reservations"] });
-            setConfirmationDialog({ open: false, action: null, reservationId: null, reservationRef: '' });
-        },
-        onError: () => {
-            toast.error("Erreur lors de l'annulation de la réservation");
-        }
-    })
-
     const reject = useMutation({
         mutationKey: ["reject-bookings"],
         mutationFn: (id: string) => bookingQuery.rejectReservation(id),
@@ -93,6 +82,19 @@ const HistoryBooking = ({ title, data }: Props) => {
         },
         onError: () => {
             toast.error("Erreur lors du rejet de la réservation");
+        }
+    })
+
+    const settle = useMutation({
+        mutationKey: ["settle-bookings"],
+        mutationFn: (id: string) => bookingQuery.settleReservation(id),
+        onSuccess: () => {
+            toast.success("Client installé");
+            queryClient.invalidateQueries({ queryKey: ["reservations"] });
+            setConfirmationDialog({ open: false, action: null, reservationId: null, reservationRef: '' });
+        },
+        onError: () => {
+            toast.error("Erreur lors de l'installation du client");
         }
     })
 
@@ -119,7 +121,7 @@ const HistoryBooking = ({ title, data }: Props) => {
         setSelectedReservation(null);
     };
 
-    const handleActionClick = (action: 'validate' | 'reject' | 'cancel' | 'complete', reservation: ReservationData) => {
+    const handleActionClick = (action: 'validate' | 'reject' | 'settle' | 'cancel' | 'complete', reservation: ReservationData) => {
         setConfirmationDialog({
             open: true,
             action,
@@ -138,36 +140,47 @@ const HistoryBooking = ({ title, data }: Props) => {
             case 'reject':
                 reject.mutate(confirmationDialog.reservationId);
                 break;
-            case 'cancel':
-                cancel.mutate(confirmationDialog.reservationId);
-                break;
             case 'complete':
                 complete.mutate(confirmationDialog.reservationId);
+                break;
+            case 'settle':
+                settle.mutate(confirmationDialog.reservationId);
                 break;
         }
     };
 
     // Fonction pour obtenir le libellé du statut
-    const getStatusLabel = (status: string) => {
+    const getStatusLabel = (status: StatusCode): string => {
         switch (status) {
-            case 'Pending': return 'En attente';
-            case 'Confirmed': return 'Confirmée';
-            case 'Complete': return 'Terminée';
-            case 'Cancelled': return 'Annulée';
-            case 'Rejected': return 'Rejetée';
-            default: return status;
+            case "Pending": return 'En attente';
+            case "Confirmed": return 'Confirmée';
+            case "Customer Settled": return 'Client Installé';
+            case "Cancelled": return 'Annulée';
+            case "Complete": return 'Terminée';
+            default: return 'Inconnu';
         }
     };
 
     // Fonction pour obtenir la couleur du statut
-    const getStatusColor = (status: string) => {
+    const getStatusColor = (status: StatusCode): string => {
         switch (status) {
-            case 'Pending': return 'bg-orange-500';
-            case 'Confirmed': return 'bg-blue-500';
-            case 'Complete': return 'bg-green-500';
-            case 'Cancelled': return 'bg-red-500';
-            case 'Rejected': return 'bg-purple-500';
-            default: return 'bg-gray-500';
+            case "Pending": return 'bg-amber-500 shadow-lg shadow-amber-500/20';
+            case "Confirmed": return 'bg-blue-500 shadow-lg shadow-blue-500/20';
+            case "Customer Settled": return 'bg-teal-500 shadow-lg shadow-teal-500/20';
+            case "Cancelled": return 'bg-rose-500 shadow-lg shadow-rose-500/20';
+            case "Complete": return 'bg-emerald-500 shadow-lg shadow-emerald-500/20';
+            default: return 'bg-gray-500 shadow-lg shadow-gray-500/20';
+        }
+    };
+
+    const getTitleColor = (status: StatusCode): string => {
+        switch (status) {
+            case "Pending": return 'text-amber-500 shadow-lg shadow-amber-500/20';
+            case "Confirmed": return 'text-blue-500 shadow-lg shadow-blue-500/20';
+            case "Customer Settled": return 'text-teal-500 shadow-lg shadow-teal-500/20';
+            case "Cancelled": return 'text-rose-500 shadow-lg shadow-rose-500/20';
+            case "Complete": return 'bg-emerald-500 shadow-lg shadow-emerald-500/20';
+            default: return 'bg-gray-500 shadow-lg shadow-gray-500/20';
         }
     };
 
@@ -179,28 +192,35 @@ const HistoryBooking = ({ title, data }: Props) => {
                     title: 'Confirmer la réservation',
                     description: `Êtes-vous sûr de vouloir confirmer la réservation ${confirmationDialog.reservationRef} ?`,
                     confirmText: 'Confirmer',
-                    confirmClass: 'bg-green-600 hover:bg-green-700'
+                    confirmClass: 'bg-emerald-600 hover:bg-emerald-700 text-white'
                 };
             case 'reject':
                 return {
                     title: 'Rejeter la réservation',
                     description: `Êtes-vous sûr de vouloir rejeter la réservation ${confirmationDialog.reservationRef} ? Cette action est irréversible.`,
                     confirmText: 'Rejeter',
-                    confirmClass: 'bg-red-600 hover:bg-red-700'
+                    confirmClass: 'bg-rose-600 hover:bg-rose-700 text-white'
                 };
             case 'cancel':
                 return {
                     title: 'Annuler la réservation',
                     description: `Êtes-vous sûr de vouloir annuler votre réservation ${confirmationDialog.reservationRef} ? Cette action est irréversible.`,
                     confirmText: 'Annuler',
-                    confirmClass: 'bg-red-600 hover:bg-red-700'
+                    confirmClass: 'bg-rose-600 hover:bg-rose-700 text-white'
                 };
             case 'complete':
                 return {
                     title: 'Compléter la réservation',
                     description: `Êtes-vous sûr de vouloir marquer comme terminée la réservation ${confirmationDialog.reservationRef} ?`,
                     confirmText: 'Compléter',
-                    confirmClass: 'bg-blue-600 hover:bg-blue-700'
+                    confirmClass: 'bg-emerald-600 hover:bg-emerald-700 text-white'
+                };
+            case 'settle':
+                return {
+                    title: 'Règlement client',
+                    description: `Êtes-vous sûr de vouloir marquer comme réglée par le client la réservation ${confirmationDialog.reservationRef} ?`,
+                    confirmText: 'Marquer réglée',
+                    confirmClass: 'bg-teal-600 hover:bg-teal-700 text-white'
                 };
             default:
                 return {
@@ -215,19 +235,30 @@ const HistoryBooking = ({ title, data }: Props) => {
     const confirmationText = getConfirmationText();
 
     // Vérifier si une action est disponible pour le statut
-    const getAvailableActions = (status: string) => {
+    const getAvailableActions = (status: StatusCode) => {
         const actions = [];
-        if (status === 'Pending') {
-            actions.push({ key: 'validate', label: 'Confirmer', icon: LuCheck, color: 'text-green-600' });
-            actions.push({ key: 'reject', label: 'Rejeter', icon: LuX, color: 'text-red-600' });
+
+        // En attente
+        if (status === "Pending") {
+            if (user?.role === "ADMIN" || user?.role === "MANAGER") {
+                actions.push({ Icon: Check, key: 'validate', label: 'Confirmer', Text: "Confirmer", color: 'text-emerald-400' });
+                actions.push({ Icon: LuX, key: 'reject', label: 'Rejeter', Text: "Rejetter", color: 'text-rose-400' });
+            } else {
+                actions.push({ Icon: LuX, key: 'cancel', label: 'Annuler', Text: "Rejetter", color: 'text-rose-400' });
+            }
         }
-        if (status === 'Confirmed') {
-            actions.push({ key: 'complete', label: 'Compléter', icon: CheckCheck, color: 'text-blue-600' });
-            actions.push({ key: 'cancel', label: 'Annuler', icon: LuX, color: 'text-red-600' });
+
+        // Confirmée
+        if (status === "Confirmed") {
+            actions.push({ Icon: Check, key: 'settle', label: 'Installer client', Text: "Client Installé", color: 'text-teal-400' });
+            actions.push({ Icon: LuX, key: 'cancel', label: 'Annuler', Text: "Rejetter", color: 'text-rose-400' });
         }
-        if (status === 'Pending' && user?.role !== "ADMIN" && user?.role !== "MANAGER") {
-            return [{ key: 'cancel', label: 'Annuler', icon: LuX, color: 'text-red-600' }];
+
+        // Réglée client
+        if (status === "Customer Settled") {
+            actions.push({ Icon: CheckCheck, key: 'complete', label: 'Terminer', Text: "Completer", color: 'text-emerald-400' });
         }
+
         return actions;
     };
 
@@ -256,7 +287,8 @@ const HistoryBooking = ({ title, data }: Props) => {
                         </TableRow>
                     ) : (
                         data?.map((reservation, id) => {
-                            const availableActions = getAvailableActions(reservation.status);
+                            const availableActions = getAvailableActions(reservation.status as StatusCode);
+                            const statusCode = reservation.status as StatusCode;
 
                             return (
                                 <TableRow
@@ -269,8 +301,10 @@ const HistoryBooking = ({ title, data }: Props) => {
 
                                     <TableCell>
                                         <div className="flex gap-2 items-center">
-                                            <span className={`${getStatusColor(reservation.status)} h-2 w-2 rounded-full`} />
-                                            <span>{getStatusLabel(reservation.status)}</span>
+                                            <span className={`${getStatusColor(statusCode)} h-2.5 w-2.5 rounded-full`} />
+                                            <span className={`${getTitleColor(statusCode)} text-gray-300 font-medium`}>
+                                                {getStatusLabel(statusCode)}
+                                            </span>
                                         </div>
                                     </TableCell>
 
@@ -323,14 +357,14 @@ const HistoryBooking = ({ title, data }: Props) => {
                                                     </DropdownMenuTrigger>
                                                     <DropdownMenuContent align="end">
                                                         {availableActions.map((action) => {
-                                                            const Icon = action.icon;
                                                             return (
                                                                 <DropdownMenuItem
                                                                     key={action.key}
-                                                                    className="cursor-pointer"
+                                                                    title={action.label}
                                                                     onClick={() => handleActionClick(action.key as any, reservation)}
+                                                                    className={`w-full ${action.color}`}
                                                                 >
-                                                                    <Icon className={`mr-2 h-4 w-4 ${action.color}`} />
+                                                                    <action.Icon className={action.color} />
                                                                     <span>{action.label}</span>
                                                                 </DropdownMenuItem>
                                                             );

@@ -57,9 +57,9 @@ const Header = () => {
     return <Loading />;
   }
 
-  if (userData.isError || bookingsQuery.isError) {
-    return <Error />;
-  }
+  // if (userData.isError || bookingsQuery.isError) {
+  //   return <Error />;
+  // }
 
   const pendingBookings =
     bookingsQuery.data?.filter((booking) => booking.status === "Pending") || [];
