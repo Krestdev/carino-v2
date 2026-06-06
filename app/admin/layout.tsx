@@ -41,9 +41,12 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
             <div className="p-6 border-b border-gray-200">
                 <div className="flex items-center justify-between">
                     <div>
-                        <h2 className="text-2xl font-bold text-primary">
-                            Dashboard
-                        </h2>
+                        <div className="flex items-center gap-2">
+                            <img src="/Logo.svg" alt="Logo" className="w-10 h-10 object-contain rounded-full" />
+                            <h2 className="text-2xl font-bold text-primary">
+                                Dashboard
+                            </h2>
+                        </div>
                         <p className="text-sm text-gray-500 mt-2">
                             {user?.role === "ADMIN" ? "Administrateur" : user?.role === "MANAGER" ? "Manager" : "Serveur"}
                         </p>
