@@ -22,6 +22,7 @@ import {
     SelectTrigger,
     SelectValue
 } from "@/components/ui/select";
+import useStore from "@/context/store";
 
 interface FilterState {
     status: string;
@@ -31,11 +32,14 @@ interface FilterState {
 }
 
 const AdminPage = () => {
+
+    const { user } = useStore();
     const router = useRouter();
     const reservation = new ReservationQuery();
     const reservationData = useQuery({
         queryKey: ["reservations"],
         queryFn: () => reservation.getReservations().then((res) => res.items),
+        enabled: user?.role === "ADMIN" || user?.role === "MANAGER"
     });
 
     const [filters, setFilters] = useState<FilterState>({
@@ -77,6 +81,11 @@ const AdminPage = () => {
             rejected: data.filter(item => item.status === "Rejected").length,
         };
     }, [reservationData.data]);
+
+    if (user?.role === "WAITER") {
+        router.push("/admin/utilisateurs");
+        return null;
+    }
 
     if (reservationData.isLoading) return <Loading />
     if (reservationData.isError) {

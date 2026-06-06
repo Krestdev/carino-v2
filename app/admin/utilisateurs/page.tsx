@@ -45,6 +45,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import UserQuery from "@/queries/userQueries";
 import Loading from "@/app/loading";
 import { Button } from "@/components/ui/button";
+import useStore from "@/context/store";
 
 interface FilterState {
     role: string;
@@ -53,6 +54,7 @@ interface FilterState {
 }
 
 const UsersPage = () => {
+    const { user } = useStore();
     const router = useRouter();
     const userQuery = new UserQuery();
     const usersData = useQuery({
@@ -86,6 +88,19 @@ const UsersPage = () => {
             filtered = filtered.filter(user => user.vip === (filters.vip === "vip"));
         }
 
+        // Affichage en fonction du role
+        if (user?.role === "WAITER") {
+            filtered = filtered.filter(user => user.role === "USER");
+        }
+
+        if (user?.role === "MANAGER") {
+            filtered = filtered.filter(user => user.role === "WAITER" || user.role === "USER");
+        }
+
+        if (user?.role === "ADMIN") {
+            filtered = filtered;
+        }
+
         // Filtre par recherche (nom, email, téléphone)
         if (filters.searchTerm) {
             const search = filters.searchTerm.toLowerCase();
@@ -111,7 +126,7 @@ const UsersPage = () => {
 
     // Statistiques
     const statistics = useMemo(() => {
-        if (!usersData.data) return {
+        if (!filteredData) return {
             total: 0,
             admins: 0,
             managers: 0,
@@ -121,7 +136,7 @@ const UsersPage = () => {
             totalOrders: 0,
         };
 
-        const data = usersData.data;
+        const data = filteredData;
         return {
             total: data.length,
             admins: data.filter(user => user.role === "ADMIN").length,
@@ -176,7 +191,7 @@ const UsersPage = () => {
     return (
         <div className="min-h-screen bg-linear-to-br from-background via-background to-muted/20">
             {/* Header */}
-            <div className="sticky top-0 z-10 backdrop-blur-xl bg-background/80 border-b border-border/50">
+            <div className="top-0 z-10 backdrop-blur-xl bg-background/80 border-b border-border/50">
                 <div className="container mx-auto px-4 py-6">
                     <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                         <div>
@@ -187,7 +202,7 @@ const UsersPage = () => {
                                 Gérez et suivez tous les utilisateurs de votre plateforme
                             </p>
                         </div>
-                        <Badge variant={"secondary"} className="px-4 py-2">
+                        <Badge variant={"secondary"} className="px-4 py-2 text-white">
                             <TrendingUp className="w-4 h-4 mr-2" />
                             {statistics.total} utilisateurs actifs
                         </Badge>
@@ -195,7 +210,7 @@ const UsersPage = () => {
                 </div>
             </div>
 
-            <div className="container mx-auto px-4 py-8">
+            <div className="container mx-auto px-4 py-8 pb-10">
                 {/* Section des filtres */}
                 <div className="flex flex-col md:flex-row items-center gap-4 pt-4 pb-8">
                     <div className="max-w-90 w-full">

@@ -81,7 +81,7 @@ const Header = () => {
     <div className="md:flex sticky top-0 z-50 flex flex-row items-center gap-6 h-20 bg-primary">
       <div className="hidden md:flex flex-row gap-3 items-center justify-end w-full">
         {/* Section Admin - uniquement pour les admins */}
-        {(user?.role === "ADMIN" || user?.role === "MANAGER") && (
+        {(user?.role === "ADMIN" || user?.role === "MANAGER" || user?.role === "WAITER") && (
           <Link
             href={"/admin"}
             className={cn(
@@ -283,7 +283,7 @@ const Header = () => {
                   </Button>
                 ))}
                 {/* Ajout du lien Admin dans le drawer pour les admins */}
-                {(user?.role === "ADMIN" || user?.role === "MANAGER") && (
+                {(user?.role === "ADMIN" || user?.role === "MANAGER" || user?.role === "WAITER") && (
                   <DrawerClose>
                     <Link
                       href={"/admin"}

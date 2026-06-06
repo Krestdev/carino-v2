@@ -19,44 +19,37 @@ import Snowfall from "@/components/snowfall";
 import { UseOnTheme } from "@/hooks/useOnTheme";
 import Auth from "./Auth";
 import { ToastContainer } from "react-toastify";
-import { RouteGuard } from "@/providers/RouteGuard";
-import Pupop from "@/components/universal/pupop";
-import Pop from "@/components/universal/Pop";
+import { RouteGuard } from "@/providers/RouteGuard"; // Import du nouveau composant
+import LayoutWrapper from "@/components/LayoutWrapper";
 
-// Police principale
+// Polices (reste identique)
 const openSans = Open_Sans({
   subsets: ["latin"],
   weight: ["400", "700"],
   variable: "--font-open-sans",
 });
 
-// Police secondaire
 const oleo = Oleo_Script_Swash_Caps({
   subsets: ["latin"],
   weight: ["400", "700"],
   variable: "--font-oleo",
 });
 
-// Police pour les titres
 const playfair = Playfair_Display({
   subsets: ["latin"],
   variable: "--font-playfair",
 });
 
-// Police pour les petits titres
 const generalSansVariable = Plus_Jakarta_Sans({
   subsets: ["latin"],
   variable: "--font-general-sans",
 });
 
-// Méta-données
 export const metadata: Metadata = {
   title: `${config.siteName} - Commandez vos plats préférés Pizzas, burgers, glaces et bien d'autres`,
-  description:
-    "Commandez vos plats préférés du restaurant le Carino et faites-vous livrer directement chez vous. Burgers, pizzas, glaces et bien d'autres sont disponibles, il ne vous reste qu'à choisir !",
+  description: "Commandez vos plats préférés du restaurant le Carino et faites-vous livrer directement chez vous. Burgers, pizzas, glaces et bien d'autres sont disponibles, il ne vous reste qu'à choisir !",
 };
 
-// Layout principal
 export default function RootLayout({
   children,
 }: {
@@ -80,16 +73,18 @@ export default function RootLayout({
               <UseOnTheme selectedTheme="christmas">
                 <Snowfall />
               </UseOnTheme>
-              <Header />
-              <RouteGuard>
-                <main>{children}</main>
-              </RouteGuard>
+
+              {/* Utilisation du wrapper client */}
+              <LayoutWrapper>
+                <RouteGuard>
+                  <main>{children}</main>
+                </RouteGuard>
+              </LayoutWrapper>
+
               <Transaction />
               <Auth />
-              <Footer />
               <Toaster />
               <ToastContainer />
-              {/* <Pop /> */}
             </QueryProvider>
           </AppProvider>
         </ThemeProvider>
