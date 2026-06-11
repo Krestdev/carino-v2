@@ -81,7 +81,7 @@ export default function Home() {
         <Suggestion products={dailyProducts} options={safeOptions} />
       )}
       <About />
-      <Promo />
+      {/* <Promo /> */}
       <Galerie />
       <Reviews />
       <CallToAct />
