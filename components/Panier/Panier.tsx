@@ -95,7 +95,7 @@ const Panier = () => {
           />
         )}
       </div>
-      <div className="flex flex-col justify-center gap-1 w-full">
+      <div className="flex flex-col gap-1 w-full">
         <div className="border border-gray-200 rounded-2xl p-4 shadow-md max-w-90 w-full mx-auto">
           <CartItems products={produits} items={cart} options={safeOptions} showTotal={false} isCart={true} width="max-w-[300px] w-full" />
           {/* <div className="flex flex-col mt-3">

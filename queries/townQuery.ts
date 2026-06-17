@@ -1,6 +1,5 @@
 import AxiosConfig from "@/providers/axios";
-import api from "@/providers/axios";
-import { AddressResponse, AddressData } from "@/types/types";
+import { AddressData } from "@/types/types";
 import { AxiosInstance } from "axios";
 
 export default class TownQuery {
