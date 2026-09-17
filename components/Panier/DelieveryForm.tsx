@@ -8,11 +8,13 @@ import TownQuery from "@/queries/townQuery";
 import UserQuery from "@/queries/userQueries";
 import {
   AddressData,
+  AuthUser,
   cartItem,
   City,
   deliveryMode,
   Order,
   OrderTypeProps,
+  ReceiptProps,
   Retry,
 } from "@/types/types";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -51,6 +53,13 @@ import { toast } from "../ui/use-toast";
 import NewTag from "../newTag";
 import PaiementStatus, { PaymentStatus } from "./PaiementStatus";
 import ProductQuery from "@/queries/productQuery";
+import GuestCheckoutChoiceDialog from "./GuestCheckoutChoiceDialog";
+import LoginDialog from "../Authentification/LoginDialog";
+import {
+  extractPaymentStatus,
+  extractVendorReference,
+  resolveOrderCreationOutcome,
+} from "@/lib/orderPayment";
 
 interface DelieveryProps {
   deliveryMode: deliveryMode;
@@ -58,6 +67,7 @@ interface DelieveryProps {
 }
 
 const formSchema = z.object({
+  name: z.string().optional(),
   locality: z.string().min(3, { message: "Entrez une adresse valide" }),
   district: z.string().min(3, { message: "Selectionnez un quartier" }),
   phoneNumber: z.string().refine((value) => /^\d{9}$/.test(value), {
@@ -151,6 +161,7 @@ const DelieveryForm = ({
     resolver: zodResolver(formSchema),
     defaultValues: {
       // city: "yaounde",
+      name: "",
       locality: "",
       district: "",
       phoneNumber:
@@ -165,136 +176,21 @@ const DelieveryForm = ({
   });
 
   const userQuery = new UserQuery();
+  const setOpenLogSign = useStore((s) => s.setOpenLogSign);
 
-  const findFirstValueByKeys = (
-    payload: unknown,
-    candidateKeys: string[]
-  ): string | null => {
-    if (!payload || typeof payload !== "object") return null;
+  // ── Checkout invité : commande en attente pendant le choix connexion/invité ──
+  const [pendingOrder, setPendingOrder] = useState<Order | null>(null);
+  const [pendingReceipt, setPendingReceipt] = useState<ReceiptProps | null>(null);
+  const [showGuestChoice, setShowGuestChoice] = useState(false);
+  const [showGuestLogin, setShowGuestLogin] = useState(false);
 
-    const normalized = new Set(candidateKeys.map((k) => k.toLowerCase()));
-    const queue: unknown[] = [payload];
-    const visited = new Set<unknown>();
-
-    while (queue.length > 0) {
-      const current = queue.shift();
-      if (!current || typeof current !== "object" || visited.has(current)) {
-        continue;
-      }
-      visited.add(current);
-
-      if (Array.isArray(current)) {
-        for (const item of current) queue.push(item);
-        continue;
-      }
-
-      for (const [key, value] of Object.entries(
-        current as Record<string, unknown>
-      )) {
-        if (normalized.has(key.toLowerCase())) {
-          if (typeof value === "string" && value.trim()) {
-            return value;
-          }
-          if (typeof value === "number" && Number.isFinite(value)) {
-            return String(value);
-          }
-        }
-
-        if (value && typeof value === "object") {
-          queue.push(value);
-        }
-      }
-    }
-
-    return null;
-  };
-
-  const extractVendorReference = (payload: any): string | null => {
-    const extractedRef =
-      payload?.vendor_reference ??
-      payload?.ref ??
-      payload?.reference ??
-      payload?.payment?.vendor_reference ??
-      payload?.payment?.ref ??
-      payload?.payment?.reference ??
-      payload?.vendorReference ??
-      payload?.transaction_ref ??
-      payload?.transactionRef ??
-      payload?.data?.vendor_reference ??
-      payload?.data?.ref ??
-      payload?.data?.reference ??
-      payload?.data?.payment?.vendor_reference ??
-      payload?.data?.payment?.ref ??
-      payload?.data?.payment?.reference ??
-      payload?.data?.vendorReference ??
-      payload?.data?.transaction_ref ??
-      payload?.data?.transactionRef ??
-      payload?.data?.[0]?.vendor_reference ??
-      payload?.data?.[0]?.ref ??
-      payload?.data?.[0]?.reference ??
-      payload?.data?.[0]?.payment?.vendor_reference ??
-      payload?.data?.[0]?.payment?.ref ??
-      payload?.data?.[0]?.payment?.reference ??
-      payload?.data?.[0]?.vendorReference ??
-      payload?.data?.[0]?.transaction_ref ??
-      payload?.data?.[0]?.transactionRef ??
-      findFirstValueByKeys(payload, [
-        "vendor_reference",
-        "vendorReference",
-        "transaction_ref",
-        "transactionRef",
-        "payment_reference",
-        "paymentReference",
-        "ref",
-        "reference",
-      ]);
-
-    const normalizedRef =
-      extractedRef === null || extractedRef === undefined
-        ? null
-        : String(extractedRef).trim() || null;
-
-    return normalizedRef;
-  };
-
-  const extractPaymentStatus = (
-    payload: any
-  ): "SUCCESS" | "FAILED" | "PENDING" | null => {
-    const rawStatus =
-      payload?.status ??
-      payload?.payment_status ??
-      payload?.paymentStatus ??
-      payload?.transaction_status ??
-      payload?.transactionStatus ??
-      payload?.data?.status ??
-      payload?.data?.payment_status ??
-      payload?.data?.paymentStatus ??
-      payload?.data?.transaction_status ??
-      payload?.data?.transactionStatus ??
-      payload?.data?.[0]?.status ??
-      payload?.data?.[0]?.payment_status ??
-      payload?.data?.[0]?.paymentStatus ??
-      payload?.data?.[0]?.transaction_status ??
-      payload?.data?.[0]?.transactionStatus ??
-      findFirstValueByKeys(payload, [
-        "status",
-        "payment_status",
-        "paymentStatus",
-        "transaction_status",
-        "transactionStatus",
-      ]);
-    if (!rawStatus) return null;
-
-    const normalizedStatus = String(rawStatus).toUpperCase();
-    const parsedStatus = normalizedStatus.includes("SUCCESS")
-      ? "SUCCESS"
-      : normalizedStatus.includes("FAILED") ||
-        normalizedStatus.includes("NOT_FOUND")
-        ? "FAILED"
-        : "PENDING";
-
-    return parsedStatus;
-  };
+  // Marque le paiement réussi : point d'entrée unique pour vider le panier,
+  // afin qu'aucun des chemins de succès (résolution immédiate, polling, retry)
+  // n'oublie de le faire.
+  function markPaymentSuccess() {
+    setPaymentStatus("SUCCESS");
+    emptyCart();
+  }
 
   // Check payment status
   const checkPaymentStatus = useMutation({
@@ -302,7 +198,7 @@ const DelieveryForm = ({
     onSuccess: (data) => {
       const status = extractPaymentStatus(data);
       if (status === "SUCCESS") {
-        setPaymentStatus("SUCCESS");
+        markPaymentSuccess();
       } else if (status === "FAILED") {
         setPaymentStatus("FAILED");
         setSourceError("payment");
@@ -331,36 +227,63 @@ const DelieveryForm = ({
     },
   });
 
-  const postOrder = useMutation({
-    mutationFn: async (data: Order) => userQuery.createOrder(data),
-    onMutate: () => {
-      setPaymentStatus("PENDING");
-    },
-    onSuccess: (data) => {
-      const payload = data as any;
-      const orderUuid =
-        payload?.order?.uuid ?? payload?.data?.uuid ?? payload?.uuid;
-      if (orderUuid) {
-        setRetryData({
-          orderUuid,
-          phone: form.getValues().phoneNumber,
-          network: form.getValues().operator,
-        });
-      }
-      const vendorReference = extractVendorReference(data);
+  // Gère la réponse de création de commande (invité ou connecté) : partagé
+  // par postOrder et guestPostOrder pour que les deux flows restent alignés.
+  function handleOrderCreated(data: unknown) {
+    const payload = data as any;
+    const orderUuid =
+      payload?.order?.uuid ?? payload?.data?.uuid ?? payload?.uuid;
+    if (orderUuid) {
+      setRetryData({
+        orderUuid,
+        phone: form.getValues().phoneNumber,
+        network: form.getValues().operator,
+      });
+    }
+
+    const { outcome, vendorReference } = resolveOrderCreationOutcome(payload);
+
+    if (outcome === "SUCCESS") {
+      markPaymentSuccess();
+      return;
+    }
+
+    if (outcome === "FAILED") {
+      setPaymentStatus("FAILED");
+      setSourceError(vendorReference ? "payment" : "order");
       if (!vendorReference) {
-        setPaymentStatus("FAILED");
         toast({
           title: "Référence de transaction introuvable",
           description:
             "La commande a été enregistrée, mais le suivi du paiement n'a pas pu démarrer.",
           variant: "destructive",
         });
-        return;
       }
-      checkPaymentStatus.mutate(vendorReference);
+      return;
+    }
+
+    checkPaymentStatus.mutate(vendorReference!);
+  }
+
+  const postOrder = useMutation({
+    mutationFn: async (data: Order) => userQuery.createOrder(data),
+    onMutate: () => {
+      setPaymentStatus("PENDING");
     },
-    onError: (error) => {
+    onSuccess: handleOrderCreated,
+    onError: () => {
+      setPaymentStatus("FAILED");
+      setSourceError("order");
+    },
+  });
+
+  const guestPostOrder = useMutation({
+    mutationFn: async (data: Order) => userQuery.createGuestOrder(data),
+    onMutate: () => {
+      setPaymentStatus("PENDING");
+    },
+    onSuccess: handleOrderCreated,
+    onError: () => {
       setPaymentStatus("FAILED");
       setSourceError("order");
     },
@@ -380,7 +303,7 @@ const DelieveryForm = ({
 
       const status = extractPaymentStatus(data);
       if (status === "SUCCESS") {
-        setPaymentStatus("SUCCESS");
+        markPaymentSuccess();
       } else if (status === "FAILED") {
         setPaymentStatus("FAILED");
       }
@@ -405,85 +328,122 @@ const DelieveryForm = ({
     );
     setFees(ApplyDeliveryPromo(realFees, values.district, cart));
 
-    if (user !== null) {
-      if (isDeliveryOpen(values.time)) {
-        const address = addresses.find((x) => x.quartier === values.district);
-        postOrder.mutate({
-          payment: {
-            network: values.operator,
-            phone: values.phoneNumber,
-          },
-          total:
-            CartTotal(cart) +
-            ApplyDeliveryPromo(realFees, values.district, cart),
-          first_name: user.name,
-          address: {
-            ville_id: address?.id!,
-            street: values.locality,
-            phone: values.deliveryNumber,
-          },
-          items: [...cart.map((item) => ({
-            item_id: Number(item.id),
-            quantity: item.quantity,
-            price: item.price,
-            type: "dish",
-            name: item.name,
-            modifiers: item.options && item.options.length > 0 ? item.options.map((optionGroup) => ({
-              name: optionGroup.name,
-              id_zelty: optionGroup.id_zelty,
-              details: optionGroup.details.map((detail) => ({
-                id: detail.id,
-                name: detail.name,
-                qte: detail.qte,
-                price: detail.price,
-              })),
-            })) : [],
-          })), ...productZone ? [{
-            item_id: Number(productZone.id),
-            quantity: 1,
-            name: productZone.name,
-            price: productZone.price,
-            type: "dish",
-            modifiers: [],
-          }] : []],
-          due_date: dueDate.toISOString(),
-          mode: deliveryMode,
-        });
-        setReceiptData({
-          fees: ApplyDeliveryPromo(realFees, values.district, cart),
-          commande: cart,
-          client_name: user.name,
-          loyalty: user.loyalty,
-          Address: {
-            name: values.district,
-            street: values.locality.concat(" - ", values.deliveryNumber),
-            zip_code: "237",
-            city: "yaounde",
-          },
-          client_mail: user.email,
-        });
-      } else {
-        toast({
-          title: "Livraison fermée.",
-          description:
-            "La livraison est disponible uniquement entre 10h30 et 20h30.",
-          variant: "info",
-        });
-      }
-    } else {
+    if (!isDeliveryOpen(values.time)) {
       toast({
-        title: "Connectez-vous pour terminer l'opération",
+        title: "Livraison fermée.",
         description:
-          "Pour finaliser votre commande vous devez avoir un compte et être connecté sur notre plateforme.",
-        variant: "destructive",
+          "La livraison est disponible uniquement entre 10h30 et 20h30.",
+        variant: "info",
+      });
+      return;
+    }
+
+    const address = addresses.find((x) => x.quartier === values.district);
+    const clientName = user ? user.name : values.name?.trim() || "Client";
+
+    const orderPayload: Order = {
+      payment: {
+        network: values.operator,
+        phone: values.phoneNumber,
+      },
+      total:
+        CartTotal(cart) +
+        ApplyDeliveryPromo(realFees, values.district, cart),
+      first_name: clientName,
+      address: {
+        ville_id: address?.id!,
+        street: values.locality,
+        phone: values.deliveryNumber,
+      },
+      items: [...cart.map((item) => ({
+        item_id: Number(item.id),
+        quantity: item.quantity,
+        price: item.price,
+        type: "dish",
+        name: item.name,
+        modifiers: item.options && item.options.length > 0 ? item.options.map((optionGroup) => ({
+          name: optionGroup.name,
+          id_zelty: optionGroup.id_zelty,
+          details: optionGroup.details.map((detail) => ({
+            id: detail.id,
+            name: detail.name,
+            qte: detail.qte,
+            price: detail.price,
+          })),
+        })) : [],
+      })), ...productZone ? [{
+        item_id: Number(productZone.id),
+        quantity: 1,
+        name: productZone.name,
+        price: productZone.price,
+        type: "dish",
+        modifiers: [],
+      }] : []],
+      due_date: dueDate.toISOString(),
+      mode: deliveryMode,
+    };
+
+    const receipt: ReceiptProps = {
+      fees: ApplyDeliveryPromo(realFees, values.district, cart),
+      commande: cart,
+      client_name: clientName,
+      loyalty: user?.loyalty ?? 0,
+      Address: {
+        name: values.district,
+        street: values.locality.concat(" - ", values.deliveryNumber),
+        zip_code: "237",
+        city: "yaounde",
+      },
+      client_mail: user?.email ?? "",
+    };
+
+    if (user) {
+      setReceiptData(receipt);
+      postOrder.mutate(orderPayload);
+    } else {
+      // Ne rien soumettre tout de suite : on garde la commande en attente
+      // pendant que l'utilisateur choisit de se connecter ou de continuer sans compte.
+      setPendingOrder(orderPayload);
+      setPendingReceipt(receipt);
+      setShowGuestChoice(true);
+    }
+  }
+
+  function handleContinueAsGuest() {
+    setShowGuestChoice(false);
+    if (!pendingOrder) return;
+    if (pendingReceipt) setReceiptData(pendingReceipt);
+    guestPostOrder.mutate(pendingOrder);
+    setPendingOrder(null);
+    setPendingReceipt(null);
+  }
+
+  function handleChooseLogin() {
+    setShowGuestChoice(false);
+    setShowGuestLogin(true);
+  }
+
+  function handleGuestLoginSuccess(loggedInUser: AuthUser) {
+    setShowGuestLogin(false);
+    if (!pendingOrder) return;
+    const finalOrder: Order = { ...pendingOrder, first_name: loggedInUser.name };
+    if (pendingReceipt) {
+      setReceiptData({
+        ...pendingReceipt,
+        client_name: loggedInUser.name,
+        loyalty: loggedInUser.loyalty,
+        client_mail: loggedInUser.email,
       });
     }
+    postOrder.mutate(finalOrder);
+    setPendingOrder(null);
+    setPendingReceipt(null);
   }
 
   // Sync postOrder pending state with parent
   useEffect(() => {
-    setPostOrderStatus(postOrder.isPending);
-  }, [postOrder.isPending, setPostOrderStatus]);
+    setPostOrderStatus(postOrder.isPending || guestPostOrder.isPending);
+  }, [postOrder.isPending, guestPostOrder.isPending, setPostOrderStatus]);
 
   function isDisable() {
     return (
@@ -491,6 +451,7 @@ const DelieveryForm = ({
       CartTotal(cart) + fees <
       Number(process.env.NEXT_PUBLIC_MINIMUM_AMOUNT || 4999) ||
       postOrder.isPending ||
+      guestPostOrder.isPending ||
       !!transactionRef
     );
   }
@@ -498,7 +459,6 @@ const DelieveryForm = ({
   // ── Handlers for PaiementStatus ──
   function handleCloseStatus() {
     if (paymentStatus === "SUCCESS") {
-      emptyCart();
       router.push("/historique");
     } else {
       setPaymentStatus(null);
@@ -632,6 +592,27 @@ const DelieveryForm = ({
               )}
             />
 
+            {/* Nom - uniquement pour les invités */}
+            {!user && (
+              <FormField
+                control={form.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem className="flex flex-col gap-1 w-full">
+                    <FormLabel className="customFormLabel text-[12px] md:text-[14px]">Nom (facultatif)</FormLabel>
+                    <FormControl>
+                      <Input
+                        {...field}
+                        className="w-full"
+                        placeholder="ex. Jean Dupont"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            )}
+
             {/* Heure */}
             <FormField
               control={form.control}
@@ -739,6 +720,26 @@ const DelieveryForm = ({
         onRetry={handleRetry}
         sourceError={sourceError}
         retryPayment={retryPayment}
+      />
+
+      {/* ── Checkout invité : choix connexion / continuer sans compte ── */}
+      <GuestCheckoutChoiceDialog
+        open={showGuestChoice}
+        onOpenChange={setShowGuestChoice}
+        onChooseLogin={handleChooseLogin}
+        onContinueAsGuest={handleContinueAsGuest}
+      />
+
+      {/* ── Connexion en surcouche, sans perdre le formulaire rempli ── */}
+      <LoginDialog
+        open={showGuestLogin}
+        onOpenChange={setShowGuestLogin}
+        setOpenLogSign={setOpenLogSign}
+        setOpenSignup={(open) => {
+          if (open) setOpenLogSign(true);
+        }}
+        skipRedirect
+        onSuccess={handleGuestLoginSuccess}
       />
     </div>
   );

@@ -72,9 +72,7 @@ const Header = () => {
       ? { icon: CircleUser, name: "Profil", href: "/profil" }
       : { icon: CircleUser, name: "Se connecter", href: "#" },
     { icon: History, name: "Historique", href: "/historique" },
-    !!token
-      ? { icon: ShoppingCart, name: "Panier", href: "/panier" }
-      : { icon: ShoppingCart, name: "Panier", href: "#" },
+    { icon: ShoppingCart, name: "Panier", href: "/panier" },
   ];
 
   return (
@@ -169,7 +167,7 @@ const Header = () => {
           </Link>
         )}
 
-        {user ? <Link
+        <Link
           href={"/panier"}
           className={cn(
             "h-10 w-fit flex px-3 py-1 text-white relative",
@@ -186,27 +184,7 @@ const Header = () => {
               {cart.length}
             </span>
           )}
-        </Link> :
-          <Link
-            href={"#"}
-            onClick={() => setOpenLogSign(true)}
-            className={cn(
-              "h-10 w-fit flex px-3 py-1 text-white relative",
-              path === "/connexion" && "text-[#FFC336]",
-            )}
-          >
-            <span
-              className={cn("text-white", path === "/panier" && "text-[#FFC336]")}
-            >
-              {"Panier"}
-            </span>
-            {cart.length > 0 && (
-              <span className="absolute -top-2 left-[70%] text-[12px] h-4 w-4 rounded-[2px] bg-[#FFC336] text-black font-medium leading-[100%] tracking-[0%] flex items-center justify-center">
-                {cart.length}
-              </span>
-            )}
-          </Link>
-        }
+        </Link>
         {/* Je vais afficher les point de fidélité bien stylé */}
         {token && (
           <div className="flex items-center gap-2 cursor-pointer group">
@@ -269,13 +247,11 @@ const Header = () => {
                     )}
                     onClick={() => {
                       setOpen(false);
-                      link.name === "Panier" && !token
-                        ? setOpenLogSign(true)
-                        : router.push(link.href);
                       if (link.name === "Se connecter") {
                         setOpenLogSign(true);
+                      } else {
+                        router.push(link.href);
                       }
-
                     }}
                   >
                     <link.icon className="h-4! w-4!" />

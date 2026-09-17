@@ -1,6 +1,10 @@
 import AxiosConfig from "@/providers/axios";
 import { checkTransactionStatus, MyOrdersResponse, Order, OrdersData, Retry, User, UserLogin, UserOrdersResponse, UserRegistration } from "@/types/types";
-import { AxiosInstance } from "axios";
+import { AxiosInstance, AxiosRequestConfig } from "axios";
+
+// Token statique partagé (identique pour les commandes invité et connectées,
+// ce n'est pas un identifiant de session) attendu par les endpoints de commande.
+const ORDER_API_STATIC_TOKEN = process.env.NEXT_PUBLIC_ORDER_STATIC_TOKEN || "";
 
 export default class UserQuery {
   route = "/auth";
@@ -11,6 +15,12 @@ export default class UserQuery {
   constructor() {
     this.api = new AxiosConfig(true).api;
   }
+
+  // Injecté ici pour que createOrder et createGuestOrder l'incluent
+  // automatiquement, sans dupliquer ce header chez chaque appelant.
+  private orderRequestConfig = (): AxiosRequestConfig => ({
+    headers: { "X-Api-Key": ORDER_API_STATIC_TOKEN },
+  });
 
   login = async (data: any): Promise<any> => {
     return this.api.post(`${this.route}/login`, data).then((res) => res.data);
@@ -48,7 +58,15 @@ export default class UserQuery {
   };
 
   createOrder = async (data: Order): Promise<{ order: OrdersData, payment: { status: string, vendor_reference: string } }> => {
-    return this.api.post(`${this.route1}`, data).then((res) => res.data);
+    return this.api.post(`${this.route1}`, data, this.orderRequestConfig()).then((res) => res.data);
+  };
+
+  // Commande sans compte : même payload que createOrder, route dédiée aux invités.
+  // Le DTO /orders/guest exige en plus un `phone` racine ; on le dérive ici du
+  // téléphone de paiement pour ne pas alourdir le payload construit par les formulaires.
+  createGuestOrder = async (data: Order): Promise<{ order: OrdersData, payment: { status: string, vendor_reference: string } }> => {
+    const guestPayload: Order = { ...data, phone: data.phone ?? data.payment.phone };
+    return this.api.post(`${this.route1}/guest`, guestPayload, this.orderRequestConfig()).then((res) => res.data);
   };
 
   updateOrder = async (id: number, data: Partial<Order>): Promise<UserOrdersResponse> => {

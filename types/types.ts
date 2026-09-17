@@ -559,6 +559,9 @@ export type Retry = {
 export type Order = {
   total: number;
   first_name: string;
+  // Requis par le DTO de /orders/guest uniquement ; injecté par
+  // UserQuery.createGuestOrder, jamais construit par les formulaires.
+  phone?: string;
   address?: {
     ville_id: number;
     street: string;

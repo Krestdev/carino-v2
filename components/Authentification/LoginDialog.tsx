@@ -30,6 +30,7 @@ import { ArrowLeft, Eye, EyeOff, LogIn } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { jwtDecode } from "jwt-decode";
+import { AuthUser } from "@/types/types";
 
 const formSchema = z.object({
   email: z.string().email("Adresse mail invalide"),
@@ -51,6 +52,10 @@ interface LoginDialogProps {
   onOpenChange: (open: boolean) => void;
   setOpenLogSign: (open: boolean) => void;
   setOpenSignup: (open: boolean) => void;
+  // Permet de sauter la redirection habituelle après connexion (ex. quand
+  // ce dialogue est ouvert par-dessus un autre flow, comme le checkout invité).
+  skipRedirect?: boolean;
+  onSuccess?: (user: AuthUser, token: string) => void;
 }
 
 const LoginDialog = ({
@@ -58,6 +63,8 @@ const LoginDialog = ({
   onOpenChange,
   setOpenLogSign,
   setOpenSignup,
+  skipRedirect = false,
+  onSuccess,
 }: LoginDialogProps) => {
   const [errorValue, setErrorValue] = useState<string>();
   const [showPassword, setShowPassword] = useState(false);
@@ -122,7 +129,7 @@ const LoginDialog = ({
         const isAdmin = user.role === "MANAGER" || user.role === "ADMIN";
         const require_password_change = user.require_password_change === false;
 
-        // if (isAdmin && require_password_change) {
+        // if (!skipRedirect && isAdmin && require_password_change) {
         //   // Rediriger vers la page edit-password
         //   toast.info("Veuillez changer votre mot de passe avant de continuer");
         //   router.push("/edit-password");
@@ -132,6 +139,7 @@ const LoginDialog = ({
 
         toast.success(`Bienvenue ${user.name}`);
         onOpenChange(false);
+        onSuccess?.(user, data.access_token);
       } catch (error) {
         console.error("Erreur lors du traitement du profil:", error);
         setErrorValue("Erreur lors de la récupération de votre profil");
