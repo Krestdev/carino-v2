@@ -41,7 +41,7 @@ const GuestCheckoutChoiceDialog = ({
             onClick={onContinueAsGuest}
           >
             <UserRound className="w-4 h-4 mr-2" />
-            Continuer sans compte
+            Commander sans compte
           </Button>
           <Button className="flex-1" onClick={onChooseLogin}>
             <LogIn className="w-4 h-4 mr-2" />
