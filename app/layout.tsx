@@ -6,6 +6,7 @@ import {
   Plus_Jakarta_Sans,
 } from "next/font/google";
 import "./globals.css";
+import { GoogleAnalytics } from "@next/third-parties/google";
 import { config } from "../data/config";
 import Footer from "../components/footer";
 import Header from "../components/header";
@@ -89,6 +90,8 @@ export default function RootLayout({
           </AppProvider>
         </ThemeProvider>
       </body>
+      {/* Google Analytics : actif seulement si NEXT_PUBLIC_GA_ID est défini au build */}
+      {process.env.NEXT_PUBLIC_GA_ID && <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID} />}
     </html>
   );
 }
