@@ -1,5 +1,5 @@
 import AxiosConfig from "@/providers/axios";
-import { checkTransactionStatus, MyOrdersResponse, Order, OrdersData, Retry, User, UserLogin, UserOrdersResponse, UserRegistration } from "@/types/types";
+import { AdminOrdersResponse, checkTransactionStatus, MyOrdersResponse, Order, OrdersData, Retry, User, UserLogin, UserOrdersResponse, UserRegistration } from "@/types/types";
 import { AxiosInstance, AxiosRequestConfig } from "axios";
 
 // Token statique partagé (identique pour les commandes invité et connectées,
@@ -55,6 +55,18 @@ export default class UserQuery {
   };
   getOne = async (id: string): Promise<MyOrdersResponse> => {
     return this.api.get(`${this.route1}/${id}`).then((res) => res.data);
+  };
+
+  // Admin uniquement : toutes les commandes (paginées)
+  getAllOrders = async (page: string, limit: string): Promise<AdminOrdersResponse> => {
+    return this.api
+      .get(`${this.route1}/admin/all`, { params: { page, limit } })
+      .then((res) => res.data);
+  };
+
+  // Admin uniquement : renvoie à Zelty une commande dont la synchro a échoué (statut SYNC_FAILED)
+  retryZeltySync = async (uuid: string): Promise<unknown> => {
+    return this.api.post(`${this.route1}/${uuid}/retry-zelty`).then((res) => res.data);
   };
 
   createOrder = async (data: Order): Promise<{ order: OrdersData, payment: { status: string, vendor_reference: string } }> => {

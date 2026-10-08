@@ -9,12 +9,8 @@ import { useRouter } from "next/navigation";
 import { AxiosError } from "axios";
 import Head from "@/components/universal/Head";
 import { useState, useMemo } from "react";
-import {
-    Card,
-    CardContent,
-    CardHeader,
-    CardTitle
-} from "@/components/ui/card";
+import StatCards, { type StatCardItem } from "@/components/admin/StatCards";
+import { CalendarDays, CheckCircle, Clock, XCircle } from "lucide-react";
 import {
     Select,
     SelectContent,
@@ -23,6 +19,7 @@ import {
     SelectValue
 } from "@/components/ui/select";
 import useStore from "@/context/store";
+import { normalizeReservationStatus, RESERVATION_STATUSES, reservationStatusLabel } from "@/lib/reservation-status";
 
 interface FilterState {
     status: string;
@@ -57,7 +54,7 @@ const AdminPage = () => {
 
         // Filtre par statut
         if (filters.status !== "all") {
-            filtered = filtered.filter(item => item.status === filters.status);
+            filtered = filtered.filter(item => normalizeReservationStatus(item.status) === filters.status);
         }
         return filtered;
     }, [reservationData.data, filters]);
@@ -69,16 +66,14 @@ const AdminPage = () => {
             pending: 0,
             completed: 0,
             cancelled: 0,
-            rejected: 0,
         };
 
-        const data = reservationData.data;
+        const statuses = reservationData.data.map(item => normalizeReservationStatus(item.status));
         return {
-            total: data.length,
-            pending: data.filter(item => item.status === "Pending").length,
-            completed: data.filter(item => item.status === "Completed").length,
-            cancelled: data.filter(item => item.status === "Cancelled").length,
-            rejected: data.filter(item => item.status === "Rejected").length,
+            total: statuses.length,
+            pending: statuses.filter(status => status === "Pending").length,
+            completed: statuses.filter(status => status === "Complete").length,
+            cancelled: statuses.filter(status => status === "Cancelled").length,
         };
     }, [reservationData.data]);
 
@@ -99,6 +94,13 @@ const AdminPage = () => {
         return null;
     }
 
+    const statItems: StatCardItem[] = [
+        { title: "Total", value: statistics.total, description: "Toutes les réservations", icon: CalendarDays, iconClass: "bg-blue-100 text-blue-600" },
+        { title: "En attente", value: statistics.pending, description: "Réservations à traiter", icon: Clock, iconClass: "bg-amber-100 text-amber-600" },
+        { title: "Terminées", value: statistics.completed, description: "Réservations complétées", icon: CheckCircle, iconClass: "bg-emerald-100 text-emerald-600" },
+        { title: "Annulées", value: statistics.cancelled, description: "Rejetées ou annulées", icon: XCircle, iconClass: "bg-rose-100 text-rose-600" },
+    ];
+
     return (
         <div className="pb-8">
             <Head
@@ -108,65 +110,23 @@ const AdminPage = () => {
             />
 
             <div className="container mx-auto flex flex-col gap-4 px-4 py-8">
+                <StatCards items={statItems} />
 
-                <div className="flex flex-row gap-2 items-center">
+                <div className="w-full md:w-56">
                     <Select
                         value={filters.status}
                         onValueChange={(value) => setFilters({ ...filters, status: value })}
                     >
-                        <SelectTrigger>
+                        <SelectTrigger className="w-full">
                             <SelectValue placeholder="Tous les statuts" />
                         </SelectTrigger>
                         <SelectContent>
                             <SelectItem value="all">Tous les statuts</SelectItem>
-                            <SelectItem value="Pending">En attente</SelectItem>
-                            <SelectItem value="Completed">Terminées</SelectItem>
-                            <SelectItem value="Cancelled">Annulées</SelectItem>
-                            <SelectItem value="Rejected">Rejetées</SelectItem>
+                            {RESERVATION_STATUSES.map((status) => (
+                                <SelectItem key={status} value={status}>{reservationStatusLabel(status)}</SelectItem>
+                            ))}
                         </SelectContent>
                     </Select>
-                </div>
-                {/* Cartes de statistiques */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-                    <Card className="border border-primary rounded-[8px]">
-                        <CardHeader>
-                            <CardTitle className="text-sm font-medium">Total</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <div className="text-2xl font-bold">{statistics.total}</div>
-                            <p className="text-xs opacity-80">Toutes les réservations</p>
-                        </CardContent>
-                    </Card>
-
-                    <Card className="border border-primary rounded-[8px] bg-amber-50">
-                        <CardHeader>
-                            <CardTitle className="text-sm font-medium">En attente</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <div className="text-2xl font-bold">{statistics.pending}</div>
-                            <p className="text-xs opacity-80">Réservations à traiter</p>
-                        </CardContent>
-                    </Card>
-
-                    <Card className="border border-primary rounded-[8px] bg-green-50">
-                        <CardHeader>
-                            <CardTitle className="text-sm font-medium">Terminées</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <div className="text-2xl font-bold">{statistics.completed}</div>
-                            <p className="text-xs opacity-80">Réservations complétées</p>
-                        </CardContent>
-                    </Card>
-
-                    <Card className="border border-primary rounded-[8px] bg-red-50">
-                        <CardHeader>
-                            <CardTitle className="text-sm font-medium">Rejetées</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <div className="text-2xl font-bold">{statistics.rejected}</div>
-                            <p className="text-xs opacity-80">Par l'administration</p>
-                        </CardContent>
-                    </Card>
                 </div>
                 <HistoryBooking
                     title={"Liste des réservations"}

@@ -735,3 +735,38 @@ export interface PromotionDelivery {
   isActive: () => boolean;
   apply: (fees: number, district: string, cart: Array<cartItem>) => number;
 }
+
+// ##############
+// Admin Orders
+// ##############
+
+export interface AdminOrderPayment {
+  status: string;
+  amount: number;
+}
+
+export interface AdminOrderListItem {
+  uuid: string;
+  display_id: string | null;
+  total: number;
+  mode: deliveryMode;
+  registration: string;
+  status: string;
+  payments: AdminOrderPayment[];
+  id_restaurant: number | null;
+  first_name: string;
+  phone: string | null;
+  user_uuid: string;
+}
+
+export interface AdminOrdersMeta {
+  total: number;
+  page: number;
+  limit: number;
+  lastPage: number;
+}
+
+export interface AdminOrdersResponse {
+  data: AdminOrderListItem[];
+  meta: AdminOrdersMeta;
+}

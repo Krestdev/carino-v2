@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/table";
 import { ReservationData } from "@/types/types";
 import { useState } from "react";
-import { LuCheck, LuEye, LuX } from "react-icons/lu";
+import { LuX } from "react-icons/lu";
 import { Button } from "../ui/button";
 import { formatRelative } from "date-fns";
 import { fr } from "date-fns/locale";
@@ -31,7 +31,11 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Check, CheckCheck, MoreVertical } from "lucide-react";
+import { CalendarDays, Check, CheckCheck, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Eye, MoreVertical } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { normalizeReservationStatus, reservationStatusBadgeClass, reservationStatusLabel, type ReservationStatus } from "@/lib/reservation-status";
+
+const ITEMS_PER_PAGE = 10;
 
 interface Props {
     title: string;
@@ -41,6 +45,7 @@ interface Props {
 const HistoryBooking = ({ title, data }: Props) => {
     const [selectedReservation, setSelectedReservation] = useState<ReservationData | null>(null);
     const [dialogOpen, setDialogOpen] = useState(false);
+    const [currentPage, setCurrentPage] = useState(1);
     const [confirmationDialog, setConfirmationDialog] = useState<{
         open: boolean;
         action: 'validate' | 'reject' | 'settle' | 'cancel' | 'complete' | null;
@@ -53,7 +58,7 @@ const HistoryBooking = ({ title, data }: Props) => {
         reservationRef: '',
     });
 
-    type StatusCode = "Pending" | "Confirmed" | "Customer Settled" | "Cancelled" | "Complete";
+    type StatusCode = ReservationStatus;
 
     const { user } = useStore();
     const queryClient = useQueryClient();
@@ -149,41 +154,6 @@ const HistoryBooking = ({ title, data }: Props) => {
         }
     };
 
-    // Fonction pour obtenir le libellé du statut
-    const getStatusLabel = (status: StatusCode): string => {
-        switch (status) {
-            case "Pending": return 'En attente';
-            case "Confirmed": return 'Confirmée';
-            case "Customer Settled": return 'Client Installé';
-            case "Cancelled": return 'Annulée';
-            case "Complete": return 'Terminée';
-            default: return 'Inconnu';
-        }
-    };
-
-    // Fonction pour obtenir la couleur du statut
-    const getStatusColor = (status: StatusCode): string => {
-        switch (status) {
-            case "Pending": return 'bg-amber-500 shadow-lg shadow-amber-500/20';
-            case "Confirmed": return 'bg-blue-500 shadow-lg shadow-blue-500/20';
-            case "Customer Settled": return 'bg-teal-500 shadow-lg shadow-teal-500/20';
-            case "Cancelled": return 'bg-rose-500 shadow-lg shadow-rose-500/20';
-            case "Complete": return 'bg-emerald-500 shadow-lg shadow-emerald-500/20';
-            default: return 'bg-gray-500 shadow-lg shadow-gray-500/20';
-        }
-    };
-
-    const getTitleColor = (status: StatusCode): string => {
-        switch (status) {
-            case "Pending": return 'text-amber-500 shadow-lg shadow-amber-500/20';
-            case "Confirmed": return 'text-blue-500 shadow-lg shadow-blue-500/20';
-            case "Customer Settled": return 'text-teal-500 shadow-lg shadow-teal-500/20';
-            case "Cancelled": return 'text-rose-500 shadow-lg shadow-rose-500/20';
-            case "Complete": return 'bg-emerald-500 shadow-lg shadow-emerald-500/20';
-            default: return 'bg-gray-500 shadow-lg shadow-gray-500/20';
-        }
-    };
-
     // Obtenir le texte du dialogue de confirmation
     const getConfirmationText = () => {
         switch (confirmationDialog.action) {
@@ -262,113 +232,102 @@ const HistoryBooking = ({ title, data }: Props) => {
         return actions;
     };
 
+    const rows = data ?? [];
+    const totalPages = Math.max(1, Math.ceil(rows.length / ITEMS_PER_PAGE));
+    const page = Math.min(currentPage, totalPages);
+    const pageRows = rows.slice((page - 1) * ITEMS_PER_PAGE, page * ITEMS_PER_PAGE);
+
     return (
-        <div className="flex flex-col px-5 gap-5 w-full">
-            <h3 className="text-xl font-bold">{title}</h3>
-            <Table className="max-w-[1440px] w-full mx-auto border border-gray-300">
-                <TableHeader className="bg-primary text-white">
-                    <TableRow className="divide-x divide-gray-300 hover:bg-primary/90">
-                        <TableHead className="font-bold text-white">{"Référence"}</TableHead>
-                        <TableHead className="font-bold text-white">{"Statut"}</TableHead>
-                        <TableHead className="font-bold text-white">{"Client"}</TableHead>
-                        <TableHead className="font-bold text-white">{"Téléphone"}</TableHead>
-                        <TableHead className="font-bold text-white">{"Date réservation"}</TableHead>
-                        <TableHead className="font-bold text-white">{"Places"}</TableHead>
-                        <TableHead className="font-bold text-white">{"Commentaire"}</TableHead>
-                        <TableHead className="font-bold text-white">{"Actions"}</TableHead>
-                    </TableRow>
-                </TableHeader>
-                <TableBody className="divide-y divide-gray-200">
-                    {data?.length === 0 ? (
-                        <TableRow className="divide-x divide-gray-200">
-                            <TableCell colSpan={8} className="text-center h-24">
-                                {"Aucune réservation à afficher."}
-                            </TableCell>
+        <div className="flex flex-col gap-4 w-full">
+            {title && (
+                <div className="flex items-center gap-2">
+                    <h2 className="text-xl font-semibold text-gray-900">{title}</h2>
+                    <Badge variant="secondary">{rows.length} résultat(s)</Badge>
+                </div>
+            )}
+
+            <div className="rounded-xl overflow-hidden border border-gray-200 bg-white shadow-sm">
+                <Table>
+                    <TableHeader className="bg-primary text-white">
+                        <TableRow className="hover:bg-primary/90">
+                            <TableHead className="font-bold text-white">Référence</TableHead>
+                            <TableHead className="font-bold text-white">Client</TableHead>
+                            <TableHead className="font-bold text-white">Statut</TableHead>
+                            <TableHead className="font-bold text-white">Date réservation</TableHead>
+                            <TableHead className="font-bold text-white text-center">Places</TableHead>
+                            <TableHead className="font-bold text-white">Commentaire</TableHead>
+                            <TableHead className="font-bold text-white text-center">Action</TableHead>
                         </TableRow>
-                    ) : (
-                        data?.map((reservation, id) => {
-                            const availableActions = getAvailableActions(reservation.status as StatusCode);
-                            const statusCode = reservation.status as StatusCode;
+                    </TableHeader>
+                    <TableBody>
+                        {pageRows.map((reservation, id) => {
+                            const statusCode = normalizeReservationStatus(reservation.status) as StatusCode;
+                            const availableActions = getAvailableActions(statusCode);
 
                             return (
-                                <TableRow
-                                    key={reservation.id || id}
-                                    className={`divide-x divide-gray-200 ${id % 2 === 0 ? "bg-gray-100" : ""}`}
-                                >
-                                    <TableCell className="font-medium text-center">
-                                        {`Ref-${reservation.uuid?.slice(0, 15)}...`}
+                                <TableRow key={reservation.id || id} className="even:bg-gray-50 hover:bg-gray-100">
+                                    <TableCell className="font-medium text-gray-900">
+                                        {`Ref-${reservation.uuid?.slice(0, 8)}`}
                                     </TableCell>
 
                                     <TableCell>
-                                        <div className="flex gap-2 items-center">
-                                            <span className={`${getStatusColor(statusCode)} h-2.5 w-2.5 rounded-full`} />
-                                            <span className={`${getTitleColor(statusCode)} text-gray-300 font-medium`}>
-                                                {getStatusLabel(statusCode)}
-                                            </span>
+                                        <div className="flex flex-col">
+                                            <span className="text-sm font-medium text-gray-900">{reservation.customer?.name || "N/A"}</span>
+                                            {reservation.customer?.phone && (
+                                                <span className="text-xs text-gray-500">{reservation.customer.phone}</span>
+                                            )}
                                         </div>
                                     </TableCell>
 
                                     <TableCell>
-                                        <span className="font-medium">{reservation.customer?.name || 'N/A'}</span>
+                                        <Badge className={reservationStatusBadgeClass(statusCode)}>
+                                            {reservationStatusLabel(statusCode)}
+                                        </Badge>
                                     </TableCell>
 
-                                    <TableCell>
-                                        <span>{reservation.customer?.phone || 'N/A'}</span>
-                                    </TableCell>
-
-                                    <TableCell>
+                                    <TableCell className="text-sm text-gray-700">
                                         {formatRelative(new Date(reservation.booking_for), new Date(), { locale: fr })}
                                     </TableCell>
 
+                                    <TableCell className="text-center text-sm text-gray-700">
+                                        <span className="font-semibold text-gray-900">{reservation.places}</span> place(s)
+                                    </TableCell>
+
+                                    <TableCell className="max-w-[200px] truncate text-sm text-gray-600" title={reservation.comment || undefined}>
+                                        {reservation.comment || "—"}
+                                    </TableCell>
+
                                     <TableCell className="text-center">
-                                        <span className="font-semibold">{reservation.places}</span> place(s)
-                                    </TableCell>
-
-                                    <TableCell className="truncate max-w-[200px]">
-                                        {reservation.comment ? (
-                                            <span className="text-sm text-gray-600">
-                                                {reservation.comment.length > 50
-                                                    ? `${reservation.comment.slice(0, 50)}...`
-                                                    : reservation.comment}
-                                            </span>
-                                        ) : "---"}
-                                    </TableCell>
-
-                                    <TableCell>
-                                        <div className="flex gap-2 items-center">
+                                        <div className="flex items-center justify-center gap-2">
                                             <Button
-                                                variant={"outline"}
-                                                className="text-black bg-gray-50 border-[#848484]"
+                                                variant="outline"
+                                                size="icon"
+                                                className="h-8 w-8"
+                                                title="Voir le détail"
                                                 onClick={() => handleViewReservation(reservation)}
                                             >
-                                                <LuEye />
-                                                {user?.role !== "ADMIN" && user?.role !== "MANAGER" ? "Voir" : ""}
+                                                <Eye className="h-4 w-4" />
                                             </Button>
 
                                             {availableActions.length > 0 && (
                                                 <DropdownMenu>
                                                     <DropdownMenuTrigger asChild>
-                                                        <Button
-                                                            variant={"outline"}
-                                                            className="border-gray-300 bg-gray-50"
-                                                        >
-                                                            <MoreVertical />
+                                                        <Button variant="outline" size="icon" className="h-8 w-8" title="Actions">
+                                                            <MoreVertical className="h-4 w-4" />
                                                         </Button>
                                                     </DropdownMenuTrigger>
                                                     <DropdownMenuContent align="end">
-                                                        {availableActions.map((action) => {
-                                                            return (
-                                                                <DropdownMenuItem
-                                                                    key={action.key}
-                                                                    title={action.label}
-                                                                    onClick={() => handleActionClick(action.key as any, reservation)}
-                                                                    className={`w-full ${action.color}`}
-                                                                >
-                                                                    <action.Icon className={action.color} />
-                                                                    <span>{action.label}</span>
-                                                                </DropdownMenuItem>
-                                                            );
-                                                        })}
+                                                        {availableActions.map((action) => (
+                                                            <DropdownMenuItem
+                                                                key={action.key}
+                                                                title={action.label}
+                                                                onClick={() => handleActionClick(action.key as any, reservation)}
+                                                                className={`w-full ${action.color}`}
+                                                            >
+                                                                <action.Icon className={action.color} />
+                                                                <span>{action.label}</span>
+                                                            </DropdownMenuItem>
+                                                        ))}
                                                     </DropdownMenuContent>
                                                 </DropdownMenu>
                                             )}
@@ -376,10 +335,41 @@ const HistoryBooking = ({ title, data }: Props) => {
                                     </TableCell>
                                 </TableRow>
                             )
-                        })
-                    )}
-                </TableBody>
-            </Table>
+                        })}
+                    </TableBody>
+                </Table>
+
+                {/* Pagination */}
+                {rows.length > ITEMS_PER_PAGE && (
+                    <div className="flex items-center justify-between px-6 py-4 border-t border-gray-200">
+                        <div className="text-sm text-gray-600">
+                            Page {page} sur {totalPages}
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => setCurrentPage(1)} disabled={page === 1}>
+                                <ChevronsLeft className="h-4 w-4" />
+                            </Button>
+                            <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => setCurrentPage(Math.max(1, page - 1))} disabled={page === 1}>
+                                <ChevronLeft className="h-4 w-4" />
+                            </Button>
+                            <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => setCurrentPage(Math.min(totalPages, page + 1))} disabled={page === totalPages}>
+                                <ChevronRight className="h-4 w-4" />
+                            </Button>
+                            <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => setCurrentPage(totalPages)} disabled={page === totalPages}>
+                                <ChevronsRight className="h-4 w-4" />
+                            </Button>
+                        </div>
+                    </div>
+                )}
+
+                {rows.length === 0 && (
+                    <div className="text-center py-12">
+                        <CalendarDays className="w-16 h-16 mx-auto text-gray-300 mb-4" />
+                        <h3 className="text-lg font-semibold text-gray-900">Aucune réservation trouvée</h3>
+                        <p className="text-gray-500">Il n&apos;y a pas encore de réservations à afficher</p>
+                    </div>
+                )}
+            </div>
 
             {/* Dialog des détails de réservation */}
             {selectedReservation && (

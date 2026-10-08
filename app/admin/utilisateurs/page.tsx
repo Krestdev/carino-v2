@@ -5,12 +5,7 @@ import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
 import { AxiosError } from "axios";
 import { useState, useMemo } from "react";
-import {
-    Card,
-    CardContent,
-    CardHeader,
-    CardTitle
-} from "@/components/ui/card";
+import Head from "@/components/universal/Head";
 import {
     Select,
     SelectContent,
@@ -31,10 +26,8 @@ import {
     Users,
     UserCheck,
     Crown,
-    TrendingUp,
+    ConciergeBell,
     Search,
-    Filter,
-    ShoppingBag,
     ChevronLeft,
     ChevronRight,
     ChevronsLeft,
@@ -43,6 +36,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import UserQuery from "@/queries/userQueries";
+import StatCards, { type StatCardItem } from "@/components/admin/StatCards";
 import Loading from "@/app/loading";
 import { Button } from "@/components/ui/button";
 import useStore from "@/context/store";
@@ -80,7 +74,8 @@ const UsersPage = () => {
 
         // Filtre par rôle
         if (filters.role !== "all") {
-            filtered = filtered.filter(user => user.role === filters.role);
+            // Un compte sans rôle est un client (USER)
+            filtered = filtered.filter(user => (user.role || "USER") === filters.role);
         }
 
         // Filtre VIP
@@ -90,15 +85,11 @@ const UsersPage = () => {
 
         // Affichage en fonction du role
         if (user?.role === "WAITER") {
-            filtered = filtered.filter(user => user.role === "USER");
+            filtered = filtered.filter(user => (user.role || "USER") === "USER");
         }
 
         if (user?.role === "MANAGER") {
-            filtered = filtered.filter(user => user.role === "WAITER" || user.role === "USER");
-        }
-
-        if (user?.role === "ADMIN") {
-            filtered = filtered;
+            filtered = filtered.filter(user => user.role === "WAITER" || (user.role || "USER") === "USER");
         }
 
         // Filtre par recherche (nom, email, téléphone)
@@ -113,7 +104,7 @@ const UsersPage = () => {
         }
 
         return filtered;
-    }, [usersData.data, filters]);
+    }, [usersData.data, filters, user?.role]);
 
     // Pagination des données
     const paginatedData = useMemo(() => {
@@ -130,6 +121,7 @@ const UsersPage = () => {
             total: 0,
             admins: 0,
             managers: 0,
+            waiters: 0,
             clients: 0,
             vip: 0,
             totalSpent: 0,
@@ -141,12 +133,13 @@ const UsersPage = () => {
             total: data.length,
             admins: data.filter(user => user.role === "ADMIN").length,
             managers: data.filter(user => user.role === "MANAGER").length,
-            clients: data.filter(user => !user.role || user.role === "CLIENT").length,
+            waiters: data.filter(user => user.role === "WAITER").length,
+            clients: data.filter(user => !user.role || user.role === "USER").length,
             vip: data.filter(user => user.vip).length,
             totalSpent: data.reduce((sum, user) => sum + (user.turnover || 0), 0),
             totalOrders: data.reduce((sum, user) => sum + (user.nb_orders || 0), 0),
         };
-    }, [usersData.data]);
+    }, [filteredData]);
 
     if (usersData.isLoading) return <Loading />
     if (usersData.isError) {
@@ -184,47 +177,40 @@ const UsersPage = () => {
             case "WAITER":
                 return <Badge className="bg-green-500/10 text-green-600 border-green-200">Serveur</Badge>;
             default:
-                return <Badge variant="outline" className="text-black">Client</Badge>;
+                return <Badge className="bg-gray-100 text-gray-700 border-gray-200">Client</Badge>;
         }
     };
 
-    return (
-        <div className="min-h-screen bg-linear-to-br from-background via-background to-muted/20">
-            {/* Header */}
-            <div className="top-0 z-10 backdrop-blur-xl bg-background/80 border-b border-border/50">
-                <div className="container mx-auto px-4 py-6">
-                    <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                        <div>
-                            <h1 className="text-3xl md:text-4xl font-bold bg-linear-to-r from-primary to-primary/60 bg-clip-text text-transparent">
-                                Gestion des utilisateurs
-                            </h1>
-                            <p className="text-muted-foreground mt-1">
-                                Gérez et suivez tous les utilisateurs de votre plateforme
-                            </p>
-                        </div>
-                        <Badge variant={"secondary"} className="px-4 py-2 text-white">
-                            <TrendingUp className="w-4 h-4 mr-2" />
-                            {statistics.total} utilisateurs actifs
-                        </Badge>
-                    </div>
-                </div>
-            </div>
+    const statItems: StatCardItem[] = [
+        { title: "Utilisateurs", value: statistics.total, description: "Comptes affichés", icon: Users, iconClass: "bg-blue-100 text-blue-600" },
+        { title: "Clients", value: statistics.clients, description: "Comptes clients", icon: UserCheck, iconClass: "bg-emerald-100 text-emerald-600" },
+        { title: "Serveurs", value: statistics.waiters, description: "Personnel en salle", icon: ConciergeBell, iconClass: "bg-amber-100 text-amber-600" },
+        { title: "Administration", value: statistics.admins + statistics.managers, description: `${statistics.admins} admin(s), ${statistics.managers} manager(s)`, icon: Crown, iconClass: "bg-purple-100 text-purple-600" },
+    ];
 
-            <div className="container mx-auto px-4 py-8 pb-10">
-                {/* Section des filtres */}
-                <div className="flex flex-col md:flex-row items-center gap-4 pt-4 pb-8">
-                    <div className="max-w-90 w-full">
-                        <div className="relative">
-                            <Search className="absolute right-2 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                            <Input
-                                placeholder="Rechercher par nom, email ou téléphone..."
-                                value={filters.searchTerm}
-                                onChange={(e) => {
-                                    setFilters({ ...filters, searchTerm: e.target.value });
-                                    setCurrentPage(1);
-                                }}
-                            />
-                        </div>
+    return (
+        <div className="pb-8">
+            <Head
+                title="Utilisateurs"
+                image={"/about.webp"}
+                subTitle={`${statistics.total} utilisateur(s) au total`}
+            />
+
+            <div className="container mx-auto flex flex-col gap-4 px-4 py-8">
+                <StatCards items={statItems} />
+
+                {/* Filtres */}
+                <div className="flex flex-col md:flex-row items-center gap-4">
+                    <div className="relative w-full md:max-w-90">
+                        <Search className="absolute right-2 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                        <Input
+                            placeholder="Rechercher par nom, email ou téléphone..."
+                            value={filters.searchTerm}
+                            onChange={(e) => {
+                                setFilters({ ...filters, searchTerm: e.target.value });
+                                setCurrentPage(1);
+                            }}
+                        />
                     </div>
                     <div className="w-full md:w-48">
                         <Select
@@ -241,104 +227,75 @@ const UsersPage = () => {
                                 <SelectItem value="all">Tous les rôles</SelectItem>
                                 <SelectItem value="ADMIN">Administrateurs</SelectItem>
                                 <SelectItem value="MANAGER">Managers</SelectItem>
-                                <SelectItem value="CLIENT">Clients</SelectItem>
+                                <SelectItem value="WAITER">Serveurs</SelectItem>
+                                <SelectItem value="USER">Clients</SelectItem>
                             </SelectContent>
                         </Select>
                     </div>
-                    <Button onClick={() => router.push("/admin/utilisateurs/create")}>
+                    <Button className="w-full md:w-auto md:ml-auto" onClick={() => router.push("/admin/utilisateurs/create")}>
                         Créer un utilisateur
                     </Button>
                 </div>
 
                 {/* Tableau des utilisateurs */}
-                <div>
-                    <div className="flex items-center justify-between mb-4">
-                        <div className="flex items-center gap-2">
-                            <div className="h-8 w-1 bg-primary rounded-full"></div>
-                            <h2 className="text-xl font-semibold text-primary">Liste des utilisateurs</h2>
-                            <Badge className="ml-2">
-                                {filteredData.length} résultat(s)
-                            </Badge>
-                        </div>
-                    </div>
+                <div className="flex items-center gap-2">
+                    <h2 className="text-xl font-semibold text-gray-900">Liste des utilisateurs</h2>
+                    <Badge variant="secondary">{filteredData.length} résultat(s)</Badge>
+                </div>
 
-                    <div className="overflow-x-auto">
-                        <Table>
-                            <TableHeader>
-                                <TableRow className="bg-muted">
-                                    <TableHead className="font-bold text-black">Utilisateur</TableHead>
-                                    <TableHead className="font-bold text-black">Email</TableHead>
-                                    <TableHead className="font-bold text-black">Téléphone</TableHead>
-                                    <TableHead className="font-bold text-black">Rôle</TableHead>
-                                </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                                {paginatedData.map((user, id) => (
-                                    <TableRow
-                                        key={id}
-                                        className={` ${id % 2 === 0 ? "" : "bg-muted/30 border-b border-border/30"}`}
-                                    >
-                                        <TableCell className="font-medium text-black">
-                                            <div className="flex items-center gap-3">
-                                                <Avatar className="h-8 w-8 ring-2 ring-primary/20">
-                                                    <AvatarFallback className="bg-linear-to-br from-primary/20 to-primary/5 text-primary text-xs font-semibold">
-                                                        {getInitials(user.name, user.fname)}
-                                                    </AvatarFallback>
-                                                </Avatar>
-                                                <div>
-                                                    <p className="font-semibold text-black">
-                                                        {user.name} {user.fname}
-                                                    </p>
-                                                </div>
-                                            </div>
-                                        </TableCell>
-                                        <TableCell>
-                                            <div className="flex items-center gap-2">
-                                                <span className="text-sm text-black">
-                                                    {user.email || user.mail}
-                                                </span>
-                                            </div>
-                                        </TableCell>
-                                        <TableCell>
-                                            <span className="text-sm text-black">
-                                                {user.phone}
+                <div className="rounded-xl overflow-hidden border border-gray-200 bg-white shadow-sm">
+                    <Table>
+                        <TableHeader className="bg-primary text-white">
+                            <TableRow className="hover:bg-primary/90">
+                                <TableHead className="font-bold text-white">Utilisateur</TableHead>
+                                <TableHead className="font-bold text-white">Email</TableHead>
+                                <TableHead className="font-bold text-white">Téléphone</TableHead>
+                                <TableHead className="font-bold text-white">Rôle</TableHead>
+                            </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                            {paginatedData.map((user, id) => (
+                                <TableRow key={id} className="even:bg-gray-50 hover:bg-gray-100">
+                                    <TableCell>
+                                        <div className="flex items-center gap-3">
+                                            <Avatar className="h-8 w-8 ring-2 ring-primary/20">
+                                                <AvatarFallback className="bg-primary/10 text-primary text-xs font-semibold">
+                                                    {getInitials(user.name, user.fname)}
+                                                </AvatarFallback>
+                                            </Avatar>
+                                            <span className="text-sm font-medium text-gray-900">
+                                                {user.name} {user.fname}
                                             </span>
-                                        </TableCell>
-                                        <TableCell>
-                                            {getRoleBadge(user.role || "CLIENT")}
-                                        </TableCell>
-                                    </TableRow>
-                                ))}
-                            </TableBody>
-                        </Table>
-                    </div>
+                                        </div>
+                                    </TableCell>
+                                    <TableCell className="text-sm text-gray-700">
+                                        {user.email || user.mail}
+                                    </TableCell>
+                                    <TableCell className="text-sm text-gray-700">
+                                        {user.phone || "—"}
+                                    </TableCell>
+                                    <TableCell>
+                                        {getRoleBadge(user.role || "USER")}
+                                    </TableCell>
+                                </TableRow>
+                            ))}
+                        </TableBody>
+                    </Table>
 
                     {/* Pagination */}
                     {filteredData.length > 0 && (
-                        <div className="flex items-center justify-between px-6 py-4 border-t border-border/50 bg-muted/20">
-                            {/* <div className="text-sm text-white">
-                                Affichage de {((currentPage - 1) * itemsPerPage) + 1} à {Math.min(currentPage * itemsPerPage, filteredData.length)} sur {filteredData.length} utilisateurs
-                            </div> */}
-                            <div className="ml-auto flex items-center gap-2">
-                                <Button
-                                    variant="outline"
-                                    size="icon"
-                                    onClick={() => setCurrentPage(1)}
-                                    disabled={currentPage === 1}
-                                    className="h-8 w-8"
-                                >
+                        <div className="flex items-center justify-between px-6 py-4 border-t border-gray-200">
+                            <div className="text-sm text-gray-600">
+                                Page {currentPage} sur {totalPages}
+                            </div>
+                            <div className="flex items-center gap-2">
+                                <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => setCurrentPage(1)} disabled={currentPage === 1}>
                                     <ChevronsLeft className="h-4 w-4" />
                                 </Button>
-                                <Button
-                                    variant="outline"
-                                    size="icon"
-                                    onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
-                                    disabled={currentPage === 1}
-                                    className="h-8 w-8"
-                                >
+                                <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))} disabled={currentPage === 1}>
                                     <ChevronLeft className="h-4 w-4" />
                                 </Button>
-                                <div className="flex items-center gap-1">
+                                <div className="hidden sm:flex items-center gap-1">
                                     {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
                                         let pageNum;
                                         if (totalPages <= 5) {
@@ -364,22 +321,10 @@ const UsersPage = () => {
                                         );
                                     })}
                                 </div>
-                                <Button
-                                    variant="outline"
-                                    size="icon"
-                                    onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
-                                    disabled={currentPage === totalPages}
-                                    className="h-8 w-8"
-                                >
+                                <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))} disabled={currentPage === totalPages}>
                                     <ChevronRight className="h-4 w-4" />
                                 </Button>
-                                <Button
-                                    variant="outline"
-                                    size="icon"
-                                    onClick={() => setCurrentPage(totalPages)}
-                                    disabled={currentPage === totalPages}
-                                    className="h-8 w-8"
-                                >
+                                <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => setCurrentPage(totalPages)} disabled={currentPage === totalPages}>
                                     <ChevronsRight className="h-4 w-4" />
                                 </Button>
                             </div>
@@ -388,9 +333,9 @@ const UsersPage = () => {
 
                     {filteredData.length === 0 && (
                         <div className="text-center py-12">
-                            <Users className="w-16 h-16 mx-auto text-white/50 mb-4" />
-                            <h3 className="text-lg font-semibold text-foreground">Aucun utilisateur trouvé</h3>
-                            <p className="text-white">Essayez de modifier vos filtres</p>
+                            <Users className="w-16 h-16 mx-auto text-gray-300 mb-4" />
+                            <h3 className="text-lg font-semibold text-gray-900">Aucun utilisateur trouvé</h3>
+                            <p className="text-gray-500">Essayez de modifier vos filtres</p>
                         </div>
                     )}
                 </div>

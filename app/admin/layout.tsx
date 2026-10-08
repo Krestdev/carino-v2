@@ -5,7 +5,7 @@ import { redirect, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { CalendarDays, Users, LogOut, Menu, X } from "lucide-react";
+import { CalendarDays, Users, LogOut, Menu, X, ShoppingBag } from "lucide-react";
 import Loading from "../loading";
 
 const Layout = ({ children }: { children: React.ReactNode }) => {
@@ -33,6 +33,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
 
     const navItems = [
         user?.role === "WAITER" ? null : { name: "Réservations", path: "/admin", icon: CalendarDays },
+        user?.role === "WAITER" ? null : { name: "Commandes", path: "/admin/commandes", icon: ShoppingBag },
         { name: "Utilisateurs", path: "/admin/utilisateurs", icon: Users },
     ].filter(Boolean);
 
@@ -60,7 +61,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
                 </div>
             </div>
 
-            <nav className="flex-1 p-4">
+            <nav className="flex-1 overflow-y-auto p-4">
                 <ul className="space-y-2">
                     {navItems.map((item) => {
                         if (!item) return null;
@@ -85,7 +86,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
                 </ul>
             </nav>
 
-            <div className="p-4 border-t border-gray-200">
+            <div className="shrink-0 p-4 border-t border-gray-200">
                 <div className="mb-4 px-4 py-2 bg-gray-50 rounded-lg">
                     <p className="text-xs text-gray-500">Connecté en tant que</p>
                     <p className="text-sm font-semibold text-gray-800 truncate">{user?.email}</p>
@@ -112,7 +113,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
             )}
 
             {/* Sidebar - Desktop */}
-            <aside className="hidden lg:block w-64 bg-white text-gray-800 flex flex-col border-r border-gray-200 shadow-sm">
+            <aside className="hidden lg:flex lg:flex-col w-64 shrink-0 bg-white text-gray-800 border-r border-gray-200 shadow-sm">
                 <SidebarContent />
             </aside>
 

@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { ReservationData } from "@/types/types";
+import { normalizeReservationStatus, reservationStatusLabel } from "@/lib/reservation-status";
 import { Printer, X, Calendar, Users, Clock, CreditCard, MapPin, MessageSquare, Building, Phone, User, Hash, AlertCircle } from 'lucide-react';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
@@ -27,17 +28,20 @@ const ViewReservationDialog = ({ open, onClose, reservation }: ViewReservationDi
 
     // Statut de la réservation avec couleurs
     const getStatusConfig = (status: string) => {
-        switch (status) {
+        const label = reservationStatusLabel(status);
+        switch (normalizeReservationStatus(status)) {
             case 'Pending':
-                return { label: 'En attente', color: 'bg-orange-500', textColor: 'text-orange-600', icon: Clock };
+                return { label, color: 'bg-orange-500', textColor: 'text-orange-600', icon: Clock };
             case 'Confirmed':
-                return { label: 'Confirmée', color: 'bg-blue-500', textColor: 'text-blue-600', icon: Calendar };
-            case 'Completed':
-                return { label: 'Terminée', color: 'bg-green-500', textColor: 'text-green-600', icon: Clock };
+                return { label, color: 'bg-blue-500', textColor: 'text-blue-600', icon: Calendar };
+            case 'Customer Settled':
+                return { label, color: 'bg-teal-500', textColor: 'text-teal-600', icon: Calendar };
+            case 'Complete':
+                return { label, color: 'bg-green-500', textColor: 'text-green-600', icon: Clock };
             case 'Cancelled':
-                return { label: 'Annulée', color: 'bg-red-500', textColor: 'text-red-600', icon: AlertCircle };
+                return { label, color: 'bg-red-500', textColor: 'text-red-600', icon: AlertCircle };
             default:
-                return { label: status, color: 'bg-gray-500', textColor: 'text-gray-600', icon: Clock };
+                return { label, color: 'bg-gray-500', textColor: 'text-gray-600', icon: Clock };
         }
     };
 
