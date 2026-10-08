@@ -37,6 +37,7 @@ import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import UserQuery from "@/queries/userQueries";
 import StatCards, { type StatCardItem } from "@/components/admin/StatCards";
+import CreateUserDialog from "@/components/admin/CreateUserDialog";
 import Loading from "@/app/loading";
 import { Button } from "@/components/ui/button";
 import useStore from "@/context/store";
@@ -61,6 +62,8 @@ const UsersPage = () => {
         searchTerm: "",
         vip: "all",
     });
+
+    const [createOpen, setCreateOpen] = useState(false);
 
     // Pagination
     const [currentPage, setCurrentPage] = useState(1);
@@ -232,7 +235,7 @@ const UsersPage = () => {
                             </SelectContent>
                         </Select>
                     </div>
-                    <Button className="w-full md:w-auto md:ml-auto" onClick={() => router.push("/admin/utilisateurs/create")}>
+                    <Button className="w-full md:w-auto md:ml-auto" onClick={() => setCreateOpen(true)}>
                         Créer un utilisateur
                     </Button>
                 </div>
@@ -340,6 +343,8 @@ const UsersPage = () => {
                     )}
                 </div>
             </div>
+
+            <CreateUserDialog open={createOpen} onOpenChange={setCreateOpen} />
         </div>
     );
 }

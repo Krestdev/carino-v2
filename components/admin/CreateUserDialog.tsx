@@ -3,13 +3,19 @@
 import UserQuery from "@/queries/userQueries";
 import { UserRegistration } from "@/types/types";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation } from "@tanstack/react-query";
-import { useEffect } from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import z from "zod";
 
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle,
+} from "@/components/ui/dialog";
 import {
     Form,
     FormControl,
@@ -19,7 +25,6 @@ import {
     FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-
 import {
     Select,
     SelectContent,
@@ -59,9 +64,32 @@ const formSchema = z
         path: ["confirmPassword"],
     });
 
-export default function CreateUserPage() {
+type FormValues = z.infer<typeof formSchema>;
+
+const emptyValues: FormValues = {
+    email: "",
+    phoneNumber: "",
+    username: "",
+    password: "",
+    confirmPassword: "",
+    dob: "",
+    role: "USER",
+};
+
+interface CreateUserDialogProps {
+    open: boolean;
+    onOpenChange: (open: boolean) => void;
+}
+
+export default function CreateUserDialog({ open, onOpenChange }: CreateUserDialogProps) {
     const userQuery = new UserQuery();
-    const { user } = useStore()
+    const queryClient = useQueryClient();
+    const { user } = useStore();
+
+    const form = useForm<FormValues>({
+        resolver: zodResolver(formSchema),
+        defaultValues: emptyValues,
+    });
 
     const createUser = useMutation({
         mutationKey: ["create-user"],
@@ -70,36 +98,24 @@ export default function CreateUserPage() {
         },
         onSuccess: () => {
             toast("L'utilisateur a été créé avec succès");
-            form.reset({
-                email: "",
-                phoneNumber: "",
-                username: "",
-                password: "",
-                confirmPassword: "",
-                dob: "",
-                role: "USER",
-            });
+            queryClient.invalidateQueries({ queryKey: ["users"] });
+            handleOpenChange(false);
         },
         onError: () => {
             toast("Une erreur est survenue");
         },
-    })
-
-    const form = useForm<z.infer<typeof formSchema>>({
-        resolver: zodResolver(formSchema),
-
-        defaultValues: {
-            email: "",
-            phoneNumber: "",
-            username: "",
-            password: "",
-            confirmPassword: "",
-            dob: "",
-            role: "USER",
-        },
     });
 
-    const onSubmit = (values: z.infer<typeof formSchema>) => {
+    // Repartir d'un formulaire vierge à chaque fermeture
+    const handleOpenChange = (next: boolean) => {
+        if (!next) {
+            form.reset(emptyValues);
+            createUser.reset();
+        }
+        onOpenChange(next);
+    };
+
+    const onSubmit = (values: FormValues) => {
         createUser.mutate({
             mail: values.email,
             fname: values.username,
@@ -109,23 +125,24 @@ export default function CreateUserPage() {
         });
     };
 
+    const canCreateStaff = user?.role === "ADMIN" || user?.role === "MANAGER";
+
     return (
-        <div className="max-w-4xl mx-auto">
-            <div className="border border-[#848484] rounded-xl px-8 py-8">
-                <h2 className="text-center text-white text-2xl font-semibold mb-10">
-                    Création d'un utilisateur
-                </h2>
+        <Dialog open={open} onOpenChange={handleOpenChange}>
+            <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto">
+                <DialogHeader>
+                    <DialogTitle>Créer un utilisateur</DialogTitle>
+                    <DialogDescription>
+                        Le compte pourra se connecter avec son adresse mail et son mot de passe à 4 chiffres.
+                    </DialogDescription>
+                </DialogHeader>
 
                 <Form {...form}>
-                    <form
-                        onSubmit={form.handleSubmit(onSubmit)}
-                        className="space-y-8"
-                    >
+                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
                         {createUser.isError && (
                             <Alert variant="destructive">
                                 <AlertDescription>
-                                    {createUser.error?.message ===
-                                        "Request failed with status code 400"
+                                    {createUser.error?.message === "Request failed with status code 400"
                                         ? "Cette adresse email est déjà utilisée."
                                         : "Une erreur est survenue."}
                                 </AlertDescription>
@@ -141,10 +158,7 @@ export default function CreateUserPage() {
                                     <FormItem>
                                         <FormLabel>Adresse mail</FormLabel>
                                         <FormControl>
-                                            <Input
-                                                placeholder="email@gmail.com"
-                                                {...field}
-                                            />
+                                            <Input placeholder="email@gmail.com" {...field} />
                                         </FormControl>
                                         <FormMessage />
                                     </FormItem>
@@ -158,21 +172,14 @@ export default function CreateUserPage() {
                                 render={({ field }) => (
                                     <FormItem>
                                         <FormLabel>Numéro de téléphone</FormLabel>
-
                                         <div className="relative">
-                                            <span className="absolute left-0 top-0 h-full px-3 flex items-center border-b border-primary text-white">
+                                            <span className="absolute left-0 top-0 h-full px-3 flex items-center text-muted-foreground">
                                                 +237
                                             </span>
-
                                             <FormControl>
-                                                <Input
-                                                    placeholder="690000000"
-                                                    className="pl-16"
-                                                    {...field}
-                                                />
+                                                <Input placeholder="690000000" className="pl-16" {...field} />
                                             </FormControl>
                                         </div>
-
                                         <FormMessage />
                                     </FormItem>
                                 )}
@@ -186,10 +193,7 @@ export default function CreateUserPage() {
                                     <FormItem>
                                         <FormLabel>Nom</FormLabel>
                                         <FormControl>
-                                            <Input
-                                                placeholder="Nom de l'utilisateur"
-                                                {...field}
-                                            />
+                                            <Input placeholder="Nom de l'utilisateur" {...field} />
                                         </FormControl>
                                         <FormMessage />
                                     </FormItem>
@@ -203,17 +207,13 @@ export default function CreateUserPage() {
                                 render={({ field }) => (
                                     <FormItem>
                                         <FormLabel>Date de naissance</FormLabel>
-
                                         <FormControl>
                                             <Input
                                                 type="date"
                                                 value={field.value}
-                                                onChange={(e) =>
-                                                    field.onChange(e.target.value)
-                                                }
+                                                onChange={(e) => field.onChange(e.target.value)}
                                             />
                                         </FormControl>
-
                                         <FormMessage />
                                     </FormItem>
                                 )}
@@ -226,15 +226,9 @@ export default function CreateUserPage() {
                                 render={({ field }) => (
                                     <FormItem>
                                         <FormLabel>Mot de passe</FormLabel>
-
                                         <FormControl>
-                                            <Input
-                                                type="password"
-                                                placeholder="4 chiffres"
-                                                {...field}
-                                            />
+                                            <Input type="password" placeholder="4 chiffres" {...field} />
                                         </FormControl>
-
                                         <FormMessage />
                                     </FormItem>
                                 )}
@@ -246,76 +240,51 @@ export default function CreateUserPage() {
                                 name="confirmPassword"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel>
-                                            Confirmer le mot de passe
-                                        </FormLabel>
-
+                                        <FormLabel>Confirmer le mot de passe</FormLabel>
                                         <FormControl>
-                                            <Input
-                                                type="password"
-                                                placeholder="4 chiffres"
-                                                {...field}
-                                            />
+                                            <Input type="password" placeholder="4 chiffres" {...field} />
                                         </FormControl>
-
                                         <FormMessage />
                                     </FormItem>
                                 )}
                             />
 
-                            {/* Role */}
+                            {/* Rôle */}
                             <FormField
                                 control={form.control}
                                 name="role"
                                 render={({ field }) => (
                                     <FormItem>
                                         <FormLabel>Rôle</FormLabel>
-
-                                        <Select
-                                            onValueChange={field.onChange}
-                                            defaultValue={field.value}
-                                        >
+                                        <Select onValueChange={field.onChange} value={field.value}>
                                             <FormControl>
                                                 <SelectTrigger className="w-full">
                                                     <SelectValue placeholder="Choisir un rôle" />
                                                 </SelectTrigger>
                                             </FormControl>
-
                                             <SelectContent>
-                                                <SelectItem value="USER">
-                                                    Client
-                                                </SelectItem>
-
-                                                {(user?.role === "ADMIN" || user?.role === "MANAGER") &&
-                                                    <SelectItem value="MANAGER">
-                                                        Manager
-                                                    </SelectItem>}
-
-                                                {(user?.role === "ADMIN" || user?.role === "MANAGER") &&
-                                                    <SelectItem value="WAITER">
-                                                        Serveur
-                                                    </SelectItem>}
+                                                <SelectItem value="USER">Client</SelectItem>
+                                                {canCreateStaff && <SelectItem value="MANAGER">Manager</SelectItem>}
+                                                {canCreateStaff && <SelectItem value="WAITER">Serveur</SelectItem>}
                                             </SelectContent>
                                         </Select>
-
                                         <FormMessage />
                                     </FormItem>
                                 )}
                             />
                         </div>
 
-                        <Button
-                            type="submit"
-                            disabled={createUser.isPending}
-                            className="w-full"
-                        >
-                            {createUser.isPending
-                                ? "Création..."
-                                : "Créer l'utilisateur"}
-                        </Button>
+                        <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-2">
+                            <Button type="button" variant="outline" onClick={() => handleOpenChange(false)}>
+                                Annuler
+                            </Button>
+                            <Button type="submit" disabled={createUser.isPending}>
+                                {createUser.isPending ? "Création..." : "Créer l'utilisateur"}
+                            </Button>
+                        </div>
                     </form>
                 </Form>
-            </div>
-        </div>
+            </DialogContent>
+        </Dialog>
     );
 }
