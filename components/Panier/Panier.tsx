@@ -3,7 +3,7 @@
 import useStore from "@/context/store";
 import { XAF } from "@/lib/functions";
 import { CartTotal } from "@/lib/utils";
-import { useEffect, useMemo, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useMemo, useState } from "react";
 import DelieveryForm from "./DelieveryForm";
 import TakeawayForm from "./TakeawayForm";
 import { ApplyPromotions } from "../universal/promotions";
@@ -19,7 +19,11 @@ import { ShoppingBasket } from "lucide-react";
 const Panier = () => {
   const baseCart = useStore(s => s.cart);
   const [cart, setCart] = useState<Array<cartItem>>([]);
-  const [deliveryMode, setDeliveryMode] = useState<deliveryMode>("delivery");
+  // Mode conservé dans le store pour ne pas le perdre en changeant de page
+  const deliveryMode = useStore(s => s.checkoutForm.mode);
+  const setCheckoutMode = useStore(s => s.setCheckoutMode);
+  const setDeliveryMode: Dispatch<SetStateAction<deliveryMode>> = (value) =>
+    setCheckoutMode(typeof value === "function" ? value(deliveryMode) : value);
   const [postOrderStatus, setPostOrderStatus] = useState<boolean>(false);
   const [fees, setFees] = useState<number>(0);
 

@@ -2,6 +2,7 @@
 
 import { ApplyDeliveryPromo } from "@/app/panier/fees-promotion";
 import useStore from "@/context/store";
+import { nowTimeValue } from "@/components/TimeField";
 import { CartTotal, cn, isDeliveryOpen, zoneLivraisons } from "@/lib/utils";
 import { useAppContext } from "@/providers/appContext";
 import TownQuery from "@/queries/townQuery";
@@ -77,47 +78,7 @@ const formSchema = z.object({
     message: "Le numéro de téléphone doit comporter 9 chiffres",
   }),
   operator: z.enum(["MTN_CM", "ORANGE_CM"]),
-  time: z
-    .string()
-    .nonempty({ message: "Selectionnez une heure" })
-    .refine(
-      (value) => {
-        const time = value.split(":");
-        const open = (process.env.NEXT_PUBLIC_OPENTIME || "11:00").split(":");
-        const close = (process.env.NEXT_PUBLIC_CLOSETIME || "22:00").split(
-          ":"
-        );
-        return (
-          Number(time[0]) >= Number(open[0]) &&
-          Number(time[0]) < Number(close[0])
-        );
-      },
-      {
-        message: `Uniquement entre ${process.env.NEXT_PUBLIC_OPENTIME || "11:00"
-          } et ${process.env.NEXT_PUBLIC_CLOSETIME || "22:00"}`,
-      }
-    ),
-})
-  .refine(
-    (data) => {
-      const [hours, mins] = data.time.split(":");
-      const today = new Date();
-      if (
-        Number(hours) >= today.getHours() + 2 ||
-        (Number(hours) >= today.getHours() + 1 &&
-          Number(mins) >= today.getMinutes())
-      ) {
-        return true;
-      } else {
-        return false;
-      }
-    },
-    {
-      message:
-        "Veuillez définir une heure au moins une heure plus tard que l'heure actuelle",
-      path: ["time"],
-    }
-  );
+});
 
 const DelieveryForm = ({
   deliveryMode,
@@ -131,6 +92,8 @@ const DelieveryForm = ({
 
   // Store
   const { user, emptyCart } = useStore();
+  const savedValues = useStore((s) => s.checkoutForm.delivery);
+  const saveCheckoutForm = useStore((s) => s.saveCheckoutForm);
   const baseURL = process.env.NEXT_PUBLIC_API_BASE_URL || "";
   const transactionRef = useStore((s) => s.transactionRef);
   const setReceiptData = useStore((s) => s.setReceiptData);
@@ -157,23 +120,39 @@ const DelieveryForm = ({
     if (isSuccess) setAddresses(data);
   }, [isSuccess, data]);
 
+  // Compte sans téléphone (phone: null) : champ vide
+  const userPhone = user?.phone?.slice(-9) ?? "";
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      // city: "yaounde",
       name: "",
       locality: "",
       district: "",
-      phoneNumber:
-        user?.phone.slice(user?.phone.length - 9, user?.phone.length) ?? "",
-      deliveryNumber:
-        user?.phone.slice(user?.phone.length - 9, user?.phone.length) ?? "",
+      phoneNumber: userPhone,
+      deliveryNumber: userPhone,
       operator: "ORANGE_CM",
-      time: `${String(new Date().getHours())}:${String(
-        new Date().getMinutes()
-      )}`,
-    },
+      // Saisie précédente (navigation vers une autre page puis retour)
+      ...Object.fromEntries(Object.entries(savedValues).filter(([k, v]) => v && k !== "time")),
+    } as z.infer<typeof formSchema>,
   });
+
+  // Conserver la saisie dans le store à chaque modification
+  useEffect(() => {
+    const subscription = form.watch((values) =>
+      saveCheckoutForm("delivery", values as Record<string, string | undefined>)
+    );
+    return () => subscription.unsubscribe();
+  }, [form, saveCheckoutForm]);
+
+  // Quartier restauré : recalculer la zone et les frais une fois les quartiers chargés
+  useEffect(() => {
+    const address = addresses.find((x) => x.quartier === form.getValues("district"));
+    if (!address) return;
+    setZoneId(address.id_delivery_zone);
+    setFees(ApplyDeliveryPromo(Number(address.price), address.quartier, cart));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [addresses]);
 
   const userQuery = new UserQuery();
   const setOpenLogSign = useStore((s) => s.setOpenLogSign);
@@ -315,20 +294,15 @@ const DelieveryForm = ({
   });
 
   function onSubmit(values: z.infer<typeof formSchema>) {
+    // Plus de choix d'heure pour la livraison à domicile : livraison dès que possible
     const dueDate = new Date();
-    dueDate.setHours(
-      Number(values.time.split(":")[0]),
-      Number(values.time.split(":")[1]),
-      0,
-      0
-    );
 
     const realFees = Number(
       addresses.find((x) => x.quartier === values.district)?.price ?? "0"
     );
     setFees(ApplyDeliveryPromo(realFees, values.district, cart));
 
-    if (!isDeliveryOpen(values.time)) {
+    if (!isDeliveryOpen(nowTimeValue())) {
       toast({
         title: "Livraison fermée.",
         description:
@@ -612,19 +586,6 @@ const DelieveryForm = ({
                 )}
               />
             )}
-
-            {/* Heure */}
-            <FormField
-              control={form.control}
-              name="time"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="customFormLabel">{"Heure"}</FormLabel>
-                  <Input type="time" {...field} />
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
 
             {/* Opérateur */}
             <FormField

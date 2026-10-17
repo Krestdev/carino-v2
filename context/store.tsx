@@ -1,8 +1,16 @@
 // @/context/store.js
 import { ApplyPromotions } from "@/components/universal/promotions";
-import { AuthUser, cartItem, ReceiptProps, User } from "@/types/types";
+import { AuthUser, cartItem, deliveryMode, ReceiptProps, User } from "@/types/types";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
+
+/** Saisie en cours des formulaires du panier, conservée entre les pages */
+export type CheckoutFormValues = Record<string, string | undefined>;
+export interface CheckoutForm {
+  mode: deliveryMode;
+  delivery: CheckoutFormValues;
+  takeaway: CheckoutFormValues;
+}
 
 export interface OptionProps {
   id: number;
@@ -20,6 +28,7 @@ type Store = {
   isHydrated: boolean;
   openLogSign: boolean;
   isAuthenticated: boolean;
+  checkoutForm: CheckoutForm;
 };
 
 type Actions = {
@@ -39,6 +48,8 @@ type Actions = {
   updateCartItem: (item_id: number, item: cartItem) => void;
   getToken: () => string | null;
   isTokenValid: () => boolean;
+  setCheckoutMode: (mode: deliveryMode) => void;
+  saveCheckoutForm: (kind: "delivery" | "takeaway", values: CheckoutFormValues) => void;
 };
 
 const initialState: Store = {
@@ -52,6 +63,7 @@ const initialState: Store = {
   isHydrated: false,
   openLogSign: false,
   isAuthenticated: false,
+  checkoutForm: { mode: "delivery", delivery: {}, takeaway: {} },
 };
 
 const useStore = create<Store & Actions>()(
@@ -183,6 +195,12 @@ const useStore = create<Store & Actions>()(
 
       setIsHydrated: (v) => set({ isHydrated: v }),
 
+      setCheckoutMode: (mode) =>
+        set({ checkoutForm: { ...get().checkoutForm, mode } }),
+
+      saveCheckoutForm: (kind, values) =>
+        set({ checkoutForm: { ...get().checkoutForm, [kind]: values } }),
+
       cartWithPromo: () => {
         const baseCart = get().cart;
         return ApplyPromotions(baseCart);
@@ -204,6 +222,7 @@ const useStore = create<Store & Actions>()(
         isAuthenticated: state.isAuthenticated,
         DeliveryFees: state.DeliveryFees,
         transactionRef: state.transactionRef,
+        checkoutForm: state.checkoutForm,
       }),
       onRehydrateStorage: () => (state, error) => {
         if (error) {

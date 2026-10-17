@@ -85,7 +85,12 @@ function Page() {
                     <Button type="submit" className='w-full max-w-[290px]' disabled={resetPassword.isPending}>{"Soumettre"}</Button>
                 </form>
             </Form>
-            <Dialog open={modalStatus} onOpenChange={() => setModalStatus(false)}>
+            <Dialog open={modalStatus} onOpenChange={(open) => {
+                if (open) return;
+                setModalStatus(false);
+                // Redirection après succès, quel que soit le moyen de fermer (croix, bouton, clic extérieur)
+                if (resetPassword.isSuccess) router.push("/");
+            }}>
                 <DialogContent>
                     <DialogHeader className={`text-white px-5 py-3 ${resetPassword.isSuccess ? "bg-green-600" : "bg-red-600"}`}>
                         <DialogTitle>{resetPassword.isSuccess ? "Opération réussie !" : "Echec !"}</DialogTitle>
@@ -94,7 +99,7 @@ function Page() {
                     <div className="px-4 pb-4 flex flex-col gap-5">
                         {resetPassword.isError && <p>{"Votre adresse mail ne figure pas dans la liste de nos utilisateurs enregistrés. Si vous ne disposez pas d'un compte, cliquez sur "}<Link href={"/inscription"} className='underline'>{"s'inscrire"}</Link></p>}
                         {resetPassword.isSuccess && <p>{"Un email a été envoyé à votre adresse mail muni d'un lien qui vous permettra de réinitialiser votre mot de passe."}</p>}
-                        <DialogClose asChild><Button variant={"outline"} onClick={() => resetPassword.isSuccess ? router.push("/") : null}>{"Fermer"}</Button></DialogClose>
+                        <DialogClose asChild><Button variant={"outline"} className="hidden md:inline-flex">{"Fermer"}</Button></DialogClose>
                     </div>
 
                 </DialogContent>

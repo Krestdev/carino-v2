@@ -1,4 +1,5 @@
 import useStore from "@/context/store";
+import { defaultOrderTime, isAtLeastOneHourLater, MIN_ORDER_DELAY_MESSAGE, ORDER_TIME_BOUNDS, TimeField } from "@/components/TimeField";
 import { CartTotal, cn, isDeliveryOpen } from "@/lib/utils";
 import { useAppContext } from "@/providers/appContext";
 import UserQuery from "@/queries/userQueries";
@@ -73,28 +74,9 @@ const formSchema = z
           message: `Uniquement entre ${process.env.NEXT_PUBLIC_OPENTIME || "11:00"
             } et ${process.env.NEXT_PUBLIC_CLOSETIME || "22:00"}`,
         }
-      ),
-  })
-  .refine(
-    (data) => {
-      const [hours, mins] = data.time.split(":");
-      const today = new Date();
-      if (
-        Number(hours) >= today.getHours() + 2 ||
-        (Number(hours) >= today.getHours() + 1 &&
-          Number(mins) >= today.getMinutes())
-      ) {
-        return true;
-      } else {
-        return false;
-      }
-    },
-    {
-      message:
-        "Veuillez définir une heure au moins une heure plus tard que l'heure actuelle",
-      path: ["time"],
-    }
-  );
+      )
+      .refine(isAtLeastOneHourLater, { message: MIN_ORDER_DELAY_MESSAGE }),
+  });
 
 const TakeawayForm = ({
   fees,
@@ -106,6 +88,8 @@ const TakeawayForm = ({
 }: OrderTypeProps & TakeawayProps & { cart: Array<cartItem> }) => {
   const router = useRouter();
   const { user, emptyCart } = useStore();
+  const savedValues = useStore((s) => s.checkoutForm.takeaway);
+  const saveCheckoutForm = useStore((s) => s.saveCheckoutForm);
   const setTransaction = useStore(s => s.setTransaction);
   const transactionRef = useStore(s => s.transactionRef);
   const setReceiptData = useStore(s => s.setReceiptData);
@@ -125,15 +109,23 @@ const TakeawayForm = ({
     defaultValues: {
       name: "",
       phoneNumber:
-        user?.phone.slice(user?.phone.length - 9, user?.phone.length) ?? "",
+        user?.phone?.slice(-9) ?? "",
       deliveryNumber:
-        user?.phone.slice(user?.phone.length - 9, user?.phone.length) ?? "",
+        user?.phone?.slice(-9) ?? "",
       operator: "ORANGE_CM",
-      time: `${String(new Date().getHours())}:${String(
-        new Date().getMinutes()
-      )}`,
-    },
+      time: defaultOrderTime(),
+      // Saisie précédente (navigation vers une autre page puis retour), sauf l'heure qui serait périmée
+      ...Object.fromEntries(Object.entries(savedValues).filter(([k, v]) => v && k !== "time")),
+    } as z.infer<typeof formSchema>,
   });
+
+  // Conserver la saisie dans le store à chaque modification
+  useEffect(() => {
+    const subscription = form.watch((values) =>
+      saveCheckoutForm("takeaway", values as Record<string, string | undefined>)
+    );
+    return () => subscription.unsubscribe();
+  }, [form, saveCheckoutForm]);
 
   const userQuery = new UserQuery();
 
@@ -456,12 +448,21 @@ const TakeawayForm = ({
             <FormField
               control={form.control}
               name="time"
-              render={({ field }) => (
+              render={({ field, fieldState }) => (
                 <FormItem>
                   <FormLabel className="customFormLabel text-[12px] md:text-[14px]">
                     {"Heure"}
                   </FormLabel>
-                  <Input type="time" {...field} />
+                  <TimeField
+                    value={field.value}
+                    onChange={(value) => {
+                      field.onChange(value);
+                      form.trigger("time");
+                    }}
+                    min={ORDER_TIME_BOUNDS.min}
+                    max={ORDER_TIME_BOUNDS.max}
+                    invalid={!!fieldState.error}
+                  />
                   <FormMessage />
                 </FormItem>
               )}

@@ -98,7 +98,7 @@ const LogSignDialog = ({
           </div>
 
           {/* Dialog Footer */}
-          <DialogFooter className="flex w-full justify-end">
+          <DialogFooter className="hidden md:flex w-full justify-end">
             <Button
               variant="outline"
               onClick={handleClose}

@@ -33,7 +33,7 @@ import { toast } from "../ui/use-toast";
 import { useAppContext } from "@/providers/appContext";
 import ReservationQuery from "@/queries/bookingsQuery";
 import { DatePicker } from "../ui/date-picker";
-import { TimePicker } from "../ui/time-picker";
+import { fromTimeValue, RESERVATION_TIME_BOUNDS, TimeField, toTimeValue } from "@/components/TimeField";
 import { User } from "@/types/types";
 
 const formSchema = z
@@ -183,7 +183,7 @@ const ReservationForm = () => {
                 {"se connecter"}
               </Button>
               <DialogClose asChild>
-                <Button variant={"destructive"}>{"Fermer"}</Button>
+                <Button variant={"destructive"} className="hidden md:inline-flex">{"Fermer"}</Button>
               </DialogClose>
             </div>
           </DialogContent>
@@ -197,7 +197,7 @@ const ReservationForm = () => {
               <DialogDescription>{`Votre réservation a été enregistrée avec succès, vous serez très prochainement contacté par nos services pour confirmer votre demande`}</DialogDescription>
             </DialogHeader>
             <DialogClose asChild>
-              <Button>{"Fermer"}</Button>
+              <Button className="hidden md:inline-flex">{"Fermer"}</Button>
             </DialogClose>
           </DialogContent>
         </Dialog>
@@ -259,14 +259,18 @@ const ReservationForm = () => {
               <FormField
                 control={form.control}
                 name="time"
-                render={({ field }) => (
+                render={({ field, fieldState }) => (
                   <FormItem>
                     <FormLabel>
                       {"Votre heure de réservation"}
                     </FormLabel>
-                    <FormControl>
-                      <TimePicker placeholder={"--:--"} value={field.value} onChangeValue={field.onChange} />
-                    </FormControl>
+                    <TimeField
+                      value={toTimeValue(field.value)}
+                      onChange={(value) => field.onChange(value ? fromTimeValue(value, field.value) : undefined)}
+                      min={RESERVATION_TIME_BOUNDS.min}
+                      max={RESERVATION_TIME_BOUNDS.max}
+                      invalid={!!fieldState.error}
+                    />
                     <FormMessage />
                   </FormItem>
                 )}

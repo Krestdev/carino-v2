@@ -30,6 +30,13 @@ const Categories = ({
     const category = categories.find((cat) => cat.categories.id === id);
     return totalProductPerTag.find((tag) => tag.category.id === id);
   };
+  // Nom affiché dans le sélecteur mobile : « Catégorie - <nom> »
+  const activeName =
+    activeTab === 0
+      ? "Tous les plats"
+      : categories.find((cat) => cat.categories.id === activeTab)?.categories.name ??
+        getCategory(activeTab)?.category.name ??
+        "";
 
   return (
     <div className="flex flex-col gap-3">
@@ -44,7 +51,9 @@ const Categories = ({
           onValueChange={(value) => setActiveTab(Number(value))}
         >
           <SelectTrigger className="w-full">
-            <SelectValue placeholder="Choisir une catégorie" />
+            <SelectValue placeholder="Choisir une catégorie">
+              {`Catégorie - ${activeName}`}
+            </SelectValue>
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="0">

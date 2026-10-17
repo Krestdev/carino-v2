@@ -74,7 +74,7 @@ const ViewOrderDialog = ({
           </DialogHeader>
           <div className="flex flex-col items-center justify-center py-12 gap-4">
             <p className="text-gray-500 text-sm text-center">Impossible de charger les détails de cette commande.</p>
-            <Button onClick={onClose} variant="secondary" className="text-white">
+            <Button onClick={onClose} variant="secondary" className="text-white hidden md:inline-flex">
               Fermer
             </Button>
           </div>
@@ -230,7 +230,7 @@ const ViewOrderDialog = ({
           )}
         </div>
 
-        <DialogFooter className="px-6 py-4 bg-gray-50 dark:bg-slate-900 rounded-b-lg border-t border-gray-150">
+        <DialogFooter className="hidden md:flex px-6 py-4 bg-gray-50 dark:bg-slate-900 rounded-b-lg border-t border-gray-150">
           <Button
             variant="secondary"
             onClick={onClose}
