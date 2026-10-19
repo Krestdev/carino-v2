@@ -144,7 +144,10 @@ export interface ReceiptProps {
   due_date?: Date;
   Address?: addressProps;
   client_name: string;
+  /** Vide pour un invité qui n'a pas donné d'email : seul le restaurant est alors notifié */
   client_mail: string;
+  client_phone?: string;
+  mode?: deliveryMode;
   loyalty: number;
 }
 

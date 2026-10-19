@@ -19,6 +19,7 @@ import {
   Retry,
 } from "@/types/types";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { sendOrderReceipt } from "@/lib/sendOrderReceipt";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { Check, ChevronsUpDown } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -69,6 +70,7 @@ interface DelieveryProps {
 
 const formSchema = z.object({
   name: z.string().optional(),
+  email: z.string().email({ message: "Adresse mail invalide" }).optional().or(z.literal("")),
   locality: z.string().min(3, { message: "Entrez une adresse valide" }),
   district: z.string().min(3, { message: "Selectionnez un quartier" }),
   phoneNumber: z.string().refine((value) => /^\d{9}$/.test(value), {
@@ -127,6 +129,7 @@ const DelieveryForm = ({
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: "",
+      email: "",
       locality: "",
       district: "",
       phoneNumber: userPhone,
@@ -168,6 +171,7 @@ const DelieveryForm = ({
   // n'oublie de le faire.
   function markPaymentSuccess() {
     setPaymentStatus("SUCCESS");
+    sendOrderReceipt();
     emptyCart();
   }
 
@@ -368,7 +372,9 @@ const DelieveryForm = ({
         zip_code: "237",
         city: "yaounde",
       },
-      client_mail: user?.email ?? "",
+      client_mail: user?.email ?? values.email?.trim() ?? "",
+      client_phone: values.deliveryNumber,
+      mode: "delivery",
     };
 
     if (user) {
@@ -579,6 +585,31 @@ const DelieveryForm = ({
                         {...field}
                         className="w-full"
                         placeholder="ex. Jean Dupont"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            )}
+
+            {/* Email - uniquement pour les invités : pour recevoir le reçu de commande */}
+            {!user && (
+              <FormField
+                control={form.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem className="flex flex-col gap-1 w-full">
+                    <FormLabel className="customFormLabel text-[12px] md:text-[14px]">
+                      {"Email (facultatif, pour recevoir votre reçu)"}
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        {...field}
+                        type="email"
+                        inputMode="email"
+                        className="w-full"
+                        placeholder="votre@email.com"
                       />
                     </FormControl>
                     <FormMessage />

@@ -5,6 +5,7 @@ import { useAppContext } from "@/providers/appContext";
 import UserQuery from "@/queries/userQueries";
 import { AuthUser, cartItem, deliveryMode, Order, OrderTypeProps, ReceiptProps, Retry } from "@/types/types";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { sendOrderReceipt } from "@/lib/sendOrderReceipt";
 import { useMutation } from "@tanstack/react-query";
 import { CalendarIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -48,6 +49,7 @@ interface TakeawayProps {
 const formSchema = z
   .object({
     name: z.string().optional(),
+    email: z.string().email({ message: "Adresse mail invalide" }).optional().or(z.literal("")),
     phoneNumber: z.string().refine((value) => /^\d{9}$/.test(value), {
       message: "Le numéro de téléphone doit comporter 9 chiffres",
     }),
@@ -108,6 +110,7 @@ const TakeawayForm = ({
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: "",
+      email: "",
       phoneNumber:
         user?.phone?.slice(-9) ?? "",
       deliveryNumber:
@@ -134,6 +137,7 @@ const TakeawayForm = ({
   // n'oublie de le faire.
   function markPaymentSuccess() {
     setPaymentStatus("SUCCESS");
+    sendOrderReceipt();
     emptyCart();
   }
 
@@ -311,7 +315,9 @@ const TakeawayForm = ({
       commande: cart,
       client_name: clientName,
       loyalty: user?.loyalty ?? 0,
-      client_mail: user?.email ?? "",
+      client_mail: user?.email ?? values.email?.trim() ?? "",
+      client_phone: values.deliveryNumber,
+      mode: "takeaway",
     };
 
     if (user) {
@@ -437,6 +443,31 @@ const TakeawayForm = ({
                         {...field}
                         className="w-full"
                         placeholder="ex. Jean Dupont"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            )}
+
+            {/* Email - uniquement pour les invités : pour recevoir le reçu de commande */}
+            {!user && (
+              <FormField
+                control={form.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem className="flex flex-col gap-1 w-full">
+                    <FormLabel className="customFormLabel text-[12px] md:text-[14px]">
+                      {"Email (facultatif, pour recevoir votre reçu)"}
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        {...field}
+                        type="email"
+                        inputMode="email"
+                        className="w-full"
+                        placeholder="votre@email.com"
                       />
                     </FormControl>
                     <FormMessage />
