@@ -28,8 +28,6 @@ const HistoryTable = ({ title, data, towns }: Props) => {
   const [selectedOrder, setSelectedOrder] = useState<OrdersData | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
 
-  const orders = new UserQuery();
-
   const handleViewOrder = (order: OrdersData) => {
     setSelectedOrder(order);
     setDialogOpen(true);
@@ -63,53 +61,10 @@ const HistoryTable = ({ title, data, towns }: Props) => {
               </TableCell>
             </TableRow>
           ) : (
-            data?.reverse().map((order, id) => {
-
-              const orderData = useQuery({
-                queryKey: ["order", order?.uuid],
-                queryFn: () => orders.getOne(order!.uuid!),
-                enabled: !!order?.uuid,
-              });
-
-              const currentOrder = orderData.data;
-
-              console.log(currentOrder);
-
-              return (
-                <TableRow key={id} className={`divide-x divide-gray-200 ${id % 2 === 0 ? "bg-gray-100" : ""}`}>
-                  <TableCell className={`font-medium text-center`}>
-                    {`Ref-${currentOrder?.uuid?.slice(0, 15)}...`}
-                  </TableCell>
-                  <TableCell>{
-                    currentOrder?.status === "PAID" || currentOrder?.status === "CONFIRMED" ?
-                      <div className="flex flex-row items-center gap-1">
-                        <div className="bg-green-600 h-2 w-2 rounded-full" />
-                        {"Payé"}
-                      </div>
-                      :
-                      <div className="flex flex-row items-center gap-1">
-                        <div className="bg-red-600 h-2 w-2 rounded-full" />
-                        {"Non payé"}
-                      </div>
-                  }
-                  </TableCell>
-                  <TableCell>{XAF.format(Number(order.total))}</TableCell>
-                  <TableCell>
-                    {formatRelative(order.registration, new Date(), { locale: fr })}
-                  </TableCell>
-                  <TableCell>
-                    <Button
-                      variant={"outline"}
-                      className="text-black border-[#848484]"
-                      onClick={() => handleViewOrder(order)}
-                    >
-                      <LuEye />
-                      {"voir"}
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              )
-            })
+            // Copie inversée : ne pas modifier la liste reçue en props à chaque rendu
+            [...(data ?? [])].reverse().map((order, id) => (
+              <OrderRow key={order.uuid ?? id} order={order} index={id} onView={handleViewOrder} />
+            ))
           )}
         </TableBody>
       </Table>
@@ -123,6 +78,56 @@ const HistoryTable = ({ title, data, towns }: Props) => {
         />
       )}
     </div>
+  );
+};
+
+/**
+ * Une ligne du tableau : composant à part pour que useQuery soit appelé au
+ * niveau d'un composant (et non dans une boucle, ce qui casse les règles des hooks).
+ */
+const OrderRow = ({ order, index, onView }: { order: OrdersData; index: number; onView: (order: OrdersData) => void }) => {
+  const orders = new UserQuery();
+  const orderData = useQuery({
+    queryKey: ["order", order?.uuid],
+    queryFn: () => orders.getOne(order!.uuid!),
+    enabled: !!order?.uuid,
+  });
+
+  const currentOrder = orderData.data;
+
+  return (
+    <TableRow className={`divide-x divide-gray-200 ${index % 2 === 0 ? "bg-gray-100" : ""}`}>
+      <TableCell className={`font-medium text-center`}>
+        {`Ref-${currentOrder?.uuid?.slice(0, 15)}...`}
+      </TableCell>
+      <TableCell>{
+        currentOrder?.status === "PAID" || currentOrder?.status === "CONFIRMED" ?
+          <div className="flex flex-row items-center gap-1">
+            <div className="bg-green-600 h-2 w-2 rounded-full" />
+            {"Payé"}
+          </div>
+          :
+          <div className="flex flex-row items-center gap-1">
+            <div className="bg-red-600 h-2 w-2 rounded-full" />
+            {"Non payé"}
+          </div>
+      }
+      </TableCell>
+      <TableCell>{XAF.format(Number(order.total))}</TableCell>
+      <TableCell>
+        {formatRelative(order.registration, new Date(), { locale: fr })}
+      </TableCell>
+      <TableCell>
+        <Button
+          variant={"outline"}
+          className="text-black border-[#848484]"
+          onClick={() => onView(order)}
+        >
+          <LuEye />
+          {"voir"}
+        </Button>
+      </TableCell>
+    </TableRow>
   );
 };
 

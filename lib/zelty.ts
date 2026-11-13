@@ -16,7 +16,7 @@ const transformPrices = (data: any): any => {
 
     const transformed: any = {};
     for (const key in data) {
-        let value = data[key];
+        const value = data[key];
         if (
             typeof value === "number" &&
             (key.toLowerCase().includes("price") ||

@@ -31,7 +31,7 @@ export interface cartItem {
   options: Array<cartItemOption>;
   price: number;
   image: string;
-  tags: Array<Number>;
+  tags: Array<number>;
   originalPrice?: number;
 }
 export interface cartItemOption {
