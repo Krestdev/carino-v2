@@ -6,7 +6,7 @@ import {
   TimePickerInput,
   type TimePickerI18nOverrides,
 } from "@/components/reui/time-picker";
-import { cn } from "@/lib/utils";
+import { cn, OPENING_HOURS } from "@/lib/utils";
 
 const FR: TimePickerI18nOverrides = {
   labels: {
@@ -72,9 +72,9 @@ export const defaultOrderTime = () => {
 
 /** Bornes des commandes, alignées sur la validation (heure ≥ ouverture et < heure de fermeture) */
 export const ORDER_TIME_BOUNDS = (() => {
-  const open = Number((process.env.NEXT_PUBLIC_OPENTIME || "11:00").split(":")[0]);
-  const close = Number((process.env.NEXT_PUBLIC_CLOSETIME || "22:00").split(":")[0]);
-  return { min: `${pad(open)}:00`, max: `${pad(close - 1)}:55` };
+  const [openH, openM] = OPENING_HOURS.open.split(":").map(Number);
+  const close = Number(OPENING_HOURS.close.split(":")[0]);
+  return { min: `${pad(openH)}:${pad(openM || 0)}`, max: `${pad(close - 1)}:55` };
 })();
 
 /** Réservations : de midi à 21h (dernière heure acceptée par la validation) */

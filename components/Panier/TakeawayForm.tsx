@@ -1,6 +1,6 @@
 import useStore from "@/context/store";
 import { defaultOrderTime, isAtLeastOneHourLater, MIN_ORDER_DELAY_MESSAGE, ORDER_TIME_BOUNDS, TimeField } from "@/components/TimeField";
-import { CartTotal, cn, isDeliveryOpen } from "@/lib/utils";
+import { CartTotal, cn, isDeliveryOpen, OPENING_HOURS, openingHoursLabel } from "@/lib/utils";
 import { useAppContext } from "@/providers/appContext";
 import UserQuery from "@/queries/userQueries";
 import { AuthUser, cartItem, deliveryMode, Order, OrderTypeProps, ReceiptProps, Retry } from "@/types/types";
@@ -63,18 +63,15 @@ const formSchema = z
       .refine(
         (value) => {
           const time = value.split(":");
-          const open = (process.env.NEXT_PUBLIC_OPENTIME || "11:00").split(":");
-          const close = (process.env.NEXT_PUBLIC_CLOSETIME || "22:00").split(
-            ":"
-          );
+          const open = OPENING_HOURS.open.split(":");
+          const close = OPENING_HOURS.close.split(":");
           return (
             Number(time[0]) >= Number(open[0]) &&
             Number(time[0]) < Number(close[0])
           );
         },
         {
-          message: `Uniquement entre ${process.env.NEXT_PUBLIC_OPENTIME || "11:00"
-            } et ${process.env.NEXT_PUBLIC_CLOSETIME || "22:00"}`,
+          message: `Uniquement ${openingHoursLabel()}`,
         }
       )
       .refine(isAtLeastOneHourLater, { message: MIN_ORDER_DELAY_MESSAGE }),
@@ -274,7 +271,7 @@ const TakeawayForm = ({
       toast({
         title: "Livraison fermée.",
         description:
-          "La livraison est disponible uniquement entre 10h30 et 20h30.",
+          `La livraison est disponible uniquement ${openingHoursLabel()}.`,
         variant: "info",
       });
       return;

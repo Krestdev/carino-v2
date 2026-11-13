@@ -3,7 +3,7 @@
 import { ApplyDeliveryPromo } from "@/app/panier/fees-promotion";
 import useStore from "@/context/store";
 import { nowTimeValue } from "@/components/TimeField";
-import { CartTotal, cn, isDeliveryOpen, zoneLivraisons } from "@/lib/utils";
+import { CartTotal, cn, isDeliveryOpen, zoneLivraisons, openingHoursLabel } from "@/lib/utils";
 import { useAppContext } from "@/providers/appContext";
 import TownQuery from "@/queries/townQuery";
 import UserQuery from "@/queries/userQueries";
@@ -310,7 +310,7 @@ const DelieveryForm = ({
       toast({
         title: "Livraison fermée.",
         description:
-          "La livraison est disponible uniquement entre 10h30 et 20h30.",
+          `La livraison est disponible uniquement ${openingHoursLabel()}.`,
         variant: "info",
       });
       return;

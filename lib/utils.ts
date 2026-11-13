@@ -30,6 +30,22 @@ export function isPromotion(start: Date, end: Date) {
   return (maintenant >= start && maintenant <= end);
 }
 
+/** Horaires d'ouverture (commandes et livraison), lus dans .env ; 10h30 – 20h30 par défaut */
+export const OPENING_HOURS = {
+  open: process.env.NEXT_PUBLIC_OPENTIME || "10:30",
+  close: process.env.NEXT_PUBLIC_CLOSETIME || "20:30",
+};
+
+/** "10:30" → "10h30", "08:00" → "8h" */
+const toFrenchHour = (time: string) => {
+  const [h, m] = time.split(":").map(Number);
+  return `${h}h${m ? String(m).padStart(2, "0") : ""}`;
+};
+
+/** Ex. « entre 10h30 et 20h30 » */
+export const openingHoursLabel = () =>
+  `entre ${toFrenchHour(OPENING_HOURS.open)} et ${toFrenchHour(OPENING_HOURS.close)}`;
+
 export function isDeliveryOpen(currentDate: string): boolean {
 
   const [hours, minutes] = currentDate.split(":").map(Number);
@@ -38,8 +54,8 @@ export function isDeliveryOpen(currentDate: string): boolean {
   date.setHours(hours, minutes, 0, 0);
 
   // Get the current time in UTC and adjust for UTC+1
-  const startTime = process.env.NEXT_PUBLIC_OPENTIME || "10:30"
-  const endTime = process.env.NEXT_PUBLIC_CLOSETIME || "20:30"
+  const startTime = OPENING_HOURS.open
+  const endTime = OPENING_HOURS.close
 
   const utcHours = date.getUTCHours() + 1;
   const currentTime = utcHours * 100 + date.getUTCMinutes();
