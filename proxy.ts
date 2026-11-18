@@ -44,10 +44,6 @@ export function proxy(req: NextRequest) {
     }
   }
 
-  // =========================
-  // CORS
-  // =========================
-
   response.headers.set(
     "Access-Control-Allow-Origin",
     "*"
